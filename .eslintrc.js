@@ -6,9 +6,10 @@ module.exports = {
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
   extends: [
+    'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
+    'prettier',
     'prettier/@typescript-eslint',
-    'plugin:prettier/recommended',
   ],
   root: true,
   env: {
@@ -16,9 +17,25 @@ module.exports = {
     jest: true,
   },
   rules: {
-    '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/unified-signatures': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'warn',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { varsIgnorePattern: '^_', argsIgnorePattern: '^_' },
+    ],
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-namespace': 'off',
+    '@typescript-eslint/no-empty-function': 'warn',
+    '@typescript-eslint/naming-convention': [
+      'warn',
+      {
+        selector: 'interface',
+        format: ['PascalCase'],
+        custom: {
+          regex: '^I[A-Z]',
+          match: true,
+        },
+      },
+    ],
   },
 };
