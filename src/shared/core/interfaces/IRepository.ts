@@ -20,5 +20,5 @@ export interface IRepository<T> {
 
 export interface IRepositoryFactory<E, T extends IRepository<E>> {
   getOrmName(): string;
-  build(dbContext: unknown): T;
+  build(transaction: unknown): T;
 }
