@@ -87,7 +87,7 @@ export class CreateUserUseCase
       .and(appVersionOrError)
       .and(passwordOrError)
       .and(providerOrError);
-
+    console.log(combineResult.unwrapError().message);
     if (combineResult.isFailure)
       return left(
         (combineResult as unknown) as AppError.ValidationErrorResult<User>,
@@ -114,7 +114,7 @@ export class CreateUserUseCase
       const a = await unitOfWork.commit(() =>
         this.work(userOrErr.unwrap(), userRepo),
       );
-      this._logger.log(a);
+      console.log(JSON.stringify(a));
       return a;
     } catch (err) {
       return left(Result.Fail(new AppError.UnexpectedError(err)));
@@ -125,6 +125,9 @@ export class CreateUserUseCase
     user: User,
     userRepo: IUserRepository,
   ): Promise<CreateUserUseCaseResponse> {
+    const emailExist: boolean = await userRepo.existByEmail(user.email);
+    if (emailExist)
+      return left(Result.Fail(new UserErrors.EmailExistsError(user.email)));
     await userRepo.save(user);
     return right(Result.Ok(user));
   }

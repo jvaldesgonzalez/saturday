@@ -11,10 +11,10 @@ export class UsersController {
       fullname: 'adssdasd',
       username: 'dasdasdasd',
       profileImageUrl: 'dasdasdasdas',
-      email: 'aere@gmail.com',
+      email: 'aer@gmail.com',
       firebasePushId: 'dasdadas',
       appVersion: 1,
-      password: '21@fsdlk23ddas@WDEas',
+      password: '21@fsdlk23dda',
       provider: 'local',
       role: EnumRoles.Partner,
     });

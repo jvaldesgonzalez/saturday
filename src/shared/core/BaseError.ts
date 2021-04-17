@@ -8,8 +8,10 @@ type BaseErrorProps = {
 };
 
 export abstract class BaseError extends Error implements IResultError {
+  public readonly message: string;
   constructor({ name, message, context }: BaseErrorProps) {
     super(message);
+    this.message = message;
     Logger.error(`${message}`, null, context);
     Object.defineProperty(this, 'name', { value: name });
   }
