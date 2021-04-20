@@ -17,6 +17,6 @@ export class UserProvider extends ValueObject<UserProviderProps> {
   }
 
   public static create({ value }: UserProviderProps): Result<UserProvider> {
-    return Result.Ok(new UserProvider({ value }));
+    return Result.ok(new UserProvider({ value }));
   }
 }

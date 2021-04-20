@@ -13,6 +13,6 @@ export class UserProfileImg extends ValueObject<UserProfileImgProps> {
   }
 
   public static create({ value }: UserProfileImgProps): Result<UserProfileImg> {
-    return Result.Ok(new UserProfileImg({ value }));
+    return Result.ok(new UserProfileImg({ value }));
   }
 }

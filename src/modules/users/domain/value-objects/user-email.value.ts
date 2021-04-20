@@ -2,7 +2,6 @@ import { ValueObject } from 'src/shared/domain/value-object.abstract';
 import { IGuardResult } from 'src/shared/core/interfaces/IGuardResult';
 import { Guard } from 'src/shared/core/Guard';
 import { Result } from 'src/shared/core/Result';
-import { AppError } from 'src/shared/core/errors/AppError';
 
 type UserEmailProps = {
   value: string;
@@ -29,12 +28,9 @@ export class UserEmail extends ValueObject<UserEmailProps> {
       value,
       'email',
     );
-    if (!nullGuardResult.succeeded)
-      return Result.Fail(new AppError.ValidationError(nullGuardResult.message));
+    if (!nullGuardResult.succeeded) return Result.fail(nullGuardResult.message);
     if (!this.isValidEmail(value))
-      return Result.Fail(
-        new AppError.ValidationError(`email: ${value} isn't valid`),
-      );
-    return Result.Ok(new UserEmail({ value: this.format(value) }));
+      return Result.fail(`email: ${value} isn't valid`);
+    return Result.ok(new UserEmail({ value: this.format(value) }));
   }
 }

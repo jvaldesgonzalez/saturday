@@ -24,12 +24,9 @@ import {
   UserProvider,
 } from '../../domain/value-objects/user-auth-provider.value';
 import { EnumRoles } from 'src/shared/domain/roles.enum';
-import Optional from 'src/shared/core/Option';
 
 export type CreateUserUseCaseResponse = Either<
-  | AppError.ValidationErrorResult<User>
-  | AppError.UnexpectedErrorResult<User>
-  | UserErrors.EmailExistsErrorResult<User>,
+  AppError.UnexpectedError | UserErrors.EmailExistsError | Result<unknown>,
   Result<User>
 >;
 
@@ -79,31 +76,32 @@ export class CreateUserUseCase
     });
     const role = EnumRoles.Partner;
 
-    const combineResult = usernameOrError
-      .and(fullnameOrError)
-      .and(profileImageUrlOrError)
-      .and(emailOrError)
-      .and(firebasePushIdOrError)
-      .and(appVersionOrError)
-      .and(passwordOrError)
-      .and(providerOrError);
-    console.log(combineResult.unwrapError().message);
+    const combineResult = Result.combine([
+      usernameOrError,
+      fullnameOrError,
+      profileImageUrlOrError,
+      emailOrError,
+      firebasePushIdOrError,
+      appVersionOrError,
+      passwordOrError,
+      providerOrError,
+    ]);
     if (combineResult.isFailure)
-      return left(
-        (combineResult as unknown) as AppError.ValidationErrorResult<User>,
-      );
+      return left(Result.fail<void>(combineResult.error));
+
     const userOrErr: Result<User> = User.new({
-      username: usernameOrError.unwrap(),
-      fullname: fullnameOrError.unwrap(),
-      profileImageUrl: profileImageUrlOrError.unwrap(),
-      email: emailOrError.unwrap(),
-      firebasePushId: firebasePushIdOrError.unwrap(),
-      appVersion: appVersionOrError.unwrap(),
-      password: Optional(passwordOrError.unwrap()),
-      provider: providerOrError.unwrap(),
+      username: usernameOrError.getValue(),
+      fullname: fullnameOrError.getValue(),
+      profileImageUrl: profileImageUrlOrError.getValue(),
+      email: emailOrError.getValue(),
+      firebasePushId: firebasePushIdOrError.getValue(),
+      appVersion: appVersionOrError.getValue(),
+      password: passwordOrError.getValue(),
+      provider: providerOrError.getValue(),
       role,
     });
-    if (userOrErr.isFailure) return left(userOrErr);
+    if (userOrErr.isFailure)
+      return left(Result.fail<User>(userOrErr.error.toString()));
 
     try {
       const unitOfWork: IUnitOfWork = this._unitOfWorkFact.build();
@@ -111,13 +109,12 @@ export class CreateUserUseCase
       const userRepo: IUserRepository = unitOfWork.getRepository(
         this._repositoryFact,
       );
-      const a = await unitOfWork.commit(() =>
-        this.work(userOrErr.unwrap(), userRepo),
+      return await unitOfWork.commit(() =>
+        this.work(userOrErr.getValue(), userRepo),
       );
-      console.log(JSON.stringify(a));
-      return a;
     } catch (err) {
-      return left(Result.Fail(new AppError.UnexpectedError(err)));
+      console.log(err);
+      return left(new AppError.UnexpectedError());
     }
   }
 
@@ -126,9 +123,8 @@ export class CreateUserUseCase
     userRepo: IUserRepository,
   ): Promise<CreateUserUseCaseResponse> {
     const emailExist: boolean = await userRepo.existByEmail(user.email);
-    if (emailExist)
-      return left(Result.Fail(new UserErrors.EmailExistsError(user.email)));
+    if (emailExist) return left(new UserErrors.EmailExistsError(user.email));
     await userRepo.save(user);
-    return right(Result.Ok(user));
+    return right(Result.ok(user));
   }
 }

@@ -1,5 +1,5 @@
-export interface Identifier {
-  equals<T extends Identifier>(id?: T): boolean;
+export interface IIdentifier {
+  equals<T extends IIdentifier>(id?: T): boolean;
   toString(): string;
 }
 
@@ -8,7 +8,7 @@ export abstract class BaseIdentifier<T> {
     this.value = value;
   }
 
-  equals(id?: Identifier): boolean {
+  equals(id?: IIdentifier): boolean {
     if (id === null || id === undefined) return false;
     if (!(id instanceof this.constructor)) return false;
     return id.toString() === this.toString();

@@ -1,5 +1,5 @@
 import { Result } from '../Result';
-import { BaseError } from '../BaseError';
+import { UseCaseError } from '../UseCaseError';
 
 /**
  * @desc General application errors (few of these as possible)
@@ -7,40 +7,20 @@ import { BaseError } from '../BaseError';
  */
 export namespace AppError {
   const _context = 'AppError';
-  export class UnexpectedError extends BaseError {
+  export class UnexpectedError extends Result<UseCaseError> {
     private readonly _brand?: UnexpectedError;
-    public constructor(error?: Error) {
-      super({
-        name: 'UnexpectedError',
-        message: error
-          ? `An unexpected error occurred: ${error.message}`
-          : 'An unexpected error occurred.',
-        context: _context,
-      });
-    }
-  }
-
-  export type UnexpectedErrorResult<T> = Result<T, UnexpectedError>;
-
-  export class TransactionalError extends BaseError {
-    private readonly _brand?: TransactionalError;
     public constructor() {
-      super({
-        name: 'TransactionalError',
-        message: `A transactional error has ocurred`,
+      super(false, {
+        message: `An unexpected error occurred.`,
         context: _context,
-      });
+      } as UseCaseError);
     }
   }
 
-  export type TransactionalErrorResult<T> = Result<T, ValidationError>;
-
-  export class ValidationError extends BaseError {
+  export class ValidationError extends Result<UseCaseError> {
     private readonly _brand?: ValidationError;
     public constructor(message: string) {
-      super({ name: 'ValidationError', message, context: _context });
+      super(false, { message, context: _context } as UseCaseError);
     }
   }
-
-  export type ValidationErrorResult<T> = Result<T, ValidationError>;
 }

@@ -1,4 +1,3 @@
-import { AppError } from 'src/shared/core/errors/AppError';
 import { Guard } from 'src/shared/core/Guard';
 import { Result } from 'src/shared/core/Result';
 import { ValueObject } from 'src/shared/domain/value-object.abstract';
@@ -17,16 +16,14 @@ export class Username extends ValueObject<UsernameProps> {
 
   public static create({ value }: UsernameProps): Result<Username> {
     const nullGuardResult = Guard.againstNullOrUndefined(value, 'name');
-    if (!nullGuardResult.succeeded)
-      return Result.Fail(new AppError.ValidationError(nullGuardResult.message));
+    if (!nullGuardResult.succeeded) return Result.fail(nullGuardResult.message);
     const minGuardResult = Guard.againstAtLeast({
       numChars: this.minLength,
       argument: value,
       argumentPath: 'name',
     });
-    if (!minGuardResult.succeeded)
-      return Result.Fail(new AppError.ValidationError(minGuardResult.message));
+    if (!minGuardResult.succeeded) return Result.fail(minGuardResult.message);
 
-    return Result.Ok(new Username({ value }));
+    return Result.ok(new Username({ value }));
   }
 }

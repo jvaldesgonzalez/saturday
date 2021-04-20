@@ -11,6 +11,6 @@ export class FirebasePushId extends ValueObject<FirebasePushIdProps> {
   }
 
   public static create({ value }: FirebasePushIdProps): Result<FirebasePushId> {
-    return Result.Ok(new FirebasePushId({ value }));
+    return Result.ok(new FirebasePushId({ value }));
   }
 }

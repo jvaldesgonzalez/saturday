@@ -1,4 +1,3 @@
-import Optional from 'src/shared/core/Option';
 import { DomainEntity } from 'src/shared/domain/entity.abstract';
 import { Version } from 'src/shared/domain/version.value-object';
 import { UserProvider } from '../value-objects/user-auth-provider.value';
@@ -8,14 +7,12 @@ import { UserFullname } from '../value-objects/user-fullname.value';
 import { UserPassword } from '../value-objects/user-password.value';
 import { UserProfileImg } from '../value-objects/user-profile-img.value';
 import { Username } from '../value-objects/username.value';
-import { UserErrors } from '../errors/user.errors';
 import { Result } from 'src/shared/core/Result';
 import { JWTClaims, JWTToken } from '../value-objects/token.value';
 import { EnumRoles } from 'src/shared/domain/roles.enum';
 import * as jwt from 'jsonwebtoken';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { Guard, GuardArgumentCollection } from 'src/shared/core/Guard';
-import { AppError } from 'src/shared/core/errors/AppError';
 
 type UserProps = {
   fullname: UserFullname;
@@ -24,7 +21,7 @@ type UserProps = {
   email: UserEmail;
   firebasePushId: FirebasePushId;
   appVersion: Version;
-  password: Optional<UserPassword>;
+  password: UserPassword | undefined;
   provider: UserProvider;
   isActive: boolean;
   createdAt: Date;
@@ -65,8 +62,9 @@ export class User extends DomainEntity<UserProps> {
     return this.props.email;
   }
 
-  public get password(): Optional<UserPassword> {
-    return this.props.password;
+  public get password(): UserPassword {
+    if (this.props.password) return this.props.password;
+    return undefined;
   }
 
   get createdAt(): Date {
@@ -105,23 +103,13 @@ export class User extends DomainEntity<UserProps> {
     this.props.updatedAt = new Date();
   }
 
-  async changePassword(
-    lastPasswordPlain: string,
-    newPassword: UserPassword,
-  ): Promise<UserErrors.WrongPasswordResult<void>> {
-    const passwordMatches = await this.props.password.mapOrAsync(
-      false,
-      (pass) => pass.compareWith(lastPasswordPlain),
-    );
-    if (!passwordMatches) return Result.Fail(new UserErrors.WrongPassword());
-
-    this.props.password = Optional(newPassword);
+  changePassword(newPassword: UserPassword): void {
+    this.props.password = newPassword;
     this.props.updatedAt = new Date();
-    return Result.Ok();
   }
 
   resetPassword(newPassword: UserPassword): void {
-    this.props.password = Optional(newPassword);
+    this.props.password = newPassword;
     this.props.updatedAt = new Date();
   }
 
@@ -130,17 +118,7 @@ export class User extends DomainEntity<UserProps> {
     this.props.isActive = false;
   }
 
-  async comparePassword(plainPassword: string): Promise<boolean> {
-    return await this.props.password.mapOrAsync(false, (pass) =>
-      pass.compareWith(plainPassword),
-    );
-  }
-
-  async getUserToken(
-    plainPassword: string,
-  ): Promise<Result<JWTToken, UserErrors.WrongPassword>> {
-    const passwordMatches = await this.comparePassword(plainPassword);
-    if (!passwordMatches) return Result.Fail(new UserErrors.WrongPassword());
+  getUserToken(): JWTToken {
     const jwtClaims: JWTClaims = {
       id: this._id.toString(),
       role: this.role,
@@ -151,7 +129,7 @@ export class User extends DomainEntity<UserProps> {
     const token = jwt.sign(jwtClaims, process.env.JWT_SECRET ?? 'test-secret', {
       expiresIn: process.env.JWT_EXPIRATION ?? 86400,
     });
-    return Result.Ok(token);
+    return token;
   }
 
   public static new(props: NewUserProps): Result<User> {
@@ -180,8 +158,7 @@ export class User extends DomainEntity<UserProps> {
       },
     ];
     const nullGuard = Guard.againstNullOrUndefinedBulk(args);
-    if (!nullGuard.succeeded)
-      return Result.Fail(new AppError.ValidationError(nullGuard.message));
-    return Result.Ok(new User(props, id));
+    if (!nullGuard.succeeded) return Result.fail(nullGuard.message);
+    return Result.ok(new User(props, id));
   }
 }

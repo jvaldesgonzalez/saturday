@@ -1,59 +1,45 @@
-import { BaseError } from 'src/shared/core/BaseError';
+import { IUseCaseError } from 'src/shared/core/interfaces/IUseCaseError';
 import { Result } from 'src/shared/core/Result';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { UserEmail } from '../value-objects/user-email.value';
+import { Username } from '../value-objects/username.value';
 
 export namespace UserErrors {
   const _context = 'UserError';
-  export class UserDoesntExists extends BaseError {
+  export class UserDoesntExists extends Result<IUseCaseError> {
     readonly message: string;
     constructor(id: UniqueEntityID) {
-      super({
-        name: 'UserDoesntExist',
+      super(false, {
         message: `Doesn't exist user with id ${id.toString()}`,
         context: _context,
       });
     }
   }
-
-  export type UserDoesntExistsResult<T> = Result<T, UserDoesntExists>;
-
-  export class UserWithEmailDoesNotExist extends BaseError {
+  export class UserWithEmailOrUsernameDoesNotExist extends Result<IUseCaseError> {
     readonly message: string;
-    constructor(email: UserEmail) {
-      super({
-        name: 'UserWithEmailDoesNotExist',
-        message: `Doesn't exist user with email ${email.value}`,
+    constructor(emailOrUsername: UserEmail | Username) {
+      super(false, {
+        message: `Doesn't exist user with email ${emailOrUsername.value}`,
         context: _context,
       });
     }
   }
 
-  export type UserWithEmailDoesNotExistResult<T> = Result<
-    T,
-    UserWithEmailDoesNotExist
-  >;
-
-  export class WrongPassword extends BaseError {
+  export class WrongPassword extends Result<IUseCaseError> {
     constructor() {
-      super({
-        name: 'WrongPassword',
+      super(false, {
         message: `Wrong user password`,
         context: _context,
       });
     }
   }
 
-  export type WrongPasswordResult<T> = Result<T, WrongPassword>;
-
-  export class EmailExistsError extends BaseError {
+  export class EmailExistsError extends Result<IUseCaseError> {
     constructor(email: UserEmail) {
-      super({
-        name: 'EmailExistError',
+      super(false, {
         message: `User with email '${email.value}' already exist`,
         context: _context,
       });
     }
   }
-  export type EmailExistsErrorResult<T> = Result<T, EmailExistsError>;
 }

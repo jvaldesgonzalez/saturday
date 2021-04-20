@@ -1,5 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Driver, Session, Transaction } from 'neo4j-driver';
+import {
+  InjectPersistenceManager,
+  PersistenceManager,
+  Transactional,
+} from '@liberation-data/drivine';
+import { Injectable } from '@nestjs/common';
 import {
   IRepository,
   IRepositoryFactory,
@@ -9,17 +13,15 @@ import { OrmName } from '../enums/orm-names.enum';
 
 @Injectable()
 export class Neo4jUnitOfWork implements IUnitOfWork {
-  private readonly dbDriver: Driver;
-  private session: Session;
-  private transaction: Transaction;
-
-  constructor(@Inject('NEO4J_DRIVER') dbDriver: Driver) {
-    this.dbDriver = dbDriver;
-    this.session = dbDriver.session();
+  private started: boolean;
+  constructor(
+    @InjectPersistenceManager() readonly persistenceManager: PersistenceManager,
+  ) {
+    this.started = false;
   }
 
   public getOrmName(): string {
-    return OrmName.NEO4J_DRIVER;
+    return OrmName.NEO4J_DRIVINE;
   }
 
   public getRepository<E, T extends IRepository<E>>(
@@ -30,28 +32,19 @@ export class Neo4jUnitOfWork implements IUnitOfWork {
         throw new Error(
           `ORM type ${this.getOrmName()} is not compatible with ${F.getOrmName()}`,
         );
-      case !this.transaction:
+      case !this.started:
         throw new Error('Transaction must be started');
-      case !this.transaction.isOpen():
-        throw new Error('Transaction must be open');
       default:
-        return F.build(this.transaction);
+        return F.build(this.persistenceManager);
     }
   }
 
   public start(): void {
-    this.transaction = this.session.beginTransaction();
+    this.started = true;
   }
 
+  @Transactional()
   async commit<T>(work: () => Promise<T> | T): Promise<T> {
-    try {
-      const result = await work();
-      await this.transaction.commit();
-      return result;
-    } catch (error) {
-      await this.transaction.rollback();
-    } finally {
-      await this.session.close();
-    }
+    return await work();
   }
 }

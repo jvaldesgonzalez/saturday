@@ -1,14 +1,14 @@
 import { AggregateRoot } from '@nestjs/cqrs';
 import { IEntity, BaseProps } from '../core/interfaces/IEntity';
-import { Identifier } from './Identifier';
+import { IIdentifier } from './Identifier';
 
 export abstract class AggregateDomainEntity<TProps extends BaseProps>
   extends AggregateRoot
   implements IEntity {
-  public readonly _id: Identifier;
+  public readonly _id: IIdentifier;
   protected readonly props: TProps;
 
-  protected constructor(props: TProps, id: Identifier) {
+  protected constructor(props: TProps, id: IIdentifier) {
     super();
     this._id = id;
     this.props = props;

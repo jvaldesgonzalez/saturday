@@ -2,7 +2,6 @@ import { ValueObject } from 'src/shared/domain/value-object.abstract';
 import { IGuardResult } from 'src/shared/core/interfaces/IGuardResult';
 import { Guard } from 'src/shared/core/Guard';
 import { Result } from 'src/shared/core/Result';
-import { AppError } from 'src/shared/core/errors/AppError';
 import * as bcrypt from 'bcrypt';
 
 type UserPasswordProps = {
@@ -47,22 +46,18 @@ export class UserPassword extends ValueObject<UserPasswordProps> {
       value,
       'password',
     );
-    if (!nullGuardResult.succeeded)
-      return Result.Fail(new AppError.ValidationError(nullGuardResult.message));
+    if (!nullGuardResult.succeeded) return Result.fail(nullGuardResult.message);
 
     const minGuardResult = Guard.againstAtLeast({
       numChars: this.minLength,
       argument: value,
       argumentPath: 'password',
     });
-    if (!minGuardResult.succeeded)
-      return Result.Fail(new AppError.ValidationError(minGuardResult.message));
+    if (!minGuardResult.succeeded) return Result.fail(minGuardResult.message);
 
     if (!this.isNotSimple(value))
-      return Result.Fail(
-        new AppError.ValidationError(`password: ${value} isn't complex`),
-      );
-    return Result.Ok(new UserPassword({ value, isHashed: false }));
+      return Result.fail(`password: ${value} isn't complex`);
+    return Result.ok(new UserPassword({ value, isHashed: false }));
   }
 
   public static async createFromPlain({
@@ -72,23 +67,19 @@ export class UserPassword extends ValueObject<UserPasswordProps> {
       value,
       'password',
     );
-    if (!nullGuardResult.succeeded)
-      return Result.Fail(new AppError.ValidationError(nullGuardResult.message));
+    if (!nullGuardResult.succeeded) return Result.fail(nullGuardResult.message);
 
     const minGuardResult = Guard.againstAtLeast({
       numChars: this.minLength,
       argument: value,
       argumentPath: 'password',
     });
-    if (!minGuardResult.succeeded)
-      return Result.Fail(new AppError.ValidationError(minGuardResult.message));
+    if (!minGuardResult.succeeded) return Result.fail(minGuardResult.message);
 
     if (!this.isNotSimple(value))
-      return Result.Fail(
-        new AppError.ValidationError(`password: ${value} isn't complex`),
-      );
+      return Result.fail(`password: ${value} isn't complex`);
 
     value = await this.hashPassword(value);
-    return Result.Ok(new UserPassword({ value, isHashed: true }));
+    return Result.ok(new UserPassword({ value, isHashed: true }));
   }
 }

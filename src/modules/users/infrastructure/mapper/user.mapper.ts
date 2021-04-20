@@ -1,4 +1,4 @@
-import Optional from 'src/shared/core/Option';
+import { Result } from 'src/shared/core/Result';
 import { EnumRoles } from 'src/shared/domain/roles.enum';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { Version } from 'src/shared/domain/version.value-object';
@@ -30,36 +30,39 @@ export class UserMapper {
     const providerOrError = UserProvider.create({
       value: p.provider as AuthProvider,
     });
-    const passwordOrNone: Optional<UserPassword> = p.password
-      ? Optional(UserPassword.create({ value: p.password, isHashed: true }))
-      : Optional(null);
+    const passwordOrError = UserPassword.create({
+      value: p.password,
+      isHashed: true,
+    });
 
-    const combinedResult = fullnameOrError
-      .and(usernameOrError)
-      .and(profileImageUrlOrError)
-      .and(firebasePushIdOrError)
-      .and(providerOrError)
-      .and(appVersionOrError);
+    const combinedResult = Result.combine([
+      fullnameOrError,
+      usernameOrError,
+      profileImageUrlOrError,
+      firebasePushIdOrError,
+      providerOrError,
+      appVersionOrError,
+    ]);
 
-    if (!combinedResult.isSuccess) combinedResult.unwrapError().throw();
+    if (!combinedResult.isSuccess) throw combinedResult.errorValue();
 
     return User.create(
       {
-        fullname: fullnameOrError.unwrap(),
-        username: usernameOrError.unwrap(),
-        profileImageUrl: profileImageUrlOrError.unwrap(),
-        email: emailOrError.unwrap(),
-        firebasePushId: firebasePushIdOrError.unwrap(),
-        appVersion: appVersionOrError.unwrap(),
-        password: passwordOrNone,
-        provider: providerOrError.unwrap(),
+        fullname: fullnameOrError.getValue(),
+        username: usernameOrError.getValue(),
+        profileImageUrl: profileImageUrlOrError.getValue(),
+        email: emailOrError.getValue(),
+        firebasePushId: firebasePushIdOrError.getValue(),
+        appVersion: appVersionOrError.getValue(),
+        password: passwordOrError.getValue(),
+        provider: providerOrError.getValue(),
         isActive: p.isActive,
         createdAt: new Date(p.createdAt),
         updatedAt: new Date(p.updatedAt),
         role: p.role as EnumRoles,
       },
       new UniqueEntityID(p.id),
-    ).unwrap();
+    ).getValue();
   }
 
   public static DomainToPersistent(d: User): UserEntity {
@@ -71,7 +74,7 @@ export class UserMapper {
       email: d.email.value,
       firebasePushId: d.firebasePushId.value,
       appVersion: d.appVersion.value,
-      password: d.password.mapOr(null, (pass) => pass.value),
+      password: d.password ? d.password.value : null,
       provider: d.provider.value,
       isActive: d.isActive,
       createdAt: d.createdAt.toISOString(),
