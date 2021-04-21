@@ -16,7 +16,7 @@ export class UserProvider extends ValueObject<UserProviderProps> {
     return this.props.value;
   }
 
-  public static create({ value }: UserProviderProps): Result<UserProvider> {
+  public static create(value: AuthProvider): Result<UserProvider> {
     return Result.ok(new UserProvider({ value }));
   }
 }

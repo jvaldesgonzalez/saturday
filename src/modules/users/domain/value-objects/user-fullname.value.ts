@@ -16,7 +16,7 @@ export class UserFullname extends ValueObject<UserFullnameProps> {
     return this.props.value;
   }
 
-  public static create({ value }: UserFullnameProps): Result<UserFullname> {
+  public static create(value: string): Result<UserFullname> {
     const nullGuardResult: IGuardResult = Guard.againstNullOrUndefined(
       value,
       'lastname',

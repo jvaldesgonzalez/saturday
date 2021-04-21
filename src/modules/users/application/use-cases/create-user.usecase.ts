@@ -45,35 +45,18 @@ export class CreateUserUseCase
 
   async execute(request: CreateUserDto): Promise<CreateUserUseCaseResponse> {
     this._logger.log('Executing...');
-    const usernameOrError: Result<Username> = Username.create({
-      value: request.username,
-    });
-    const fullnameOrError: Result<UserFullname> = UserFullname.create({
-      value: request.fullname,
-    });
-    const profileImageUrlOrError: Result<UserProfileImg> = UserProfileImg.create(
-      {
-        value: request.profileImageUrl,
-      },
+    const usernameOrError = Username.create(request.username);
+    const fullnameOrError = UserFullname.create(request.fullname);
+    const profileImageUrlOrError = UserProfileImg.create(
+      request.profileImageUrl,
     );
-    const emailOrError: Result<UserEmail> = UserEmail.create({
-      value: request.email,
+    const emailOrError = UserEmail.create(request.email);
+    const firebasePushIdOrError = FirebasePushId.create(request.firebasePushId);
+    const appVersionOrError = Version.create(request.appVersion);
+    const passwordOrError = UserPassword.create({
+      value: request.password,
     });
-    const firebasePushIdOrError: Result<FirebasePushId> = FirebasePushId.create(
-      { value: request.firebasePushId },
-    );
-    const appVersionOrError: Result<Version> = Version.create({
-      value: request.appVersion,
-    });
-    const passwordOrError: Result<UserPassword> = await UserPassword.createFromPlain(
-      {
-        value: request.password,
-        isHashed: false,
-      },
-    );
-    const providerOrError: Result<UserProvider> = UserProvider.create({
-      value: AuthProvider.Local,
-    });
+    const providerOrError = UserProvider.create(AuthProvider.Local);
     const role = EnumRoles.Partner;
 
     const combineResult = Result.combine([

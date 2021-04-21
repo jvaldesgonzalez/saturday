@@ -12,7 +12,7 @@ export class UserProfileImg extends ValueObject<UserProfileImgProps> {
     return this.props.value;
   }
 
-  public static create({ value }: UserProfileImgProps): Result<UserProfileImg> {
+  public static create(value: string): Result<UserProfileImg> {
     return Result.ok(new UserProfileImg({ value }));
   }
 }

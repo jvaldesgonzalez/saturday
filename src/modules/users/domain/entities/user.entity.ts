@@ -21,7 +21,7 @@ type UserProps = {
   email: UserEmail;
   firebasePushId: FirebasePushId;
   appVersion: Version;
-  password: UserPassword | undefined;
+  password?: UserPassword;
   provider: UserProvider;
   isActive: boolean;
   createdAt: Date;

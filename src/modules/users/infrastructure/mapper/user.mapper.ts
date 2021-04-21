@@ -17,23 +17,14 @@ import { UserEntity } from '../entities/user.entity';
 
 export class UserMapper {
   public static PersistentToDomain(p: UserEntity): User {
-    const fullnameOrError = UserFullname.create({ value: p.fullname });
-    const usernameOrError = Username.create({ value: p.username });
-    const profileImageUrlOrError = UserProfileImg.create({
-      value: p.profileImageUrl,
-    });
-    const emailOrError = UserEmail.create({ value: p.email });
-    const firebasePushIdOrError = FirebasePushId.create({
-      value: p.firebasePushId,
-    });
-    const appVersionOrError = Version.create({ value: p.appVersion });
-    const providerOrError = UserProvider.create({
-      value: p.provider as AuthProvider,
-    });
-    const passwordOrError = UserPassword.create({
-      value: p.password,
-      isHashed: true,
-    });
+    const fullnameOrError = UserFullname.create(p.fullname);
+    const usernameOrError = Username.create(p.username);
+    const profileImageUrlOrError = UserProfileImg.create(p.profileImageUrl);
+    const emailOrError = UserEmail.create(p.email);
+    const firebasePushIdOrError = FirebasePushId.create(p.firebasePushId);
+    const appVersionOrError = Version.create(p.appVersion);
+    const providerOrError = UserProvider.create(p.provider as AuthProvider);
+    const passwordOrError = UserPassword.create({ value: p.password });
 
     const combinedResult = Result.combine([
       fullnameOrError,

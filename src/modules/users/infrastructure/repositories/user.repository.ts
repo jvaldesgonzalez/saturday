@@ -1,6 +1,7 @@
 import {
   InjectPersistenceManager,
   PersistenceManager,
+  QuerySpecification,
 } from '@liberation-data/drivine';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
 import { User } from '../../domain/entities/user.entity';
@@ -26,10 +27,31 @@ export class UserRepository
   public async findOneByEmailOrUsername(
     emailOrUsername: UserEmail | Username,
   ): Promise<User> {
-    return null;
+    const res = await this.persistenceManager.maybeGetOne<UserEntity>(
+      QuerySpecification.withStatement(
+        `
+      MATCH (u:User)
+      WHERE u.email = $value OR e.username = $value
+      RETURN u`,
+      )
+        .bind({ value: emailOrUsername.value })
+        .transform(UserEntity),
+    );
+    return res ? UserMapper.PersistentToDomain(res) : null;
   }
 
   public async existByEmail(email: UserEmail): Promise<boolean> {
-    return true;
+    const res = await this.persistenceManager.maybeGetOne<UserEntity>(
+      QuerySpecification.withStatement(
+        `MATCH (u:User)
+      WHERE u.email = $email
+      RETURN u`,
+      )
+        .bind({
+          email: email.value,
+        })
+        .transform(UserEntity),
+    );
+    return !!res ? true : false;
   }
 }

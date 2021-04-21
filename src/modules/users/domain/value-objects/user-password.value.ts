@@ -1,12 +1,11 @@
 import { ValueObject } from 'src/shared/domain/value-object.abstract';
-import { IGuardResult } from 'src/shared/core/interfaces/IGuardResult';
 import { Guard } from 'src/shared/core/Guard';
 import { Result } from 'src/shared/core/Result';
 import * as bcrypt from 'bcrypt';
 
 type UserPasswordProps = {
   value: string;
-  isHashed: boolean;
+  isHashed?: boolean;
 };
 
 export class UserPassword extends ValueObject<UserPasswordProps> {
@@ -17,69 +16,71 @@ export class UserPassword extends ValueObject<UserPasswordProps> {
     return this.props.value;
   }
 
-  get isHashed(): boolean {
-    return this.props.isHashed;
+  private constructor(props: UserPasswordProps) {
+    super(props);
+  }
+
+  private static isAppropriateLength(password: string): boolean {
+    return password.length >= this.minLength;
   }
 
   /**
-   * Compares as plain-text and hashed password.
-   *
-   * @param {string} plainTextPassword
-   * @returns  {Promise<boolean>}
-   * @memberof UserPassword
+   * @method comparePassword
+   * @desc Compares as plain-text and hashed password.
    */
-  async compareWith(plainTextPassword: string): Promise<boolean> {
-    return bcrypt.compare(plainTextPassword, this.props.value);
+
+  public async comparePassword(plainTextPassword: string): Promise<boolean> {
+    let hashed: string;
+    if (this.isAlreadyHashed()) {
+      hashed = this.props.value;
+      return this.bcryptCompare(plainTextPassword, hashed);
+    } else {
+      return this.props.value === plainTextPassword;
+    }
   }
 
-  private static async hashPassword(plainPassword: string): Promise<string> {
-    return bcrypt.hash(plainPassword, 10);
-  }
-
-  private static isNotSimple(password: string): boolean {
-    const re = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[A-Za-z\d].{8,}/;
-    return re.test(password);
-  }
-
-  public static create({ value }: UserPasswordProps): Result<UserPassword> {
-    const nullGuardResult: IGuardResult = Guard.againstNullOrUndefined(
-      value,
-      'password',
-    );
-    if (!nullGuardResult.succeeded) return Result.fail(nullGuardResult.message);
-
-    const minGuardResult = Guard.againstAtLeast({
-      numChars: this.minLength,
-      argument: value,
-      argumentPath: 'password',
+  private bcryptCompare(plainText: string, hashed: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      bcrypt.compare(plainText, hashed, (err, compareResult) => {
+        if (err) return resolve(false);
+        return resolve(compareResult);
+      });
     });
-    if (!minGuardResult.succeeded) return Result.fail(minGuardResult.message);
-
-    if (!this.isNotSimple(value))
-      return Result.fail(`password: ${value} isn't complex`);
-    return Result.ok(new UserPassword({ value, isHashed: false }));
   }
 
-  public static async createFromPlain({
-    value,
-  }: UserPasswordProps): Promise<Result<UserPassword>> {
-    const nullGuardResult: IGuardResult = Guard.againstNullOrUndefined(
-      value,
-      'password',
-    );
-    if (!nullGuardResult.succeeded) return Result.fail(nullGuardResult.message);
+  public isAlreadyHashed(): boolean {
+    return this.props.isHashed;
+  }
 
-    const minGuardResult = Guard.againstAtLeast({
-      numChars: this.minLength,
-      argument: value,
-      argumentPath: 'password',
-    });
-    if (!minGuardResult.succeeded) return Result.fail(minGuardResult.message);
+  private async hashPassword(password: string): Promise<string> {
+    return await bcrypt.hash(password, 10);
+  }
 
-    if (!this.isNotSimple(value))
-      return Result.fail(`password: ${value} isn't complex`);
+  public async getHashedValue(): Promise<string> {
+    if (this.isAlreadyHashed()) return this.props.value;
+    return await this.hashPassword(this.props.value);
+  }
 
-    value = await this.hashPassword(value);
-    return Result.ok(new UserPassword({ value, isHashed: true }));
+  public static create(props: UserPasswordProps): Result<UserPassword> {
+    const propsResult = Guard.againstNullOrUndefined(props.value, 'password');
+
+    if (!propsResult.succeeded) {
+      return Result.fail<UserPassword>(propsResult.message);
+    } else {
+      if (!props.isHashed) {
+        if (!this.isAppropriateLength(props.value)) {
+          return Result.fail<UserPassword>(
+            'Password doesnt meet criteria [8 chars min].',
+          );
+        }
+      }
+
+      return Result.ok<UserPassword>(
+        new UserPassword({
+          value: props.value,
+          isHashed: !!props.isHashed === true,
+        }),
+      );
+    }
   }
 }

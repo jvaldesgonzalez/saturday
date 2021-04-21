@@ -23,7 +23,7 @@ export class UserEmail extends ValueObject<UserEmailProps> {
     return email.trim().toLowerCase();
   }
 
-  public static create({ value }: UserEmailProps): Result<UserEmail> {
+  public static create(value: string): Result<UserEmail> {
     const nullGuardResult: IGuardResult = Guard.againstNullOrUndefined(
       value,
       'email',
