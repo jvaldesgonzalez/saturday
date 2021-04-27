@@ -8,7 +8,7 @@ export namespace UserErrors {
   const _context = 'UserError';
   export class UserDoesntExists extends Result<IUseCaseError> {
     readonly message: string;
-    constructor(id: UniqueEntityID) {
+    constructor(id: UniqueEntityID | string) {
       super(false, {
         message: `Doesn't exist user with id ${id.toString()}`,
         context: _context,

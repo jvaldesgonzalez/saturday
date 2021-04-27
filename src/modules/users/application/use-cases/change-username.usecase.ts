@@ -50,7 +50,9 @@ export class ChangeUsernameUseCase
         return await unitOfWork.commit(() =>
           this.work(username, request.userId, userRepo),
         );
-      } catch (error) {}
+      } catch (error) {
+        return left(new AppError.UnexpectedError());
+      }
     } catch (error) {
       return left(new AppError.UnexpectedError());
     }
