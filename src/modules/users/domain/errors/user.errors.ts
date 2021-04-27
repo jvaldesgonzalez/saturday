@@ -42,4 +42,13 @@ export namespace UserErrors {
       });
     }
   }
+
+  export class UsernameExistsError extends Result<IUseCaseError> {
+    constructor(email: Username) {
+      super(false, {
+        message: `User with username '${email.value}' already exist`,
+        context: _context,
+      });
+    }
+  }
 }

@@ -5,6 +5,7 @@ import {
 } from '@liberation-data/drivine';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
 import { User } from '../../domain/entities/user.entity';
+import { Username } from '../../domain/value-objects';
 import { UserEmail } from '../../domain/value-objects/user-email.value';
 import { UserEntity } from '../entities/user.entity';
 import { UserMapper } from '../mapper/user.mapper';
@@ -22,6 +23,20 @@ export class UserRepository
       'UserRepository',
       persistenceManager,
     );
+  }
+  public async existByUsername(username: Username): Promise<boolean> {
+    const res = await this.persistenceManager.maybeGetOne<UserEntity>(
+      QuerySpecification.withStatement(
+        `MATCH (u:User)
+      WHERE u.username = $username
+      RETURN u`,
+      )
+        .bind({
+          username: username.value,
+        })
+        .transform(UserEntity),
+    );
+    return !!res ? true : false;
   }
   public async findOneByEmail(emailOrUsername: UserEmail): Promise<User> {
     const res = await this.persistenceManager.maybeGetOne<UserEntity>(
