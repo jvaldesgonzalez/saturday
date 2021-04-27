@@ -17,7 +17,7 @@ export type ChangeUsernameUseCaseResponse = Either<
   | AppError.UnexpectedError
   | UserErrors.UserDoesntExists
   | UserErrors.UsernameExistsError
-  | Result<unknown>,
+  | Result<any>,
   Result<void>
 >;
 
@@ -67,6 +67,7 @@ export class ChangeUsernameUseCase
     if (usernameExists)
       return left(new UserErrors.UsernameExistsError(username));
     const user = await userRepo.findById(userId);
+    this._logger.log({ user });
     if (!user)
       return left(new UserErrors.UserDoesntExists(new UniqueEntityID(userId)));
     user.changeUsername(username);

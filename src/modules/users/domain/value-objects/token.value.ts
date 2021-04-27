@@ -1,7 +1,7 @@
 import { EnumRoles } from 'src/shared/domain/roles.enum';
 
 export type JWTClaims = {
-  id: string | number;
+  id: string;
   role: EnumRoles;
   email: string;
   username: string;
