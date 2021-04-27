@@ -71,7 +71,7 @@ export class UserRepository
       QuerySpecification.withStatement(
         `
       MATCH (u:User)
-      WHERE u.email = $value OR e.username = $value
+      WHERE u.email = $value OR u.username = $value
       RETURN u`,
       )
         .bind({ value: emailOrUsername.value })

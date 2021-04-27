@@ -19,7 +19,7 @@ type Response = Either<
   | UserErrors.WrongPassword
   | UserErrors.UserWithEmailOrUsernameDoesNotExist
   | AppError.UnexpectedError
-  | Result<unknown>,
+  | Result<any>,
   Result<LoginResponseDto>
 >;
 
@@ -36,9 +36,10 @@ export class LoginUserUseCase
       const emailOrError = UserEmail.create(request.email);
       const passwordOrError = UserPassword.create({ value: request.password });
       const combinedResult = Result.combine([emailOrError, passwordOrError]);
-      if (combinedResult.isFailure)
+      if (combinedResult.isFailure) {
+        console.log(combinedResult.error);
         return left(Result.fail<void>(combinedResult.error));
-
+      }
       const email = emailOrError.getValue();
       const password = passwordOrError.getValue();
 
@@ -64,6 +65,7 @@ export class LoginUserUseCase
         }),
       );
     } catch (error) {
+      console.log(error);
       return left(new AppError.UnexpectedError());
     }
   }

@@ -33,7 +33,9 @@ export abstract class BaseRepository<
     this._logger.log(`Save entity with id: {${entity._id}}`);
     await this.persistenceManager.execute(
       QuerySpecification.withStatement<void>(
-        `MERGE (n:${this.entityName}) SET n += $data`,
+        `MERGE (n:${
+          this.entityName
+        } {id:"${entity._id.toString()}"}) SET n += $data`,
       ).bind({ data: await this._domainToPersistentFunc(entity) }),
     );
   }
