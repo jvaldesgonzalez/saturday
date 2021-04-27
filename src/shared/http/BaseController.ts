@@ -14,11 +14,7 @@ export abstract class BaseController<IRequest, IResponse> {
   protected abstract executeImpl(req: IRequest): Promise<IResponse>;
 
   public async execute(req: IRequest): Promise<IResponse> {
-    try {
-      return await this.executeImpl(req);
-    } catch (error) {
-      this._logger.error(`Uncaught controller error`);
-    }
+    return await this.executeImpl(req);
   }
 
   public clientError(message?: string): void {

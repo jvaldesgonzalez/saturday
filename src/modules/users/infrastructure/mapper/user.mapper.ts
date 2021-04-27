@@ -24,7 +24,10 @@ export class UserMapper {
     const firebasePushIdOrError = FirebasePushId.create(p.firebasePushId);
     const appVersionOrError = Version.create(p.appVersion);
     const providerOrError = UserProvider.create(p.provider as AuthProvider);
-    const passwordOrError = UserPassword.create({ value: p.password });
+    const passwordOrError = UserPassword.create({
+      value: p.password,
+      isHashed: true,
+    });
 
     const combinedResult = Result.combine([
       fullnameOrError,
@@ -56,7 +59,7 @@ export class UserMapper {
     ).getValue();
   }
 
-  public static DomainToPersistent(d: User): UserEntity {
+  public static async DomainToPersistent(d: User): Promise<UserEntity> {
     return {
       id: d._id.toString(),
       fullname: d.fullname.value,
@@ -65,7 +68,11 @@ export class UserMapper {
       email: d.email.value,
       firebasePushId: d.firebasePushId.value,
       appVersion: d.appVersion.value,
-      password: d.password ? d.password.value : null,
+      password: d.password
+        ? d.password.isAlreadyHashed()
+          ? d.password.value
+          : await d.password.getHashedValue()
+        : null,
       provider: d.provider.value,
       isActive: d.isActive,
       createdAt: d.createdAt.toISOString(),

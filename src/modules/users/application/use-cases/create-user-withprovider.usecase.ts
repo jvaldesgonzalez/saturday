@@ -24,7 +24,7 @@ import { IUserRepository } from '../../infrastructure/repositories/interface/use
 import { CreateUserWithProviderDto } from '../dtos/create-user-withprovider.dto';
 
 export type CreateUserWithProviderUseCaseResponse = Either<
-  AppError.UnexpectedError | UserErrors.EmailExistsError | Result<unknown>,
+  AppError.UnexpectedError | UserErrors.EmailExistsError | Result<any>,
   Result<User>
 >;
 

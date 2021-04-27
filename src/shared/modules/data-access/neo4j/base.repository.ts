@@ -18,7 +18,9 @@ export abstract class BaseRepository<
   protected readonly entityName: string;
   constructor(
     entityName: string,
-    private readonly _domainToPersistentFunc: (domainEntity: E) => Partial<P>,
+    private readonly _domainToPersistentFunc: (
+      domainEntity: E,
+    ) => Partial<P> | Promise<Partial<P>>,
     context: string,
     @InjectPersistenceManager() readonly persistenceManager: PersistenceManager,
   ) {
@@ -32,7 +34,7 @@ export abstract class BaseRepository<
     await this.persistenceManager.execute(
       QuerySpecification.withStatement<void>(
         `MERGE (n:${this.entityName}) SET n += $data`,
-      ).bind({ data: this._domainToPersistentFunc(entity) }),
+      ).bind({ data: await this._domainToPersistentFunc(entity) }),
     );
   }
 
@@ -45,7 +47,7 @@ export abstract class BaseRepository<
         MATCH (n:${this.entityName})
         WHERE n.id = $id
         DETACH DELETE n`,
-      ).bind({ id: this._domainToPersistentFunc(entity).id }),
+      ).bind({ id: (await this._domainToPersistentFunc(entity)).id }),
     );
   }
 

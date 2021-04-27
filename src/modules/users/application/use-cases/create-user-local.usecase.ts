@@ -25,7 +25,7 @@ import {
 } from '../../domain/value-objects/user-auth-provider.value';
 
 export type CreateUserLocalUseCaseResponse = Either<
-  AppError.UnexpectedError | UserErrors.EmailExistsError | Result<unknown>,
+  AppError.UnexpectedError | UserErrors.EmailExistsError | Result<any>,
   Result<User>
 >;
 

@@ -5,6 +5,7 @@ import { CreateUserLocalUseCase } from './application/use-cases/create-user-loca
 // import { LoginUserUseCase } from './application/use-cases/login-user.usecase';
 import { UserRepository } from './infrastructure/repositories/user.repository';
 import { UserRepositoryFactory } from './infrastructure/repositories/user.repository.factory';
+import { CreateUserLocalController } from './presentation/controllers/createUserLocal/create-user-local.controller';
 import { UsersController } from './presentation/user.controller';
 
 @Module({
@@ -23,6 +24,7 @@ import { UsersController } from './presentation/user.controller';
       useClass: Neo4jUnitOfWorkFactory,
     },
     CreateUserLocalUseCase,
+    CreateUserLocalController,
     // LoginUserUseCase,
   ],
   controllers: [UsersController],
