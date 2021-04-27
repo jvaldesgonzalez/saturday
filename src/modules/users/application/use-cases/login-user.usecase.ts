@@ -55,11 +55,12 @@ export class LoginUserUseCase
       }
 
       const accessToken = user.getUserToken();
+      const refreshToken = user.getRefreshToken();
 
       return right(
         Result.ok<LoginResponseDto>({
           accessToken,
-          refreshToken: accessToken,
+          refreshToken,
         }),
       );
     } catch (error) {

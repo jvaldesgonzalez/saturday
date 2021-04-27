@@ -8,7 +8,11 @@ import { UserPassword } from '../value-objects/user-password.value';
 import { UserProfileImg } from '../value-objects/user-profile-img.value';
 import { Username } from '../value-objects/username.value';
 import { Result } from 'src/shared/core/Result';
-import { JWTClaims, JWTToken } from '../value-objects/token.value';
+import {
+  JWTClaims,
+  JWTToken,
+  RefreshToken,
+} from '../value-objects/token.value';
 import { EnumRoles } from 'src/shared/domain/roles.enum';
 import * as jwt from 'jsonwebtoken';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
@@ -137,6 +141,24 @@ export class User extends DomainEntity<UserProps> {
     const token = jwt.sign(jwtClaims, process.env.JWT_SECRET ?? 'test-secret', {
       expiresIn: process.env.JWT_EXPIRATION ?? 86400,
     });
+    return token;
+  }
+
+  getRefreshToken(): RefreshToken {
+    const jwtClaims: JWTClaims = {
+      id: this._id.toString(),
+      role: this.role,
+      email: this.email.value,
+      username: this.username.value,
+    };
+    //TODO: Put secret in a config module (AKA Make a config module XD)
+    const token = jwt.sign(
+      jwtClaims,
+      process.env.JWT_SECRET ?? 'test-secret-refresh',
+      {
+        expiresIn: process.env.JWT_EXPIRATION ?? 86400,
+      },
+    );
     return token;
   }
 
