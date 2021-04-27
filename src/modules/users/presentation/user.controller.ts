@@ -6,6 +6,9 @@ import { CreateUserLocalResponse } from './controllers/createUserLocal/response'
 import { LoginUserController } from './controllers/loginUser/login-user.controller';
 import { LoginUserRequest } from './controllers/loginUser/request';
 import { LoginUserResponse } from './controllers/loginUser/response';
+import { RefreshTokenController } from './controllers/refreshToken/refresh-token.controller';
+import { RefreshTokenRequest } from './controllers/refreshToken/request';
+import { RefreshTokenResponse } from './controllers/refreshToken/response';
 // import { LoginUserUseCase } from '../application/use-cases/login-user.usecase';
 
 @ApiTags('users')
@@ -16,16 +19,24 @@ export class UsersController {
   constructor(
     private createUserCtx: CreateUserLocalController,
     private loginUserCtx: LoginUserController,
+    private refreshTokenCtx: RefreshTokenController,
   ) {}
-  @Post('/auth/local')
+  @Post('/local')
   async createLocal(
     @Body() data: CreateUserLocalRequest,
   ): Promise<CreateUserLocalResponse> {
     return this.createUserCtx.execute(data);
   }
 
-  @Post('/auth/local/login')
+  @Post('/local/login')
   async loginLocal(@Body() data: LoginUserRequest): Promise<LoginUserResponse> {
     return this.loginUserCtx.execute(data);
+  }
+
+  @Post('/tokens/refresh')
+  async refreshToken(
+    @Body() data: RefreshTokenRequest,
+  ): Promise<RefreshTokenResponse> {
+    return this.refreshTokenCtx.execute(data);
   }
 }

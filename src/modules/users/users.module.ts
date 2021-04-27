@@ -6,6 +6,7 @@ import { UserRepository } from './infrastructure/repositories/user.repository';
 import { UserRepositoryFactory } from './infrastructure/repositories/user.repository.factory';
 import { CreateUserLocalController } from './presentation/controllers/createUserLocal/create-user-local.controller';
 import { LoginUserController } from './presentation/controllers/loginUser/login-user.controller';
+import { RefreshTokenController } from './presentation/controllers/refreshToken/refresh-token.controller';
 import { UsersController } from './presentation/user.controller';
 
 @Module({
@@ -26,6 +27,7 @@ import { UsersController } from './presentation/user.controller';
     ...userUseCases,
     CreateUserLocalController,
     LoginUserController,
+    RefreshTokenController,
   ],
   controllers: [UsersController],
 })

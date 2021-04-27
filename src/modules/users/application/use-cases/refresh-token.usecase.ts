@@ -15,7 +15,10 @@ type Response = {
 };
 
 export type RefreshTokenUseCaseResponse = Either<
-  AppError.UnexpectedError | UserErrors.UserDoesntExists,
+  | AppError.UnexpectedError
+  | UserErrors.UserDoesntExists
+  | UserErrors.InvalidSignature
+  | Result<any>,
   Result<Response>
 >;
 
@@ -32,10 +35,13 @@ export class RefreshTokenUseCase
   async execute(
     request: RefreshTokenDto,
   ): Promise<RefreshTokenUseCaseResponse> {
-    const decoded: any = jwt.verify(
-      request.refreshToken,
-      'test-secret-refresh',
-    );
+    let decoded: any;
+    try {
+      decoded = jwt.verify(request.refreshToken, 'test-secret-refresh');
+    } catch (error) {
+      return left(new UserErrors.InvalidSignature());
+    }
+    this._logger.log({ decoded });
     const user = await this._userRepository.findById(decoded.id);
     if (!user) return left(new UserErrors.UserDoesntExists(decoded.id));
     return right(

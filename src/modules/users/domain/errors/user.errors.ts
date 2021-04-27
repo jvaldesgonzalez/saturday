@@ -51,4 +51,13 @@ export namespace UserErrors {
       });
     }
   }
+
+  export class InvalidSignature extends Result<IUseCaseError> {
+    constructor() {
+      super(false, {
+        message: `Invalid token signature`,
+        context: _context,
+      });
+    }
+  }
 }
