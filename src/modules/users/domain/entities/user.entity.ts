@@ -83,39 +83,47 @@ export class User extends DomainEntity<UserProps> {
     return this.props.role;
   }
 
-  changeEmail(newEmail: UserEmail): void {
+  changeEmail(newEmail: UserEmail): Result<void> {
     this.props.email = newEmail;
     this.props.updatedAt = new Date();
+    return Result.ok();
   }
 
-  changeUsername(newUsername: Username): void {
+  changeUsername(newUsername: Username): Result<void> {
     this.props.username = newUsername;
     this.props.updatedAt = new Date();
+    return Result.ok();
   }
 
-  changeFullname(newFullname: UserFullname): void {
+  changeFullname(newFullname: UserFullname): Result<void> {
     this.props.fullname = newFullname;
     this.props.updatedAt = new Date();
+    return Result.ok();
   }
 
-  changeProfileImage(newImage: UserProfileImg): void {
+  changeProfileImage(newImage: UserProfileImg): Result<void> {
     this.props.fullname = newImage;
     this.props.updatedAt = new Date();
+    return Result.ok();
   }
 
-  changePassword(newPassword: UserPassword): void {
+  changePassword(newPassword: UserPassword): Result<void> {
     this.props.password = newPassword;
     this.props.updatedAt = new Date();
+    return Result.ok();
   }
 
-  resetPassword(newPassword: UserPassword): void {
+  resetPassword(newPassword: UserPassword): Result<void> {
     this.props.password = newPassword;
     this.props.updatedAt = new Date();
+    return Result.ok();
   }
 
-  markDeleted(): void {
+  markDeleted(): Result<void> {
     this.props.updatedAt = new Date();
     this.props.isActive = false;
+    return Result.ok();
+    return Result.ok();
   }
 
   getUserToken(): JWTToken {
