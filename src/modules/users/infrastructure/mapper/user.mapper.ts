@@ -70,7 +70,7 @@ export class UserMapper {
       isActive: d.isActive,
       createdAt: d.createdAt.toISOString(),
       updatedAt: d.updatedAt.toISOString(),
-      role: d.role as number,
+      role: d.role as string,
     };
   }
 }

@@ -6,7 +6,6 @@ import {
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
 import { User } from '../../domain/entities/user.entity';
 import { UserEmail } from '../../domain/value-objects/user-email.value';
-import { Username } from '../../domain/value-objects/username.value';
 import { UserEntity } from '../entities/user.entity';
 import { UserMapper } from '../mapper/user.mapper';
 import { IUserRepository } from './interface/user.repository.interface';
@@ -24,9 +23,7 @@ export class UserRepository
       persistenceManager,
     );
   }
-  public async findOneByEmailOrUsername(
-    emailOrUsername: UserEmail | Username,
-  ): Promise<User> {
+  public async findOneByEmail(emailOrUsername: UserEmail): Promise<User> {
     const res = await this.persistenceManager.maybeGetOne<UserEntity>(
       QuerySpecification.withStatement(
         `

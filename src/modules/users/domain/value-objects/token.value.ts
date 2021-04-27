@@ -8,3 +8,5 @@ export type JWTClaims = {
 };
 
 export type JWTToken = string;
+
+export type RefreshToken = string;

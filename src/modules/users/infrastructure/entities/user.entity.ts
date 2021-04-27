@@ -8,7 +8,7 @@ export class UserEntity extends PersistentEntity {
   firebasePushId: string;
   appVersion: number;
   password: string;
-  role: number;
+  role: string;
   provider: string;
   isActive: boolean;
 }

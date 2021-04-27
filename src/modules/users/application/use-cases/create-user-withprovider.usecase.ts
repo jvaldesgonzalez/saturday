@@ -1,38 +1,37 @@
-import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
-import { CreateUserDto } from '../dtos/create-user.dto';
-import { Result } from 'src/shared/core/Result';
+import { Inject, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'src/shared/core/Either';
-import { User } from '../../domain/entities/user.entity';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { AppError } from 'src/shared/core/errors/AppError';
+import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';
 import {
   IUnitOfWorkFactory,
   IUnitOfWork,
 } from 'src/shared/core/interfaces/IUnitOfWork';
-import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';
-import { IUserRepository } from '../../infrastructure/repositories/interface/user.repository.interface';
-import { AppError } from 'src/shared/core/errors/AppError';
-import { UserErrors } from '../../domain/errors/user.errors';
-import { Username } from '../../domain/value-objects/username.value';
-import { UserFullname } from '../../domain/value-objects/user-fullname.value';
-import { UserEmail } from '../../domain/value-objects/user-email.value';
-import { UserPassword } from '../../domain/value-objects/user-password.value';
-import { UserProfileImg } from '../../domain/value-objects/user-profile-img.value';
-import { FirebasePushId } from '../../domain/value-objects/user-firebase-push-id.value';
+import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
+import { Result } from 'src/shared/core/Result';
 import { Version } from 'src/shared/domain/version.value-object';
+import { User } from '../../domain/entities/user.entity';
+import { UserErrors } from '../../domain/errors/user.errors';
 import {
-  AuthProvider,
+  FirebasePushId,
+  UserEmail,
+  UserFullname,
+  Username,
+  UserProfileImg,
   UserProvider,
-} from '../../domain/value-objects/user-auth-provider.value';
-import { EnumRoles } from 'src/shared/domain/roles.enum';
+} from '../../domain/value-objects';
+import { IUserRepository } from '../../infrastructure/repositories/interface/user.repository.interface';
+import { CreateUserWithProviderDto } from '../dtos/create-user-withprovider.dto';
 
-export type CreateUserUseCaseResponse = Either<
+export type CreateUserWithProviderUseCaseResponse = Either<
   AppError.UnexpectedError | UserErrors.EmailExistsError | Result<unknown>,
   Result<User>
 >;
 
 @Injectable()
-export class CreateUserUseCase
-  implements IUseCase<CreateUserDto, CreateUserUseCaseResponse> {
+export class CreateUserWithProviderUseCase
+  implements
+    IUseCase<CreateUserWithProviderDto, CreateUserWithProviderUseCaseResponse> {
   private _logger: Logger;
   constructor(
     @Inject('IUnitOfWorkFactory')
@@ -40,11 +39,14 @@ export class CreateUserUseCase
     @Inject('IRepositoryFactory')
     private readonly _repositoryFact: IRepositoryFactory<User, IUserRepository>,
   ) {
-    this._logger = new Logger('CreateUserUseCase');
+    this._logger = new Logger('CreateUserWithProviderUseCase');
   }
 
-  async execute(request: CreateUserDto): Promise<CreateUserUseCaseResponse> {
+  async execute(
+    request: CreateUserWithProviderDto,
+  ): Promise<CreateUserWithProviderUseCaseResponse> {
     this._logger.log('Executing...');
+
     const usernameOrError = Username.create(request.username);
     const fullnameOrError = UserFullname.create(request.fullname);
     const profileImageUrlOrError = UserProfileImg.create(
@@ -53,11 +55,8 @@ export class CreateUserUseCase
     const emailOrError = UserEmail.create(request.email);
     const firebasePushIdOrError = FirebasePushId.create(request.firebasePushId);
     const appVersionOrError = Version.create(request.appVersion);
-    const passwordOrError = UserPassword.create({
-      value: request.password,
-    });
-    const providerOrError = UserProvider.create(AuthProvider.Local);
-    const role = EnumRoles.Partner;
+    const providerOrError = UserProvider.create(request.provider);
+    const role = request.role;
 
     const combineResult = Result.combine([
       usernameOrError,
@@ -66,20 +65,18 @@ export class CreateUserUseCase
       emailOrError,
       firebasePushIdOrError,
       appVersionOrError,
-      passwordOrError,
       providerOrError,
     ]);
     if (combineResult.isFailure)
       return left(Result.fail<void>(combineResult.error));
 
-    const userOrErr: Result<User> = User.new({
+    const userOrErr = User.new({
       username: usernameOrError.getValue(),
       fullname: fullnameOrError.getValue(),
       profileImageUrl: profileImageUrlOrError.getValue(),
       email: emailOrError.getValue(),
       firebasePushId: firebasePushIdOrError.getValue(),
       appVersion: appVersionOrError.getValue(),
-      password: passwordOrError.getValue(),
       provider: providerOrError.getValue(),
       role,
     });
@@ -104,7 +101,7 @@ export class CreateUserUseCase
   async work(
     user: User,
     userRepo: IUserRepository,
-  ): Promise<CreateUserUseCaseResponse> {
+  ): Promise<CreateUserWithProviderUseCaseResponse> {
     const emailExist: boolean = await userRepo.existByEmail(user.email);
     if (emailExist) return left(new UserErrors.EmailExistsError(user.email));
     await userRepo.save(user);
