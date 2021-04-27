@@ -9,6 +9,7 @@ import { CHeckUsernameController } from './presentation/controllers/checkUsernam
 import { CreateUserLocalController } from './presentation/controllers/createUserLocal/create-user-local.controller';
 import { LoginUserController } from './presentation/controllers/loginUser/login-user.controller';
 import { RefreshTokenController } from './presentation/controllers/refreshToken/refresh-token.controller';
+import { ViewProfileController } from './presentation/controllers/viewProfile/view-profile.controller';
 import { UsersController } from './presentation/user.controller';
 
 @Module({
@@ -32,6 +33,7 @@ import { UsersController } from './presentation/user.controller';
     RefreshTokenController,
     CHeckUsernameController,
     ChangeUsernameController,
+    ViewProfileController,
   ],
   controllers: [UsersController],
 })

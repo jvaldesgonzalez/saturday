@@ -1,4 +1,5 @@
 import { Put, UseGuards } from '@nestjs/common';
+import { Get } from '@nestjs/common';
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from 'src/shared/core/auth/current-user.decorator';
@@ -19,6 +20,8 @@ import { LoginUserResponse } from './controllers/loginUser/response';
 import { RefreshTokenController } from './controllers/refreshToken/refresh-token.controller';
 import { RefreshTokenRequest } from './controllers/refreshToken/request';
 import { RefreshTokenResponse } from './controllers/refreshToken/response';
+import { ViewProfileResponse } from './controllers/viewProfile/response';
+import { ViewProfileController } from './controllers/viewProfile/view-profile.controller';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -31,6 +34,7 @@ export class UsersController {
     private refreshTokenCtx: RefreshTokenController,
     private checkUsernameCtx: CHeckUsernameController,
     private changeUsernameCtx: ChangeUsernameController,
+    private viewProfileCtx: ViewProfileController,
   ) {}
   @Post('/local')
   async createLocal(
@@ -65,5 +69,13 @@ export class UsersController {
     @Body() data: ChangeUsernameBody,
   ): Promise<ChangeUsernameResponse> {
     return this.changeUsernameCtx.execute({ userId: user.id, ...data });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/profile')
+  async viewProfile(
+    @CurrentUser() user: JWTClaims,
+  ): Promise<ViewProfileResponse> {
+    return this.viewProfileCtx.execute({ userId: user.id });
   }
 }
