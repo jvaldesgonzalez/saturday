@@ -4,6 +4,7 @@ import { Neo4jUnitOfWorkFactory } from 'src/shared/modules/data-access/neo4j/uni
 import userUseCases from './application/use-cases';
 import { UserRepository } from './infrastructure/repositories/user.repository';
 import { UserRepositoryFactory } from './infrastructure/repositories/user.repository.factory';
+import { CHeckUsernameController } from './presentation/controllers/checkUsername/check-username.controller';
 import { CreateUserLocalController } from './presentation/controllers/createUserLocal/create-user-local.controller';
 import { LoginUserController } from './presentation/controllers/loginUser/login-user.controller';
 import { RefreshTokenController } from './presentation/controllers/refreshToken/refresh-token.controller';
@@ -28,6 +29,7 @@ import { UsersController } from './presentation/user.controller';
     CreateUserLocalController,
     LoginUserController,
     RefreshTokenController,
+    CHeckUsernameController,
   ],
   controllers: [UsersController],
 })

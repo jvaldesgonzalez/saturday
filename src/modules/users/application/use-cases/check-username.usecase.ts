@@ -11,7 +11,7 @@ import { IUserRepository } from '../../infrastructure/repositories/interface/use
 import { CheckUsernameDto } from '../dtos/check-username.dto';
 
 export type CheckUsernameUseCaseResponse = Either<
-  UserErrors.UsernameExistsError | AppError.UnexpectedError | Result<unknown>,
+  UserErrors.UsernameExistsError | AppError.UnexpectedError | Result<any>,
   Result<void>
 >;
 

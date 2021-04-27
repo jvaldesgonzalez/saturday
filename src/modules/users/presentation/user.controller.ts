@@ -1,5 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CHeckUsernameController } from './controllers/checkUsername/check-username.controller';
+import { CheckUsernameRequest } from './controllers/checkUsername/request';
+import { CheckUsernameResponse } from './controllers/checkUsername/response';
 import { CreateUserLocalController } from './controllers/createUserLocal/create-user-local.controller';
 import { CreateUserLocalRequest } from './controllers/createUserLocal/request';
 import { CreateUserLocalResponse } from './controllers/createUserLocal/response';
@@ -20,6 +23,7 @@ export class UsersController {
     private createUserCtx: CreateUserLocalController,
     private loginUserCtx: LoginUserController,
     private refreshTokenCtx: RefreshTokenController,
+    private checkUsernameCtx: CHeckUsernameController,
   ) {}
   @Post('/local')
   async createLocal(
@@ -33,10 +37,17 @@ export class UsersController {
     return this.loginUserCtx.execute(data);
   }
 
-  @Post('/tokens/refresh')
+  @Post('/refresh-token')
   async refreshToken(
     @Body() data: RefreshTokenRequest,
   ): Promise<RefreshTokenResponse> {
     return this.refreshTokenCtx.execute(data);
+  }
+
+  @Post('/check-username')
+  async checkUsername(
+    @Body() data: CheckUsernameRequest,
+  ): Promise<CheckUsernameResponse> {
+    return this.checkUsernameCtx.execute(data);
   }
 }
