@@ -3,6 +3,7 @@ import {
   PersistenceManager,
   QuerySpecification,
 } from '@liberation-data/drivine';
+import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
 import { User } from '../../domain/entities/user.entity';
 import { Username } from '../../domain/value-objects';
@@ -24,6 +25,35 @@ export class UserRepository
       persistenceManager,
     );
   }
+  public async existsById(id: UniqueEntityID): Promise<boolean> {
+    const res = await this.persistenceManager.maybeGetOne<UserEntity>(
+      QuerySpecification.withStatement(
+        `MATCH (u:User)
+      WHERE u.id = $id
+      RETURN u`,
+      )
+        .bind({
+          id: id.toString(),
+        })
+        .transform(UserEntity),
+    );
+    return !!res ? true : false;
+  }
+
+  public async findById(id: UniqueEntityID): Promise<User> {
+    const res = await this.persistenceManager.maybeGetOne<UserEntity>(
+      QuerySpecification.withStatement(
+        `
+      MATCH (u:User)
+      WHERE u.id = $id
+      RETURN u`,
+      )
+        .bind({ id: id.toString() })
+        .transform(UserEntity),
+    );
+    return res ? UserMapper.PersistentToDomain(res) : null;
+  }
+
   public async existByUsername(username: Username): Promise<boolean> {
     const res = await this.persistenceManager.maybeGetOne<UserEntity>(
       QuerySpecification.withStatement(
@@ -38,6 +68,7 @@ export class UserRepository
     );
     return !!res ? true : false;
   }
+
   public async findOneByEmail(emailOrUsername: UserEmail): Promise<User> {
     const res = await this.persistenceManager.maybeGetOne<UserEntity>(
       QuerySpecification.withStatement(
