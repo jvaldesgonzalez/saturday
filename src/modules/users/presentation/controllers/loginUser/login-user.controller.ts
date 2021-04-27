@@ -21,13 +21,13 @@ export class LoginUserController extends BaseController<
       const error = result.value;
       switch (error.constructor) {
         case UserErrors.UserWithEmailOrUsernameDoesNotExist:
-          this.clientError(error.errorValue());
+          this.clientError(error.errorValue().message);
           break;
         case UserErrors.WrongPassword:
-          this.unauthorized(error.errorValue());
+          this.unauthorized(error.errorValue().message);
         default:
           console.log(error);
-          this.clientError(error.errorValue());
+          this.fail(error.errorValue());
       }
     }
     if (result.isRight()) {

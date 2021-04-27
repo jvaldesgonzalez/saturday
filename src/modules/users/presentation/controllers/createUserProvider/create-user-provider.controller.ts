@@ -21,10 +21,10 @@ export class CreateUserProviderController extends BaseController<
       const error = result.value;
       switch (error.constructor) {
         case UserErrors.EmailExistsError:
-          this.clientError(error.errorValue());
+          this.clientError(error.errorValue().message);
           break;
         default:
-          this.clientError(error.errorValue());
+          this.fail(error.errorValue());
       }
     } else {
       return;

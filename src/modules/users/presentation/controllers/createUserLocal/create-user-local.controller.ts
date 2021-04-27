@@ -21,10 +21,9 @@ export class CreateUserLocalController extends BaseController<
       const error = result.value;
       switch (error.constructor) {
         case UserErrors.EmailExistsError:
-          this.clientError(error.errorValue());
+          this.clientError(error.errorValue().message);
         default:
-          console.log(error.errorValue());
-          this.clientError(error.errorValue());
+          this.fail(error.errorValue());
       }
     } else {
       return;
