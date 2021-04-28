@@ -1,4 +1,3 @@
-import { DomainEntity } from 'src/shared/domain/entity.abstract';
 import { Version } from 'src/shared/domain/version.value-object';
 import { UserProvider } from '../value-objects/user-auth-provider.value';
 import { UserEmail } from '../value-objects/user-email.value';
@@ -17,6 +16,7 @@ import { EnumRoles } from 'src/shared/domain/roles.enum';
 import * as jwt from 'jsonwebtoken';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { Guard, GuardArgumentCollection } from 'src/shared/core/Guard';
+import { AggregateDomainEntity } from 'src/shared/domain/aggregate-entity.abstract';
 
 type UserProps = {
   fullname: UserFullname;
@@ -35,7 +35,7 @@ type UserProps = {
 
 type NewUserProps = Omit<UserProps, 'createdAt' | 'updatedAt' | 'isActive'>;
 
-export class User extends DomainEntity<UserProps> {
+export class User extends AggregateDomainEntity<UserProps> {
   private readonly __brand: void;
 
   public get firebasePushId(): FirebasePushId {
