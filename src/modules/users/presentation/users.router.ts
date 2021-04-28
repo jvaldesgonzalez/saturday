@@ -15,6 +15,9 @@ import { CheckUsernameResponse } from './controllers/checkUsername/response';
 import { CreateUserLocalController } from './controllers/createUserLocal/create-user-local.controller';
 import { CreateUserLocalRequest } from './controllers/createUserLocal/request';
 import { CreateUserLocalResponse } from './controllers/createUserLocal/response';
+import { EditProfileController } from './controllers/editProfile/edit-profile.controller';
+import { EditProfileBody } from './controllers/editProfile/request';
+import { EditProfileResponse } from './controllers/editProfile/response';
 import { LoginUserController } from './controllers/loginUser/login-user.controller';
 import { LoginUserRequest } from './controllers/loginUser/request';
 import { LoginUserResponse } from './controllers/loginUser/response';
@@ -36,6 +39,7 @@ export class UsersController {
     private changeUsernameCtx: ChangeUsernameController,
     private viewProfileCtx: ViewProfileController,
     private changePassCtx: ChangePasswordController,
+    private editProfileCtx: EditProfileController,
   ) {}
   @Post('/local')
   async createLocal(
@@ -87,5 +91,14 @@ export class UsersController {
     @Body() data: ChangePasswordBody,
   ): Promise<ChangePasswordResponse> {
     return this.changePassCtx.execute({ userId: user.id, ...data });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/profile')
+  async editProfile(
+    @CurrentUser() user: JWTClaims,
+    @Body() data: EditProfileBody,
+  ): Promise<EditProfileResponse> {
+    return this.editProfileCtx.execute({ userId: user.id, ...data });
   }
 }

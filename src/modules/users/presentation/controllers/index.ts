@@ -3,6 +3,7 @@ import { ChangeUsernameController } from './changeUsername/change-username.contr
 import { CHeckUsernameController } from './checkUsername/check-username.controller';
 import { CreateUserLocalController } from './createUserLocal/create-user-local.controller';
 import { CreateUserProviderController } from './createUserProvider/create-user-provider.controller';
+import { EditProfileController } from './editProfile/edit-profile.controller';
 import { LoginUserController } from './loginUser/login-user.controller';
 import { RefreshTokenController } from './refreshToken/refresh-token.controller';
 import { ViewProfileController } from './viewProfile/view-profile.controller';
@@ -16,6 +17,7 @@ const usersControllers = [
   LoginUserController,
   RefreshTokenController,
   ViewProfileController,
+  EditProfileController,
 ];
 
 export default usersControllers;

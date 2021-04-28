@@ -106,7 +106,7 @@ export class User extends DomainEntity<UserProps> {
   }
 
   changeProfileImage(newImage: UserProfileImg): Result<void> {
-    this.props.fullname = newImage;
+    this.props.profileImageUrl = newImage;
     this.props.updatedAt = new Date();
     return Result.ok();
   }

@@ -17,7 +17,7 @@ import { IUserRepository } from '../../infrastructure/repositories/interface/use
 import { UpdateProfileDto } from '../dtos/update-profile.dto';
 
 export type UpdateProfileUseCaseResponse = Either<
-  AppError.UnexpectedError | UserErrors.UserDoesntExists | Result<unknown>,
+  AppError.UnexpectedError | UserErrors.UserDoesntExists | Result<any>,
   Result<void>
 >;
 
