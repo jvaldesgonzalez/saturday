@@ -15,7 +15,7 @@ export type ChangePasswordUseCaseResponse = Either<
   | UserErrors.UserDoesntExists
   | UserErrors.WrongPassword
   | AppError.UnexpectedError
-  | Result<unknown>,
+  | Result<any>,
   Result<void>
 >;
 
@@ -54,7 +54,7 @@ export class ChangePasswordUseCase
 
     const user = await userRepo.findById(req.userId);
     if (!user) return left(new UserErrors.UserDoesntExists(req.userId));
-    const isMatch = user.password.comparePassword(req.oldPassword);
+    const isMatch = await user.password.comparePassword(req.oldPassword);
     if (!isMatch) return left(new UserErrors.WrongPassword());
 
     user.changePassword(passwordOrError.getValue());

@@ -1,10 +1,11 @@
-import { Put, UseGuards } from '@nestjs/common';
-import { Get } from '@nestjs/common';
-import { Body, Controller, Post } from '@nestjs/common';
+import { Get, Body, Controller, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from 'src/shared/core/auth/current-user.decorator';
 import { JwtAuthGuard } from 'src/shared/core/auth/JwtAuth.guard';
 import { JWTClaims } from '../domain/value-objects/token.value';
+import { ChangePasswordController } from './controllers/changePassword/change-password.controller';
+import { ChangePasswordBody } from './controllers/changePassword/request';
+import { ChangePasswordResponse } from './controllers/changePassword/response';
 import { ChangeUsernameController } from './controllers/changeUsername/change-username.controller';
 import { ChangeUsernameBody } from './controllers/changeUsername/request';
 import { ChangeUsernameResponse } from './controllers/changeUsername/response';
@@ -26,7 +27,6 @@ import { ViewProfileController } from './controllers/viewProfile/view-profile.co
 @ApiTags('users')
 @ApiBearerAuth()
 @Controller('auth')
-@Controller()
 export class UsersController {
   constructor(
     private createUserCtx: CreateUserLocalController,
@@ -35,6 +35,7 @@ export class UsersController {
     private checkUsernameCtx: CHeckUsernameController,
     private changeUsernameCtx: ChangeUsernameController,
     private viewProfileCtx: ViewProfileController,
+    private changePassCtx: ChangePasswordController,
   ) {}
   @Post('/local')
   async createLocal(
@@ -77,5 +78,14 @@ export class UsersController {
     @CurrentUser() user: JWTClaims,
   ): Promise<ViewProfileResponse> {
     return this.viewProfileCtx.execute({ userId: user.id });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/password')
+  async changePassword(
+    @CurrentUser() user: JWTClaims,
+    @Body() data: ChangePasswordBody,
+  ): Promise<ChangePasswordResponse> {
+    return this.changePassCtx.execute({ userId: user.id, ...data });
   }
 }

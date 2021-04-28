@@ -1,16 +1,11 @@
 import { Module } from '@nestjs/common';
 import { DataAccessModule } from 'src/shared/modules/data-access/data-access.module';
 import { Neo4jUnitOfWorkFactory } from 'src/shared/modules/data-access/neo4j/unit-of-work.neo4j.factory';
-import userUseCases from './application/use-cases';
+import usersUseCases from './application/use-cases';
 import { UserRepository } from './infrastructure/repositories/user.repository';
 import { UserRepositoryFactory } from './infrastructure/repositories/user.repository.factory';
-import { ChangeUsernameController } from './presentation/controllers/changeUsername/change-username.controller';
-import { CHeckUsernameController } from './presentation/controllers/checkUsername/check-username.controller';
-import { CreateUserLocalController } from './presentation/controllers/createUserLocal/create-user-local.controller';
-import { LoginUserController } from './presentation/controllers/loginUser/login-user.controller';
-import { RefreshTokenController } from './presentation/controllers/refreshToken/refresh-token.controller';
-import { ViewProfileController } from './presentation/controllers/viewProfile/view-profile.controller';
-import { UsersController } from './presentation/user.controller';
+import usersControllers from './presentation/controllers';
+import { UsersController } from './presentation/users.router';
 
 @Module({
   imports: [DataAccessModule],
@@ -27,13 +22,8 @@ import { UsersController } from './presentation/user.controller';
       provide: 'IUnitOfWorkFactory',
       useClass: Neo4jUnitOfWorkFactory,
     },
-    ...userUseCases,
-    CreateUserLocalController,
-    LoginUserController,
-    RefreshTokenController,
-    CHeckUsernameController,
-    ChangeUsernameController,
-    ViewProfileController,
+    ...usersUseCases,
+    ...usersControllers,
   ],
   controllers: [UsersController],
 })

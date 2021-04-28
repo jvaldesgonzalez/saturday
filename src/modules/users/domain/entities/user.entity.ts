@@ -127,7 +127,6 @@ export class User extends DomainEntity<UserProps> {
     this.props.updatedAt = new Date();
     this.props.isActive = false;
     return Result.ok();
-    return Result.ok();
   }
 
   getUserToken(): JWTToken {

@@ -8,7 +8,7 @@ import { RefreshTokenUseCase } from './refresh-token.usecase';
 import { UpdateProfileUseCase } from './update-profile.usecase';
 import { ViewProfileUseCase } from './view-profile.usecase';
 
-const userUseCases = [
+const usersUseCases = [
   ChangePasswordUseCase,
   ChangeUsernameUseCase,
   CheckUsernameUseCase,
@@ -20,4 +20,4 @@ const userUseCases = [
   ViewProfileUseCase,
 ];
 
-export default userUseCases;
+export default usersUseCases;
