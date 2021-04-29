@@ -54,3 +54,11 @@ export class Result<T> {
     return Result.ok();
   }
 }
+
+export function Ok<U>(value?: U): Result<U> {
+  return new Result<U>(true, null, value);
+}
+
+export function Fail<U>(error: string): Result<U> {
+  return new Result<U>(false, error);
+}

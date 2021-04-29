@@ -1,5 +1,6 @@
 import { NotImplementedException, UnauthorizedException } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
 import { InternalServerErrorException } from '@nestjs/common';
 import { ForbiddenException } from '@nestjs/common';
 import { BadRequestException } from '@nestjs/common';
@@ -15,6 +16,10 @@ export abstract class BaseController<IRequest, IResponse> {
 
   public async execute(req: IRequest): Promise<IResponse> {
     return await this.executeImpl(req);
+  }
+
+  public conflict(message?: string): void {
+    throw new ConflictException(message ? message : 'Conflict');
   }
 
   public clientError(message?: string): void {
