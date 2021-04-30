@@ -7,7 +7,10 @@ import { EventName } from '../value-objects/event-name.value';
 import { EventPlace } from '../value-objects/event-place.value';
 import { UnknownFieldCollection } from '../value-objects/unknown-fields-collection.value';
 import { CategoryRefCollection } from './categoryRef.entity';
-import { EventOccurrenceCollection } from './event-ocurrency.entity';
+import {
+  EventOccurrence,
+  EventOccurrenceCollection,
+} from './event-ocurrency.entity';
 import { PublisherRef } from './publisherRef.entity';
 
 type CollaboratorsCollection = PublisherRef[];
@@ -87,6 +90,11 @@ export class Event extends AggregateDomainEntity<EventProps> {
 
   changePlace(place: EventPlace): Result<void> {
     this.props.place = place;
+    return Ok();
+  }
+
+  addOccurrence(occurrence: EventOccurrence): Result<void> {
+    this.props.occurrences.add(occurrence);
     return Ok();
   }
 
