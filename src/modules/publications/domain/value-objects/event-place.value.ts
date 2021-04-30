@@ -9,7 +9,7 @@ type EventPlaceProps = {
   address: string;
   longitude: string;
   latitude: string;
-  hostRef: HostRef;
+  hostRef?: HostRef;
 };
 
 export class EventPlace extends ValueObject<EventPlaceProps> {

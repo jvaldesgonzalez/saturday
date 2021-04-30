@@ -13,7 +13,7 @@ export class PublisherRef extends DomainEntity<Empty> {
     super(null, id);
   }
 
-  public static create(id?: UniqueEntityID): Result<PublisherRef> {
-    return Ok(new PublisherRef(id));
+  public static create(id?: string): Result<PublisherRef> {
+    return Ok(new PublisherRef(new UniqueEntityID(id)));
   }
 }

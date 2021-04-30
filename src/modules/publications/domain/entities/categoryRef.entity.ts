@@ -9,21 +9,13 @@ export class CategoryRef extends DomainEntity<Empty> {
     super(null, id);
   }
 
-  public static create(id?: UniqueEntityID): Result<CategoryRef> {
-    return Ok(new CategoryRef(id));
+  public static create(id?: string): Result<CategoryRef> {
+    return Ok(new CategoryRef(new UniqueEntityID(id)));
   }
 }
 
 export class CategoryRefCollection extends WatchedList<CategoryRef> {
-  private constructor(initialCats: CategoryRef[]) {
-    super(initialCats);
-  }
-
   public compareItems(a: CategoryRef, b: CategoryRef): boolean {
     return a.equals(b);
-  }
-
-  public static create(initialTags?: CategoryRef[]): CategoryRefCollection {
-    return new CategoryRefCollection(initialTags ? initialTags : []);
   }
 }

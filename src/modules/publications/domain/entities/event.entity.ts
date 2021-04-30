@@ -19,7 +19,6 @@ type EventProps = {
   description: UnknownFieldCollection;
   categories: CategoryRefCollection;
   place: EventPlace;
-  price?: number;
   collaborators?: CollaboratorsCollection;
   multimedia: MultimediaCollection;
   attentionTags?: AttentionTagCollection;

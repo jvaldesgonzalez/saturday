@@ -50,7 +50,7 @@ export class Ticket extends DomainEntity<TicketProps> {
     return Ok();
   }
 
-  public static new(props: TicketProps): Result<TicketProps> {
+  public static new(props: TicketProps): Result<Ticket> {
     return this.create(props, new UniqueEntityID());
   }
 

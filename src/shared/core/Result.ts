@@ -62,3 +62,12 @@ export function Ok<U>(value?: U): Result<U> {
 export function Fail<U>(error: string): Result<U> {
   return new Result<U>(false, error);
 }
+
+export function Join<U>(results: Result<U>[]): Result<U[]> {
+  const values: U[] = [];
+  for (const result of results) {
+    if (result.isFailure) return Fail(result.error.toString());
+    values.push(result.getValue());
+  }
+  return Ok(values);
+}
