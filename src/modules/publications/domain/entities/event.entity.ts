@@ -98,6 +98,14 @@ export class Event extends AggregateDomainEntity<EventProps> {
     return Ok();
   }
 
+  deleteOccurrence(occurrenceId: UniqueEntityID): Result<void> {
+    const occurr = this.props.occurrences
+      .getItems()
+      .find((occ) => occ._id.toString() === occurrenceId.toString());
+    this.props.occurrences.remove(occurr);
+    return Ok();
+  }
+
   public static new(
     props: Omit<EventProps, 'createdAt' | 'updatedAt'>,
   ): Result<Event> {
