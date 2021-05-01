@@ -34,9 +34,14 @@ export class EventOccurrence extends DomainEntity<EventOccurrenceProps> {
     return Ok();
   }
 
+  findTicketById(id: string): Ticket | undefined {
+    return this.props.tickets
+      .getItems()
+      .find((item) => item._id.toString() === id);
+  }
+
   editTicket(ticket: Ticket): Result<void> {
-    if (!this.props.tickets.exists(ticket))
-      return Fail(`Ticket ${ticket._id} doesn't exists in this occurrence`);
+    if (!this.props.tickets.exists(ticket)) return Ok();
     this.props.tickets.remove(ticket);
     this.props.tickets.add(ticket);
     return Ok();

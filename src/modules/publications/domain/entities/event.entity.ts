@@ -3,6 +3,7 @@ import { AggregateDomainEntity } from 'src/shared/domain/aggregate-entity.abstra
 import { Multimedia } from 'src/shared/domain/multimedia.value';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { AttentionTagCollection } from '../value-objects/attention-tag-collection.value';
+import { AttentionTag } from './attention-tag.entity';
 import { EventName } from '../value-objects/event-name.value';
 import { EventPlace } from '../value-objects/event-place.value';
 import { UnknownFieldCollection } from '../value-objects/unknown-fields-collection.value';
@@ -39,6 +40,10 @@ export class Event extends AggregateDomainEntity<EventProps> {
 
   public get place(): EventPlace {
     return this.props.place;
+  }
+
+  public get occurrences(): EventOccurrenceCollection {
+    return this.props.occurrences;
   }
 
   public get description(): UnknownFieldCollection {
@@ -112,8 +117,30 @@ export class Event extends AggregateDomainEntity<EventProps> {
     const occurr = this.props.occurrences
       .getItems()
       .find((occ) => occ._id.toString() === occurrenceId.toString());
-    this.props.occurrences.remove(occurr);
+    if (occurr) this.props.occurrences.remove(occurr);
     return Ok();
+  }
+
+  findOccurrenceById(id: string): EventOccurrence | undefined {
+    return this.props.occurrences
+      .getItems()
+      .find((occurr) => occurr._id.toString() === id);
+  }
+
+  addTag(tag: AttentionTag): Result<void> {
+    this.props.attentionTags.add(tag);
+    return Ok();
+  }
+
+  removeTag(tag: AttentionTag): Result<void> {
+    this.props.attentionTags.remove(tag);
+    return Ok();
+  }
+
+  findTagById(tagId: string): AttentionTag | undefined {
+    return this.props.attentionTags
+      .getItems()
+      .find((item) => item._id.toString() === tagId);
   }
 
   public static new(
@@ -132,7 +159,9 @@ export class Event extends AggregateDomainEntity<EventProps> {
   public static create(props: EventProps, id: UniqueEntityID): Result<Event> {
     const defaultValues: EventProps = {
       ...props,
-      attentionTags: props.attentionTags ? props.attentionTags : [],
+      attentionTags: props.attentionTags
+        ? props.attentionTags
+        : new AttentionTagCollection([]),
       description: props.description ? props.description : [],
       collaborators: props.collaborators ? props.collaborators : [],
     };
