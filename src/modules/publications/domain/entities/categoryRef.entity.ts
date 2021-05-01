@@ -1,5 +1,4 @@
 import { Ok, Result } from 'src/shared/core/Result';
-import { WatchedList } from 'src/shared/core/WatchedList';
 import { DomainEntity } from 'src/shared/domain/entity.abstract';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { Empty } from './publisherRef.entity';
@@ -14,8 +13,4 @@ export class CategoryRef extends DomainEntity<Empty> {
   }
 }
 
-export class CategoryRefCollection extends WatchedList<CategoryRef> {
-  public compareItems(a: CategoryRef, b: CategoryRef): boolean {
-    return a.equals(b);
-  }
-}
+export type CategoryRefCollection = CategoryRef[];

@@ -1,9 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  CategoryRef,
-  CategoryRefCollection,
-} from 'src/modules/publications/domain/entities/categoryRef.entity';
+import { CategoryRef } from 'src/modules/publications/domain/entities/categoryRef.entity';
 import {
   EventOccurrence,
   EventOccurrenceCollection,
@@ -56,7 +53,9 @@ export class CreateEventUseCase
     );
     const placeOrError = EventPlace.create({
       ...request.place,
-      hostRef: new UniqueEntityID(request.place.hostRef),
+      hostRef: request.place.hostRef
+        ? new UniqueEntityID(request.place.hostRef)
+        : null,
     });
     const collaboratorsOrError = Join(
       request.collaborators.map((col) => PublisherRef.create(col)),
@@ -85,7 +84,7 @@ export class CreateEventUseCase
       publisher: publisherOrError.getValue(),
       name: nameOrError.getValue(),
       description: unknownFieldsOrError.getValue(),
-      categories: new CategoryRefCollection(categoriesOrError.getValue()),
+      categories: categoriesOrError.getValue(),
       place: placeOrError.getValue(),
       collaborators: collaboratorsOrError.getValue(),
       multimedia: multimediasOrError.getValue(),

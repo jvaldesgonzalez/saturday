@@ -78,6 +78,16 @@ export class Event extends AggregateDomainEntity<EventProps> {
     return Ok();
   }
 
+  changeCollaborators(collaborators: CollaboratorsCollection): Result<void> {
+    this.props.collaborators = collaborators;
+    return Ok();
+  }
+
+  changeMultimedia(multimedia: MultimediaCollection): Result<void> {
+    this.props.multimedia = multimedia;
+    return Ok();
+  }
+
   changeDescription(desc: UnknownFieldCollection): Result<void> {
     this.props.description = desc;
     return Ok();
