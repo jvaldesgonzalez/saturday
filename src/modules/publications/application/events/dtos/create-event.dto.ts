@@ -14,7 +14,7 @@ type PlaceRaw = {
   hostRef: string;
 };
 
-type MultimediaRaw = {
+export type MultimediaRaw = {
   type: MultimediaType;
   url: string;
 };
