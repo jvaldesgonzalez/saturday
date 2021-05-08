@@ -1,3 +1,3 @@
-export type DeleteCollection = {
+export type DeleteCollectionDto = {
   collectionId: string;
 };

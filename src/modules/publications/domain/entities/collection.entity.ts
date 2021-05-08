@@ -65,6 +65,10 @@ export class Collection extends AggregateDomainEntity<CollectionProps> {
     return Ok();
   }
 
+  markDeleted(): Result<void> {
+    return Ok();
+  }
+
   public static new(props: NewCollectionProps): Result<Collection> {
     return Collection.create(
       {
