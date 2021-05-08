@@ -4,4 +4,5 @@ import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 
 export interface IEventRepository extends IRepository<Event> {
   findById(id: UniqueEntityID | string): Promise<Event>;
+  exists(id: UniqueEntityID | string): Promise<boolean>;
 }

@@ -13,6 +13,7 @@ import {
   EventOccurrenceCollection,
 } from './event-ocurrency.entity';
 import { PublisherRef } from './publisherRef.entity';
+import { WatchedList } from 'src/shared/core/WatchedList';
 
 type CollaboratorsCollection = PublisherRef[];
 type MultimediaCollection = Multimedia[];
@@ -166,5 +167,11 @@ export class Event extends AggregateDomainEntity<EventProps> {
       collaborators: props.collaborators ? props.collaborators : [],
     };
     return Ok(new Event(defaultValues, id));
+  }
+}
+
+export class EventCollection extends WatchedList<Event> {
+  compareItems(a: Event, b: Event): boolean {
+    return a.equals(b);
   }
 }
