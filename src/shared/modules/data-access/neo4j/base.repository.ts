@@ -18,7 +18,7 @@ export abstract class BaseRepository<
   protected readonly entityName: string;
   constructor(
     entityName: string,
-    private readonly _domainToPersistentFunc: (
+    protected readonly _domainToPersistentFunc: (
       domainEntity: E,
     ) => Partial<P> | Promise<Partial<P>>,
     context: string,
