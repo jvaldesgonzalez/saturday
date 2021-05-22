@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
-import { Collection } from 'src/modules/publications/domain/entities/collection.entity';
-import { ICollectionRepository } from 'src/modules/publications/infrascruture/repositories/interfaces/ICollectionRepository';
+import { Collection } from 'src/modules/events/domain/entities/collection.entity';
+import { ICollectionRepository } from 'src/modules/events/infrascruture/repositories/interfaces/ICollectionRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';

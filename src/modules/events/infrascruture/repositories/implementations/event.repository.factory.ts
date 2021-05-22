@@ -1,5 +1,5 @@
 import { PersistenceManager } from '@liberation-data/drivine';
-import { Event } from 'src/modules/publications/domain/entities/event.entity';
+import { Event } from 'src/modules/events/domain/entities/event.entity';
 import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';
 import { OrmName } from 'src/shared/modules/data-access/enums/orm-names.enum';
 import { IEventRepository } from '../interfaces/IEventRepository';

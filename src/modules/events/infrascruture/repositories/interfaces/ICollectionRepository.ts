@@ -1,4 +1,4 @@
-import { Collection } from 'src/modules/publications/domain/entities/collection.entity';
+import { Collection } from 'src/modules/events/domain/entities/collection.entity';
 import { IRepository } from 'src/shared/core/interfaces/IRepository';
 import { IIdentifier } from 'src/shared/domain/Identifier';
 

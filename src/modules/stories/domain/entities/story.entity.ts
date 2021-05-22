@@ -12,6 +12,7 @@ type StoryProps = {
   multimedia: Multimedia;
   attachedText?: string;
 };
+
 export class Story extends AggregateDomainEntity<StoryProps> {
   public readonly __brand: void;
 

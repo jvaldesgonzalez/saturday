@@ -1,8 +1,8 @@
 import { Inject, Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
-import { PublisherRef } from 'src/modules/publications/domain/entities/publisherRef.entity';
-import { Story } from 'src/modules/publications/domain/entities/story.entity';
-import { IStoryRepository } from 'src/modules/publications/infrascruture/repositories/interfaces/IStoryRepository';
+import { PublisherRef } from 'src/modules/events/domain/entities/publisherRef.entity';
+import { Story } from 'src/modules/stories/domain/entities/story.entity';
+import { IStoryRepository } from 'src/modules/stories/infrascruture/repositories/interfaces/story.repository.interface';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';

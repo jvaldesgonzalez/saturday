@@ -1,7 +1,7 @@
-import { Empty } from 'src/modules/publications/domain/entities/publisherRef.entity';
 import { Ok, Result } from 'src/shared/core/Result';
 import { DomainEntity } from 'src/shared/domain/entity.abstract';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import { Empty } from 'src/shared/typedefs/empty';
 
 export class UserRef extends DomainEntity<Empty> {
   get id(): UniqueEntityID {

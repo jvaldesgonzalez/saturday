@@ -1,13 +1,13 @@
 import { Inject } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
-import { Collection } from 'src/modules/publications/domain/entities/collection.entity';
+import { Collection } from 'src/modules/events/domain/entities/collection.entity';
 import {
   EventRef,
   EventRefCollection,
-} from 'src/modules/publications/domain/entities/eventRef.entity';
-import { PublisherRef } from 'src/modules/publications/domain/entities/publisherRef.entity';
-import { ICollectionRepository } from 'src/modules/publications/infrascruture/repositories/interfaces/ICollectionRepository';
-import { IEventRepository } from 'src/modules/publications/infrascruture/repositories/interfaces/IEventRepository';
+} from 'src/modules/events/domain/entities/eventRef.entity';
+import { PublisherRef } from 'src/modules/events/domain/entities/publisherRef.entity';
+import { ICollectionRepository } from 'src/modules/events/infrascruture/repositories/interfaces/ICollectionRepository';
+import { IEventRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';

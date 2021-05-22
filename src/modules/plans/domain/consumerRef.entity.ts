@@ -1,8 +1,8 @@
-import { Empty } from 'src/modules/publications/domain/entities/publisherRef.entity';
 import { Ok, Result } from 'src/shared/core/Result';
 import { DomainEntity } from 'src/shared/domain/entity.abstract';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 
+type Empty = Record<never, never>;
 export class ConsumerRef extends DomainEntity<Empty> {
   get id(): UniqueEntityID {
     return this.id;

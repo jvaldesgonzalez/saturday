@@ -1,22 +1,22 @@
 import { Inject } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
-import { CategoryRef } from 'src/modules/publications/domain/entities/categoryRef.entity';
+import { CategoryRef } from 'src/modules/events/domain/entities/categoryRef.entity';
 import {
-  EventOccurrence,
   EventOccurrenceCollection,
-} from 'src/modules/publications/domain/entities/event-ocurrency.entity';
-import { Event } from 'src/modules/publications/domain/entities/event.entity';
-import { PublisherRef } from 'src/modules/publications/domain/entities/publisherRef.entity';
+  EventOccurrence,
+} from 'src/modules/events/domain/entities/event-ocurrency.entity';
+import { Event } from 'src/modules/events/domain/entities/event.entity';
+import { PublisherRef } from 'src/modules/events/domain/entities/publisherRef.entity';
 import {
   Ticket,
   TicketCollection,
-} from 'src/modules/publications/domain/entities/ticket.entity';
-import { EventName } from 'src/modules/publications/domain/value-objects/event-name.value';
-import { EventPlace } from 'src/modules/publications/domain/value-objects/event-place.value';
-import { TicketAmount } from 'src/modules/publications/domain/value-objects/ticket-amount.value';
-import { TicketPrice } from 'src/modules/publications/domain/value-objects/ticket-price.value';
-import { UnknownField } from 'src/modules/publications/domain/value-objects/unknown-field.value';
-import { IEventRepository } from 'src/modules/publications/infrascruture/repositories/interfaces/IEventRepository';
+} from 'src/modules/events/domain/entities/ticket.entity';
+import { EventName } from 'src/modules/events/domain/value-objects/event-name.value';
+import { EventPlace } from 'src/modules/events/domain/value-objects/event-place.value';
+import { TicketAmount } from 'src/modules/events/domain/value-objects/ticket-amount.value';
+import { TicketPrice } from 'src/modules/events/domain/value-objects/ticket-price.value';
+import { UnknownField } from 'src/modules/events/domain/value-objects/unknown-field.value';
+import { IEventRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';

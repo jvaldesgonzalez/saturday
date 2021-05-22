@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Event } from 'src/modules/publications/domain/entities/event.entity';
-import { AttentionTag } from 'src/modules/publications/domain/entities/attention-tag.entity';
-import { IEventRepository } from 'src/modules/publications/infrascruture/repositories/interfaces/IEventRepository';
+import { AttentionTag } from 'src/modules/events/domain/entities/attention-tag.entity';
+import { Event } from 'src/modules/events/domain/entities/event.entity';
+import { IEventRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';
