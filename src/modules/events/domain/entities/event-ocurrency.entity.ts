@@ -9,6 +9,8 @@ type EventOccurrenceProps = {
   dateTimeInit: Date;
   dateTimeEnd: Date;
   tickets: TicketCollection;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export class EventOccurrence extends DomainEntity<EventOccurrenceProps> {
@@ -24,13 +26,23 @@ export class EventOccurrence extends DomainEntity<EventOccurrenceProps> {
     return this.props.tickets;
   }
 
+  public get createdAt(): Date {
+    return this.props.createdAt;
+  }
+
+  public get updatedAt(): Date {
+    return this.props.updatedAt;
+  }
+
   addTicket(ticket: Ticket): Result<void> {
     this.props.tickets.add(ticket);
+    this.props.updatedAt = new Date();
     return Ok();
   }
 
   removeTicket(ticket: Ticket): Result<void> {
     this.props.tickets.remove(ticket);
+    this.props.updatedAt = new Date();
     return Ok();
   }
 
@@ -44,11 +56,17 @@ export class EventOccurrence extends DomainEntity<EventOccurrenceProps> {
     if (!this.props.tickets.exists(ticket)) return Ok();
     this.props.tickets.remove(ticket);
     this.props.tickets.add(ticket);
+    this.props.updatedAt = new Date();
     return Ok();
   }
 
-  public static new(props: EventOccurrenceProps): Result<EventOccurrence> {
-    return this.create(props, new UniqueEntityID());
+  public static new(
+    props: Omit<EventOccurrenceProps, 'createdAt' | 'updatedAt'>,
+  ): Result<EventOccurrence> {
+    return this.create(
+      { ...props, createdAt: new Date(), updatedAt: new Date() },
+      new UniqueEntityID(),
+    );
   }
 
   public static create(

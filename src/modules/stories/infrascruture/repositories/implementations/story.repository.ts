@@ -53,7 +53,7 @@ export class StoryRepository
         `
         MATCH (u:User)
         WHERE u.id = $publisher
-        CREATE (m:Multimedia)<-[:CONTAINS_MEDIA]-(s:Story)-[:PUBLISHED_BY]->(u)
+        MERGE (m:Multimedia)<-[:CONTAINS_MEDIA]-(s:Story)-[:PUBLISHED_BY]->(u)
         SET m += $multimedia
         SET s += $story
         `,

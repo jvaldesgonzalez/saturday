@@ -4,5 +4,5 @@ export class TicketEntity extends PersistentEntity {
   price: number;
   name: string;
   amount: number;
-  description: number;
+  description: string;
 }

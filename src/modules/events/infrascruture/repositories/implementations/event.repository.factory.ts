@@ -3,6 +3,7 @@ import { Event } from 'src/modules/events/domain/entities/event.entity';
 import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';
 import { OrmName } from 'src/shared/modules/data-access/enums/orm-names.enum';
 import { IEventRepository } from '../interfaces/IEventRepository';
+import { EventRepository } from './event.repository';
 
 export class EventRepositoryFactory
   implements IRepositoryFactory<Event, IEventRepository> {
@@ -11,6 +12,6 @@ export class EventRepositoryFactory
   }
 
   build(txManager: PersistenceManager): IEventRepository {
-    return null; //TODO: build event repository
+    return new EventRepository(txManager);
   }
 }

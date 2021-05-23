@@ -11,6 +11,8 @@ type TicketProps = {
   name: string;
   amount: TicketAmount;
   description: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export class Ticket extends DomainEntity<TicketProps> {
@@ -30,34 +32,48 @@ export class Ticket extends DomainEntity<TicketProps> {
     return this.props.amount;
   }
 
+  public get createdAt(): Date {
+    return this.props.createdAt;
+  }
+
+  public get updatedAt(): Date {
+    return this.props.updatedAt;
+  }
+
   changeAmount(amount: TicketAmount): Result<void> {
     this.props.amount = amount;
+    this.props.updatedAt = new Date();
     return Ok();
   }
 
   changePrice(price: TicketAmount): Result<void> {
     this.props.price = price;
+    this.props.updatedAt = new Date();
     return Ok();
   }
 
   changeName(name: string): Result<void> {
     this.props.name = name;
+    this.props.updatedAt = new Date();
     return Ok();
   }
 
   changeDescription(desc: string): Result<void> {
     this.props.description = desc;
+    this.props.updatedAt = new Date();
     return Ok();
   }
 
-  public static new(props: TicketProps): Result<Ticket> {
-    return this.create(props, new UniqueEntityID());
+  public static new(
+    props: Omit<TicketProps, 'createdAt' | 'updatedAt'>,
+  ): Result<Ticket> {
+    return this.create(
+      { ...props, createdAt: new Date(), updatedAt: new Date() },
+      new UniqueEntityID(),
+    );
   }
 
-  public static create(
-    props: TicketProps,
-    id?: UniqueEntityID,
-  ): Result<Ticket> {
+  public static create(props: TicketProps, id: UniqueEntityID): Result<Ticket> {
     const againstNil = Guard.againstNullOrUndefinedBulk([
       { argument: props.name, argumentPath: 'name' },
       { argument: props.description, argumentPath: 'description' },

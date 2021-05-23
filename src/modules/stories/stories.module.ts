@@ -11,4 +11,4 @@ import { StoryRepository } from './infrascruture/repositories/implementations/st
     },
   ],
 })
-export class StoryModule {}
+export class StoriesModule {}

@@ -22,7 +22,7 @@ export class StoryMapper {
   public static DomainToPersistent(s: Story): StoryEntity {
     return {
       id: s._id.toString(),
-      publisher: s.publisher.id.toString(),
+      publisher: s.publisher._id.toString(),
       multimedia: { type: s.multimedia.type, url: s.multimedia.url },
       attachedText: s.attachedText,
       createdAt: s.createdAt.toISOString(),

@@ -1,6 +1,5 @@
-import { PersistentEntity } from 'src/shared/modules/data-access/neo4j/base.entity';
-
-export class AttentionTagEntity extends PersistentEntity {
+export class AttentionTagEntity {
+  id: string;
   title: string;
   color: string;
   description: string;
