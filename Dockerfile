@@ -6,6 +6,8 @@ LABEL maintainer="jvaldesgonzalez9@gmail.com"
 LABEL project="saturday.backend"
 LABEL version="0.0.1"
 
+WORKDIR /home/node/app
+
 COPY package.json ./
 COPY yarn.lock ./
 
@@ -15,6 +17,5 @@ COPY . .
 
 EXPOSE 3000
 
-RUN yarn build
+CMD ["yarn", "start"]
 
-CMD ["yarn", "run", "start:prod"]

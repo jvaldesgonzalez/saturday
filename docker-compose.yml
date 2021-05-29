@@ -1,0 +1,37 @@
+version: '1.0'
+
+services:
+  neo4j:
+    image: neo4j:latest
+    restart: always
+    container_name: neo4j
+    ports:
+      - 7687:7687
+    networks:
+      - saturday_network
+
+  backend-saturday:
+    build:
+      context: .
+    image: backend-saturday:${APP_VERSION}
+    ports:
+      - 3000:3000
+    restart: always
+    environment:
+      DRIVINE_LOG_LEVEL=VERBOSE
+      DATABASE_TYPE=NEO4J
+      DATABASE_USER=neo4j
+      DATABASE_PASSWORD=12345
+      DATABASE_HOST=neo4j
+      DATABASE_PORT=7687
+      DATABASE_NAME=neo4j
+    depends_on:
+      - neo4j
+    networks:
+      - saturday_network
+
+networks:
+  saturday_network:
+    driver: bridge
+    name: saturday_network
+
