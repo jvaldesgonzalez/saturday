@@ -11,8 +11,8 @@ async function bootstrap(): Promise<void> {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
-    .setTitle('Mandao Backend')
-    .setDescription('Mandao apps API description')
+    .setTitle('Saturday Backend')
+    .setDescription('Saturday apps API description')
     .setVersion('0.0.1')
     .addTag('users')
     .addBearerAuth()

@@ -5,7 +5,6 @@ import {
   Transactional,
 } from '@liberation-data/drivine';
 import { Event } from 'src/modules/events/domain/entities/event.entity';
-import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
 import { EventEntity } from '../../entities/event.entity';
 import { EventMapper } from '../../mapper/event.mapper';
