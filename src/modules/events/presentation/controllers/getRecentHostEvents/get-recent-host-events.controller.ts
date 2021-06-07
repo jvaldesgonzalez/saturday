@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IEventRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventRepository';
+import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
 import { BaseController } from 'src/shared/http/BaseController';
 import { GetRecentHostEventsRequest } from './request';
 import { GetRecentHostEventsResponse } from './response';

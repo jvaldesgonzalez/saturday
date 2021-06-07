@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { AttentionTagRef } from 'src/modules/events/domain/entities/attention-tag.entity';
 import { Event } from 'src/modules/events/domain/entities/event.entity';
-import { IEventRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventRepository';
+import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';
@@ -22,12 +22,13 @@ export class AddTagUseCase
   private _logger: Logger;
   constructor(
     @Inject('IUnitOfWorkFactory') private _unitOfWorkFact: IUnitOfWorkFactory,
-    @Inject('IRepositoryFactory') private _repositoryFact: IRepositoryFactory<Event, IEventRepository>,
+    @Inject('IRepositoryFactory')
+    private _repositoryFact: IRepositoryFactory<Event, IEventRepository>,
   ) {
     this._logger = new Logger('AddTagUseCase');
   }
   async execute(request: AddAttentionTagDto): Promise<AddTagUseCaseResponse> {
-		this._logger.log("Executing...");
+    this._logger.log('Executing...');
     try {
       const uow = this._unitOfWorkFact.build();
       await uow.start();

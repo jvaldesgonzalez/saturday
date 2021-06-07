@@ -2,14 +2,14 @@ import { Inject } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
 import { EventOccurrence } from 'src/modules/events/domain/entities/event-ocurrency.entity';
 import { Event } from 'src/modules/events/domain/entities/event.entity';
-import {EventRef} from 'src/modules/events/domain/entities/eventRef.entity';
+import { EventRef } from 'src/modules/events/domain/entities/eventRef.entity';
 import {
   Ticket,
   TicketCollection,
 } from 'src/modules/events/domain/entities/ticket.entity';
 import { TicketAmount } from 'src/modules/events/domain/value-objects/ticket-amount.value';
 import { TicketPrice } from 'src/modules/events/domain/value-objects/ticket-price.value';
-import { IEventRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventRepository';
+import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';
@@ -41,7 +41,7 @@ export class AddOccurrenceUseCase
   async execute(
     request: AddOccurrenceDto,
   ): Promise<AddOccurrenceUseCaseResponse> {
-		this._logger.log("Executing...");
+    this._logger.log('Executing...');
     const ticketsOrError = Join(
       request.tickets.map((tkt) => {
         const amountOrError = TicketAmount.create(tkt.amount);
@@ -62,7 +62,7 @@ export class AddOccurrenceUseCase
 
     const occurrenceOrError = EventOccurrence.new({
       ...request,
-			eventId:EventRef.create(request.eventId).getValue(),
+      eventId: EventRef.create(request.eventId).getValue(),
       tickets: new TicketCollection(ticketsOrError.getValue()),
     });
 

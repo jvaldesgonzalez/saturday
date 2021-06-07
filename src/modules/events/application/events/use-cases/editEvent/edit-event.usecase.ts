@@ -5,7 +5,7 @@ import { PublisherRef } from 'src/modules/events/domain/entities/publisherRef.en
 import { EventName } from 'src/modules/events/domain/value-objects/event-name.value';
 import { EventPlace } from 'src/modules/events/domain/value-objects/event-place.value';
 import { UnknownField } from 'src/modules/events/domain/value-objects/unknown-field.value';
-import { IEventRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventRepository';
+import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';

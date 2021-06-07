@@ -1,9 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
 import { CategoryRef } from 'src/modules/events/domain/entities/categoryRef.entity';
-import {EventOccurrence} from 'src/modules/events/domain/entities/event-ocurrency.entity';
+import { EventOccurrence } from 'src/modules/events/domain/entities/event-ocurrency.entity';
 import { Event } from 'src/modules/events/domain/entities/event.entity';
-import {EventRef} from 'src/modules/events/domain/entities/eventRef.entity';
+import { EventRef } from 'src/modules/events/domain/entities/eventRef.entity';
 import { PublisherRef } from 'src/modules/events/domain/entities/publisherRef.entity';
 import {
   Ticket,
@@ -14,7 +14,7 @@ import { EventPlace } from 'src/modules/events/domain/value-objects/event-place.
 import { TicketAmount } from 'src/modules/events/domain/value-objects/ticket-amount.value';
 import { TicketPrice } from 'src/modules/events/domain/value-objects/ticket-price.value';
 import { UnknownField } from 'src/modules/events/domain/value-objects/unknown-field.value';
-import { IEventRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventRepository';
+import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
@@ -94,7 +94,7 @@ export class CreateEventUseCase
 
   private createOccurrencesFromRaw(
     raw: OccurrenceRaw,
-		eventId:string
+    eventId: string,
   ): Result<EventOccurrence> {
     const ticketsOrError = Join(
       raw.tickets.map((tkt) => {
@@ -116,7 +116,7 @@ export class CreateEventUseCase
 
     return EventOccurrence.new({
       ...raw,
-			eventId:EventRef.create(eventId).getValue(),
+      eventId: EventRef.create(eventId).getValue(),
       tickets: new TicketCollection(ticketsOrError.getValue()),
     });
   }

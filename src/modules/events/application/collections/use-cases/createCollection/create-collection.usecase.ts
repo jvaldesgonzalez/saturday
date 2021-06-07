@@ -6,8 +6,8 @@ import {
   EventRefCollection,
 } from 'src/modules/events/domain/entities/eventRef.entity';
 import { PublisherRef } from 'src/modules/events/domain/entities/publisherRef.entity';
-import { ICollectionRepository } from 'src/modules/events/infrascruture/repositories/interfaces/ICollectionRepository';
-import { IEventRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventRepository';
+import { ICollectionRepository } from 'src/modules/events/infrastruture/repositories/interfaces/ICollectionRepository';
+import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';

@@ -5,7 +5,7 @@ import { Event } from 'src/modules/events/domain/entities/event.entity';
 import { Ticket } from 'src/modules/events/domain/entities/ticket.entity';
 import { TicketAmount } from 'src/modules/events/domain/value-objects/ticket-amount.value';
 import { TicketPrice } from 'src/modules/events/domain/value-objects/ticket-price.value';
-import { IEventRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventRepository';
+import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';

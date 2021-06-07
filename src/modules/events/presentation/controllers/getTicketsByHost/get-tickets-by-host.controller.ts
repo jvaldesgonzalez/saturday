@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IEventOccurrenceRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventOccurrenceRepository';
+import { IEventOccurrenceRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventOccurrenceRepository';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { PageParams } from 'src/shared/core/PaginatorParams';
 import { BaseController } from 'src/shared/http/BaseController';
