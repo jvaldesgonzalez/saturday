@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { AttentionTag } from 'src/modules/events/domain/entities/attention-tag.entity';
+import { AttentionTagRef } from 'src/modules/events/domain/entities/attention-tag.entity';
 import { Event } from 'src/modules/events/domain/entities/event.entity';
 import { IEventRepository } from 'src/modules/events/infrascruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
@@ -22,12 +22,12 @@ export class AddTagUseCase
   private _logger: Logger;
   constructor(
     @Inject('IUnitOfWorkFactory') private _unitOfWorkFact: IUnitOfWorkFactory,
-    @Inject('IRepositoryFactory')
-    private _repositoryFact: IRepositoryFactory<Event, IEventRepository>,
+    @Inject('IRepositoryFactory') private _repositoryFact: IRepositoryFactory<Event, IEventRepository>,
   ) {
     this._logger = new Logger('AddTagUseCase');
   }
   async execute(request: AddAttentionTagDto): Promise<AddTagUseCaseResponse> {
+		this._logger.log("Executing...");
     try {
       const uow = this._unitOfWorkFact.build();
       await uow.start();
@@ -45,7 +45,7 @@ export class AddTagUseCase
     const event = await repo.findById(request.eventId);
     if (!event)
       return left(new AddTagErrors.EventDoestnExists(request.eventId));
-    const tag = AttentionTag.create(request.tag);
+    const tag = AttentionTagRef.create(request.tagId);
     if (tag.isFailure) return left(Fail(tag.error.toString()));
     event.addTag(tag.getValue());
     try {

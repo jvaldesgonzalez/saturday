@@ -51,39 +51,39 @@ export class AddTicketUseCase
     repo: IEventRepository,
   ): Promise<AddTicketUseCaseResponse> {
     try {
-      const event = await repo.findById(request.eventId);
+      // const event = await repo.findById(request.eventId);
 
-      if (!event)
-        return left(new AddTicketErrors.EventDoestnExists(request.eventId));
+      // if (!event)
+      //   return left(new AddTicketErrors.EventDoestnExists(request.eventId));
 
-      const occurrence = event.occurrences
-        .getItems()
-        .find((occ) => occ._id.toString() === request.occurrenceId);
+      // const occurrence = event.occurrences
+      //   .getItems()
+      //   .find((occ) => occ._id.toString() === request.occurrenceId);
 
-      if (!occurrence)
-        return left(
-          new AddTicketErrors.OccurrenceDoesntExistInEvent(
-            request.occurrenceId,
-          ),
-        );
+      // if (!occurrence)
+      //   return left(
+      //     new AddTicketErrors.OccurrenceDoesntExistInEvent(
+      //       request.occurrenceId,
+      //     ),
+      //   );
 
-      const amountOrError = TicketAmount.create(request.amount);
-      const priceOrError = TicketPrice.create(request.price);
+      // const amountOrError = TicketAmount.create(request.amount);
+      // const priceOrError = TicketPrice.create(request.price);
 
-      const combined = Result.combine([amountOrError, priceOrError]);
+      // const combined = Result.combine([amountOrError, priceOrError]);
 
-      if (combined.isFailure) return left(Fail<Ticket>(combined.error));
-      const ticketOrError = Ticket.new({
-        ...request,
-        amount: amountOrError.getValue(),
-        price: priceOrError.getValue(),
-      });
+      // if (combined.isFailure) return left(Fail<Ticket>(combined.error));
+      // const ticketOrError = Ticket.new({
+      //   ...request,
+      //   amount: amountOrError.getValue(),
+      //   price: priceOrError.getValue(),
+      // });
 
-      if (ticketOrError.isFailure)
-        return left(Fail<Ticket>(ticketOrError.error.toString()));
+      // if (ticketOrError.isFailure)
+      //   return left(Fail<Ticket>(ticketOrError.error.toString()));
 
-      occurrence.addTicket(ticketOrError.getValue());
-      await repo.save(event);
+      // occurrence.addTicket(ticketOrError.getValue());
+      // await repo.save(event);
 
       return right(Ok());
     } catch (error) {

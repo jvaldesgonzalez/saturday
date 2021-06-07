@@ -48,18 +48,18 @@ export class RemoveTicketUseCase
     request: RemoveTicketDto,
     repo: IEventRepository,
   ): Promise<RemoveTicketUseCaseResponse> {
-    const event = await repo.findById(request.eventId);
-    if (!event)
-      return left(new RemoveTicketErrors.EventDoestnExists(request.eventId));
-    const occurrence = event.findOccurrenceById(request.occurrenceId);
-    if (!occurrence)
-      return left(
-        new RemoveTicketErrors.OccurrenceDoesntExistInEvent(
-          request.occurrenceId,
-        ),
-      );
-    const ticket = occurrence.findTicketById(request.ticketId);
-    if (ticket) occurrence.removeTicket(ticket);
+    // const event = await repo.findById(request.eventId);
+    // if (!event)
+    //   return left(new RemoveTicketErrors.EventDoestnExists(request.eventId));
+    // const occurrence = event.findOccurrenceById(request.occurrenceId);
+    // if (!occurrence)
+    //   return left(
+    //     new RemoveTicketErrors.OccurrenceDoesntExistInEvent(
+    //       request.occurrenceId,
+    //     ),
+    //   );
+    // const ticket = occurrence.findTicketById(request.ticketId);
+    // if (ticket) occurrence.removeTicket(ticket);
     return right(Ok());
   }
 }

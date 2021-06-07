@@ -2,11 +2,9 @@ import { Fail, Join, Result } from 'src/shared/core/Result';
 import { Multimedia, MultimediaType } from 'src/shared/domain/multimedia.value';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { CategoryRef } from '../../domain/entities/categoryRef.entity';
-import {
-  EventOccurrence,
-  EventOccurrenceCollection,
-} from '../../domain/entities/event-ocurrency.entity';
+import { EventOccurrence } from '../../domain/entities/event-ocurrency.entity';
 import { Event } from '../../domain/entities/event.entity';
+import { EventRef } from '../../domain/entities/eventRef.entity';
 import { PublisherRef } from '../../domain/entities/publisherRef.entity';
 import { Ticket, TicketCollection } from '../../domain/entities/ticket.entity';
 import { EventName } from '../../domain/value-objects/event-name.value';
@@ -51,6 +49,7 @@ export class EventMapper {
     return EventOccurrence.create(
       {
         ...raw,
+        eventId: EventRef.create(raw.eventId).getValue(),
         dateTimeInit: new Date(raw.dateTimeInit),
         dateTimeEnd: new Date(raw.dateTimeEnd),
         createdAt: new Date(raw.createdAt),
@@ -84,9 +83,6 @@ export class EventMapper {
         Multimedia.create({ type: mtm.type as MultimediaType, url: mtm.url }),
       ),
     );
-    const occurrencesOrError = Join(
-      p.occurrences.map((occur) => EventMapper.createOccurrencesFromRaw(occur)),
-    );
 
     return Event.create(
       {
@@ -97,9 +93,6 @@ export class EventMapper {
         place: placeOrError.getValue(),
         collaborators: collaboratorsOrError.getValue(),
         multimedia: multimediasOrError.getValue(),
-        occurrences: new EventOccurrenceCollection(
-          occurrencesOrError.getValue(),
-        ),
         createdAt: new Date(p.createdAt),
         updatedAt: new Date(p.updatedAt),
       },
@@ -140,34 +133,9 @@ export class EventMapper {
           };
         }),
       ),
-      attentionTags: d.attentionTags.getItems().map((att) => {
-        return {
-          title: att.title,
-          color: att.color,
-          description: att.description,
-          id: att._id.toString(),
-        };
-      }),
-      occurrences: d.occurrences.getItems().map((occ) => {
-        return {
-          id: occ._id.toString(),
-          createdAt: occ.createdAt.toISOString(),
-          updatedAt: occ.updatedAt.toISOString(),
-          dateTimeInit: occ.dateTimeInit.toISOString(),
-          dateTimeEnd: occ.dateTimeEnd.toISOString(),
-          tickets: occ.tickets.getItems().map((t) => {
-            return {
-              id: t._id.toString(),
-              price: t.price.value,
-              name: t.name,
-              amount: t.amount.value,
-              description: t.description,
-              createdAt: t.createdAt.toISOString(),
-              updatedAt: t.updatedAt.toISOString(),
-            };
-          }),
-        };
-      }),
+      attentionTags: d.attentionTags
+        .getItems()
+        .map((tagId) => tagId._id.toString()),
     };
   }
 }

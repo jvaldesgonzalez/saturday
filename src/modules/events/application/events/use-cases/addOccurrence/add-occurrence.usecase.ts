@@ -2,6 +2,7 @@ import { Inject } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
 import { EventOccurrence } from 'src/modules/events/domain/entities/event-ocurrency.entity';
 import { Event } from 'src/modules/events/domain/entities/event.entity';
+import {EventRef} from 'src/modules/events/domain/entities/eventRef.entity';
 import {
   Ticket,
   TicketCollection,
@@ -40,6 +41,7 @@ export class AddOccurrenceUseCase
   async execute(
     request: AddOccurrenceDto,
   ): Promise<AddOccurrenceUseCaseResponse> {
+		this._logger.log("Executing...");
     const ticketsOrError = Join(
       request.tickets.map((tkt) => {
         const amountOrError = TicketAmount.create(tkt.amount);
@@ -60,6 +62,7 @@ export class AddOccurrenceUseCase
 
     const occurrenceOrError = EventOccurrence.new({
       ...request,
+			eventId:EventRef.create(request.eventId).getValue(),
       tickets: new TicketCollection(ticketsOrError.getValue()),
     });
 
@@ -89,8 +92,6 @@ export class AddOccurrenceUseCase
         new AddOccurrenceErrors.EventDoestnExists(occurrence._id.toString()),
       );
 
-    const addResult = eventOrNone.addOccurrence(occurrence);
-    if (addResult.isFailure) return left(addResult);
     await eventRepo.save(eventOrNone);
     return right(Ok());
   }

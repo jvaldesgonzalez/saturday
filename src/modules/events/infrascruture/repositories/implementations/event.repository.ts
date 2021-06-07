@@ -33,7 +33,6 @@ export class EventRepository
       collaborators,
       multimedia,
       attentionTags,
-      occurrences,
       ...data
     } = persistent;
     await this.persistenceManager.execute(

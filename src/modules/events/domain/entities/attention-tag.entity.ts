@@ -1,29 +1,18 @@
 import { Ok, Result } from 'src/shared/core/Result';
-import { DomainEntity } from 'src/shared/domain/entity.abstract';
+import {AggregateDomainEntity} from 'src/shared/domain/aggregate-entity.abstract';
+import {IIdentifier} from 'src/shared/domain/Identifier';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import {Empty} from 'src/shared/typedefs/empty';
 
-type RGBAColor = string;
-
-type AttentionTagProps = {
-  title: string;
-  color: RGBAColor;
-  description: string;
-};
-
-export class AttentionTag extends DomainEntity<AttentionTagProps> {
-  public get title(): string {
-    return this.props.title;
+export class AttentionTagRef extends AggregateDomainEntity<Empty> {
+  get id(): IIdentifier {
+    return this._id;
+  }
+  private constructor(id?: UniqueEntityID) {
+    super(null, id);
   }
 
-  public get color(): RGBAColor {
-    return this.props.color;
-  }
-
-  public get description(): string {
-    return this.props.description;
-  }
-
-  public static create(props: AttentionTagProps): Result<AttentionTag> {
-    return Ok(new AttentionTag(props, new UniqueEntityID()));
+  public static create(id?: string): Result<AttentionTagRef> {
+    return Ok(new AttentionTagRef(new UniqueEntityID(id)));
   }
 }

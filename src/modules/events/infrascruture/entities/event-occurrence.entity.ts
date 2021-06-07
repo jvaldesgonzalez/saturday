@@ -5,6 +5,7 @@ import { TicketEntity } from './ticket.entity';
 export class EventOccurrenceEntity extends PersistentEntity {
   dateTimeInit: string;
   dateTimeEnd: string;
+  eventId: string;
 
   @Type(() => TicketEntity)
   tickets: TicketEntity[];

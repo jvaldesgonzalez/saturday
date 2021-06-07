@@ -2,16 +2,12 @@ import { Ok, Result } from 'src/shared/core/Result';
 import { AggregateDomainEntity } from 'src/shared/domain/aggregate-entity.abstract';
 import { Multimedia } from 'src/shared/domain/multimedia.value';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import { AttentionTagCollection } from '../value-objects/attention-tag-collection.value';
-import { AttentionTag } from './attention-tag.entity';
+import { AttentionTagRefCollection } from '../value-objects/attention-tag-collection.value';
+import { AttentionTagRef } from './attention-tag.entity';
 import { EventName } from '../value-objects/event-name.value';
 import { EventPlace } from '../value-objects/event-place.value';
 import { UnknownFieldCollection } from '../value-objects/unknown-fields-collection.value';
 import { CategoryRefCollection } from './categoryRef.entity';
-import {
-  EventOccurrence,
-  EventOccurrenceCollection,
-} from './event-ocurrency.entity';
 import { PublisherRef } from './publisherRef.entity';
 import { WatchedList } from 'src/shared/core/WatchedList';
 
@@ -26,8 +22,7 @@ type EventProps = {
   place: EventPlace;
   collaborators?: CollaboratorsCollection;
   multimedia: MultimediaCollection;
-  attentionTags?: AttentionTagCollection;
-  occurrences: EventOccurrenceCollection;
+  attentionTags?: AttentionTagRefCollection;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -43,10 +38,6 @@ export class Event extends AggregateDomainEntity<EventProps> {
     return this.props.place;
   }
 
-  public get occurrences(): EventOccurrenceCollection {
-    return this.props.occurrences;
-  }
-
   public get description(): UnknownFieldCollection {
     return this.props.description;
   }
@@ -59,7 +50,7 @@ export class Event extends AggregateDomainEntity<EventProps> {
     return this.props.name;
   }
 
-  public get attentionTags(): AttentionTagCollection {
+  public get attentionTags(): AttentionTagRefCollection {
     return this.props.attentionTags;
   }
 
@@ -109,39 +100,14 @@ export class Event extends AggregateDomainEntity<EventProps> {
     return Ok();
   }
 
-  addOccurrence(occurrence: EventOccurrence): Result<void> {
-    this.props.occurrences.add(occurrence);
-    return Ok();
-  }
-
-  deleteOccurrence(occurrenceId: UniqueEntityID): Result<void> {
-    const occurr = this.props.occurrences
-      .getItems()
-      .find((occ) => occ._id.toString() === occurrenceId.toString());
-    if (occurr) this.props.occurrences.remove(occurr);
-    return Ok();
-  }
-
-  findOccurrenceById(id: string): EventOccurrence | undefined {
-    return this.props.occurrences
-      .getItems()
-      .find((occurr) => occurr._id.toString() === id);
-  }
-
-  addTag(tag: AttentionTag): Result<void> {
+  addTag(tag: AttentionTagRef): Result<void> {
     this.props.attentionTags.add(tag);
     return Ok();
   }
 
-  removeTag(tag: AttentionTag): Result<void> {
+  removeTag(tag: AttentionTagRef): Result<void> {
     this.props.attentionTags.remove(tag);
     return Ok();
-  }
-
-  findTagById(tagId: string): AttentionTag | undefined {
-    return this.props.attentionTags
-      .getItems()
-      .find((item) => item._id.toString() === tagId);
   }
 
   public static new(
@@ -162,7 +128,7 @@ export class Event extends AggregateDomainEntity<EventProps> {
       ...props,
       attentionTags: props.attentionTags
         ? props.attentionTags
-        : new AttentionTagCollection([]),
+        : new AttentionTagRefCollection([]),
       description: props.description ? props.description : [],
       collaborators: props.collaborators ? props.collaborators : [],
     };

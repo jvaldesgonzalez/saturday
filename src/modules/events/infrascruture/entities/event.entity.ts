@@ -1,7 +1,6 @@
 import { Type } from 'class-transformer';
 import { PersistentEntity } from 'src/shared/modules/data-access/neo4j/base.entity';
 import { AttentionTagEntity } from './attention-tag.entity';
-import { EventOccurrenceEntity } from './event-occurrence.entity';
 
 export class UnknownFieldPersistent {
   header: string;
@@ -34,9 +33,5 @@ export class EventEntity extends PersistentEntity {
   collaborators: string[];
   multimedia: string;
 
-  @Type(() => AttentionTagEntity)
-  attentionTags: AttentionTagEntity[];
-
-  @Type(() => EventOccurrenceEntity)
-  occurrences: EventOccurrenceEntity[];
+  attentionTags: string[];
 }

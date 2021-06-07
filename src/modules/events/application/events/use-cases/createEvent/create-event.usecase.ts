@@ -1,11 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
 import { CategoryRef } from 'src/modules/events/domain/entities/categoryRef.entity';
-import {
-  EventOccurrenceCollection,
-  EventOccurrence,
-} from 'src/modules/events/domain/entities/event-ocurrency.entity';
+import {EventOccurrence} from 'src/modules/events/domain/entities/event-ocurrency.entity';
 import { Event } from 'src/modules/events/domain/entities/event.entity';
+import {EventRef} from 'src/modules/events/domain/entities/eventRef.entity';
 import { PublisherRef } from 'src/modules/events/domain/entities/publisherRef.entity';
 import {
   Ticket,
@@ -63,9 +61,6 @@ export class CreateEventUseCase
     const multimediasOrError = Join(
       request.multimedia.map((mtm) => Multimedia.create(mtm)),
     );
-    const occurrencesOrError = Join(
-      request.occurrences.map((occur) => this.createOccurrencesFromRaw(occur)),
-    );
 
     const combinedResult = Result.combine([
       publisherOrError,
@@ -75,7 +70,6 @@ export class CreateEventUseCase
       categoriesOrError,
       collaboratorsOrError,
       multimediasOrError,
-      occurrencesOrError,
     ]);
 
     if (combinedResult.isFailure) return left(Fail(combinedResult.error));
@@ -88,7 +82,6 @@ export class CreateEventUseCase
       place: placeOrError.getValue(),
       collaborators: collaboratorsOrError.getValue(),
       multimedia: multimediasOrError.getValue(),
-      occurrences: new EventOccurrenceCollection(occurrencesOrError.getValue()),
     }).getValue();
 
     try {
@@ -101,6 +94,7 @@ export class CreateEventUseCase
 
   private createOccurrencesFromRaw(
     raw: OccurrenceRaw,
+		eventId:string
   ): Result<EventOccurrence> {
     const ticketsOrError = Join(
       raw.tickets.map((tkt) => {
@@ -122,6 +116,7 @@ export class CreateEventUseCase
 
     return EventOccurrence.new({
       ...raw,
+			eventId:EventRef.create(eventId).getValue(),
       tickets: new TicketCollection(ticketsOrError.getValue()),
     });
   }

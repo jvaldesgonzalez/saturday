@@ -1,11 +1,12 @@
 import { Guard } from 'src/shared/core/Guard';
 import { Fail, Ok, Result } from 'src/shared/core/Result';
-import { WatchedList } from 'src/shared/core/WatchedList';
-import { DomainEntity } from 'src/shared/domain/entity.abstract';
+import {AggregateDomainEntity} from 'src/shared/domain/aggregate-entity.abstract';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import {EventRef} from './eventRef.entity';
 import { Ticket, TicketCollection } from './ticket.entity';
 
 type EventOccurrenceProps = {
+	eventId:EventRef
   dateTimeInit: Date;
   dateTimeEnd: Date;
   tickets: TicketCollection;
@@ -13,7 +14,7 @@ type EventOccurrenceProps = {
   updatedAt: Date;
 };
 
-export class EventOccurrence extends DomainEntity<EventOccurrenceProps> {
+export class EventOccurrence extends AggregateDomainEntity<EventOccurrenceProps> {
   get dateTimeInit(): Date {
     return this.props.dateTimeInit;
   }
@@ -82,8 +83,3 @@ export class EventOccurrence extends DomainEntity<EventOccurrenceProps> {
   }
 }
 
-export class EventOccurrenceCollection extends WatchedList<EventOccurrence> {
-  compareItems(a: EventOccurrence, b: EventOccurrence): boolean {
-    return a.equals(b);
-  }
-}

@@ -15,6 +15,7 @@ type TicketProps = {
   updatedAt: Date;
 };
 
+//Entity and not aggregate here
 export class Ticket extends DomainEntity<TicketProps> {
   get price(): TicketPrice {
     return this.props.price;

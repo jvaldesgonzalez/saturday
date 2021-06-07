@@ -1,8 +1,8 @@
 import { WatchedList } from 'src/shared/core/WatchedList';
-import { AttentionTag } from '../entities/attention-tag.entity';
+import { AttentionTagRef } from '../entities/attention-tag.entity';
 
-export class AttentionTagCollection extends WatchedList<AttentionTag> {
-  compareItems(a: AttentionTag, b: AttentionTag): boolean {
+export class AttentionTagRefCollection extends WatchedList<AttentionTagRef> {
+  compareItems(a: AttentionTagRef, b: AttentionTagRef): boolean {
     return a.equals(b);
   }
 }

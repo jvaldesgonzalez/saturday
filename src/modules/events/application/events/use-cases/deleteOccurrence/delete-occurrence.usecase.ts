@@ -53,11 +53,11 @@ export class DeleteOccurrenceUseCase
     if (!eventOrNone)
       return left(new DeleteOccurrenceErrors.EventDoestnExists(req.eventId));
 
-    const addResult = eventOrNone.deleteOccurrence(
-      new UniqueEntityID(req.occurrenceId),
-    );
-    if (addResult.isFailure) return left(addResult);
-    await eventRepo.save(eventOrNone);
+    // const addResult = eventOrNone.deleteOccurrence(
+    //   new UniqueEntityID(req.occurrenceId),
+    // );
+    // if (addResult.isFailure) return left(addResult);
+    // await eventRepo.save(eventOrNone);
     return right(Ok());
   }
 }

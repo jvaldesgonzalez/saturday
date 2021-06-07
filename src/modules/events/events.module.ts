@@ -7,6 +7,10 @@ import { EventRepositoryFactory } from './infrascruture/repositories/implementat
 @Module({
   imports: [DataAccessModule],
   providers: [
+    // {
+    //   provide:'IEventOccurrenceRepository',
+    //   useClass:
+    // },
     {
       provide: 'IEventRepository',
       useClass: EventRepository,
