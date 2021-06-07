@@ -5,10 +5,12 @@ import {
   Transactional,
 } from '@liberation-data/drivine';
 import { Event } from 'src/modules/events/domain/entities/event.entity';
+import { GetRecentHostEventsResponse } from 'src/modules/events/presentation/controllers/getRecentHostEvents/response';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
 import { EventEntity } from '../../entities/event.entity';
 import { EventMapper } from '../../mapper/event.mapper';
 import { IEventRepository } from '../interfaces/IEventRepository';
+import * as faker from 'faker';
 
 export class EventRepository
   extends BaseRepository<Event, EventEntity>
@@ -84,5 +86,26 @@ export class EventRepository
       ).bind({ id: id }),
     );
     return !!res;
+  }
+
+  async getRecentsByHost(
+    _hostId: string,
+  ): Promise<GetRecentHostEventsResponse[]> {
+    const arr: GetRecentHostEventsResponse[] = Array(faker.datatype.number(5));
+    for (let i = 0; i < arr.length; i++) {
+      arr[i] = {
+        name: faker.name.title(),
+        category: faker.name.jobType(),
+        dateTimeInit: faker.date.recent(),
+        place: faker.address.streetName(),
+        imageUrl: faker.image.nightlife(),
+        stats: {
+          reached: faker.datatype.number(),
+          interested: faker.datatype.number(),
+          sharedTimes: faker.datatype.number(),
+        },
+      };
+    }
+    return arr;
   }
 }

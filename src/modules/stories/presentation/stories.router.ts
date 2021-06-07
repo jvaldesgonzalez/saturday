@@ -13,7 +13,7 @@ export class StoriesRouter {
   constructor(private getFromHostCtx: GetStoriesFromHostController) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get('/local')
+  @Get('/me')
   @ApiResponse({ status: 200, type: [GetStoriesFromHostResponse] })
   async getMyStories(
     @CurrentUser() user: JWTClaims,
