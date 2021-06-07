@@ -4,10 +4,12 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Story } from 'src/modules/stories/domain/entities/story.entity';
+import { GetStoriesFromHostResponse } from 'src/modules/stories/presentation/controllers/getStoriesFromHost/response';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
 import { StoryEntity } from '../../entities/story.entity';
 import { StoryMapper } from '../../mapper/story.mapper';
 import { IStoryRepository } from '../interfaces/story.repository.interface';
+import * as faker from 'faker';
 
 export class StoryRepository
   extends BaseRepository<Story, StoryEntity>
@@ -77,5 +79,19 @@ export class StoryRepository
         `,
       ).bind({ id: story._id.toString() }),
     );
+  }
+
+  //view part
+  async getByHost(hostId: string): Promise<GetStoriesFromHostResponse[]> {
+    const arr = Array(faker.datatype.number(10));
+    for (let i = 0; i < arr.length; i++) {
+      arr[i] = {
+        id: faker.datatype.uuid(),
+        type: 'image',
+        url: faker.image.imageUrl(),
+        views: faker.datatype.number(10000),
+      };
+    }
+    return arr;
   }
 }
