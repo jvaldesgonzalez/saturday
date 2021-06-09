@@ -1,6 +1,7 @@
 #Version 0.0.1
 
 FROM node:14
+LABEL maintainer="jvaldesgonzalez9@gmail.com"
 
 WORKDIR /home/node/app
 
