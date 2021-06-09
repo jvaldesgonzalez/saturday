@@ -9,6 +9,7 @@ import {
   InjectPersistenceManager,
   PersistenceManager,
 } from '@liberation-data/drivine';
+import { GetTicketsByOccurrenceResponse } from 'src/modules/events/presentation/controllers/getTicketsByOccurrence/response';
 
 export class EventOccurrenceRepository
   extends BaseRepository<EventOccurrence, EventOccurrenceEntity>
@@ -51,5 +52,23 @@ export class EventOccurrenceRepository
       current: from,
       pageSize: len,
     };
+  }
+
+  async getTicketsByOccurrence(
+    _ocurrenceId: string,
+  ): Promise<GetTicketsByOccurrenceResponse> {
+    const arr: GetTicketsByOccurrenceResponse['tickets'] = Array(
+      faker.datatype.number({ min: 1, max: 4 }),
+    );
+
+    for (let i = 0; i < arr.length; i++) {
+      arr[i] = {
+        name: faker.name.title(),
+        price: `${faker.datatype.number(300)} CUP`,
+        sold: faker.datatype.number(200),
+        total: 200 + faker.datatype.number(500),
+      };
+    }
+    return { tickets: arr };
   }
 }

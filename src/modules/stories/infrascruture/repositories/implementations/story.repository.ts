@@ -9,7 +9,7 @@ import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.reposi
 import { StoryEntity } from '../../entities/story.entity';
 import { StoryMapper } from '../../mapper/story.mapper';
 import { IStoryRepository } from '../interfaces/story.repository.interface';
-import * as faker from 'faker';
+// import * as faker from 'faker';
 
 export class StoryRepository
   extends BaseRepository<Story, StoryEntity>
@@ -82,16 +82,22 @@ export class StoryRepository
   }
 
   //view part
-  async getByHost(_hostId: string): Promise<GetStoriesFromHostResponse[]> {
-    const arr = Array(faker.datatype.number(10));
-    for (let i = 0; i < arr.length; i++) {
-      arr[i] = {
-        id: faker.datatype.uuid(),
-        type: 'image',
-        url: faker.image.imageUrl(),
-        views: faker.datatype.number(10000),
-      };
-    }
-    return arr;
+  async getByHost(hostId: string): Promise<GetStoriesFromHostResponse[]> {
+    const stories = await this.persistenceManager.query<GetStoriesFromHostResponse>(
+      QuerySpecification.withStatement<GetStoriesFromHostResponse>(
+        `
+        MATCH (s:Story)<-[edge:PUBLISH_STORY ]-(u:User)
+        WHERE u.id = $id
+        RETURN {
+          id:s.id,
+          type:edge.type,
+          url:s.url,
+          views:0
+        }
+        `,
+      ).bind({ id: hostId }),
+    );
+
+    return stories;
   }
 }

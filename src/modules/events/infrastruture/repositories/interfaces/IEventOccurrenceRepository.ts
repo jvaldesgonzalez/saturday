@@ -1,5 +1,6 @@
 import { EventOccurrence } from 'src/modules/events/domain/entities/event-ocurrency.entity';
 import { GetTicketsByHostResponse } from 'src/modules/events/presentation/controllers/getTicketsByHost/response';
+import { GetTicketsByOccurrenceResponse } from 'src/modules/events/presentation/controllers/getTicketsByOccurrence/response';
 import { IRepository } from 'src/shared/core/interfaces/IRepository';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 
@@ -14,4 +15,8 @@ export interface IEventOccurrenceRepository
     from: number,
     len: number,
   ): Promise<PaginatedFindResult<GetTicketsByHostResponse>>;
+
+  getTicketsByOccurrence(
+    ocurrenceId: string,
+  ): Promise<GetTicketsByOccurrenceResponse>;
 }

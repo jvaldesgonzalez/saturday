@@ -4,8 +4,15 @@ import {
   Get,
   Query,
   ParseIntPipe,
+  Param,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiResponse,
+  ApiQuery,
+  ApiParam,
+} from '@nestjs/swagger';
 import { JWTClaims } from 'src/modules/users/domain/value-objects/token.value';
 import { CurrentUser } from 'src/shared/core/auth/current-user.decorator';
 import { JwtAuthGuard } from 'src/shared/core/auth/JwtAuth.guard';
@@ -14,6 +21,8 @@ import { GetRecentEventsByHostController } from './controllers/getRecentHostEven
 import { GetRecentHostEventsResponse } from './controllers/getRecentHostEvents/response';
 import { GetTicketsByHostController } from './controllers/getTicketsByHost/get-tickets-by-host.controller';
 import { GetTicketsByHostResponse } from './controllers/getTicketsByHost/response';
+import { GetTicketsByOccurrenceController } from './controllers/getTicketsByOccurrence/get-tickets-by-occurrence.controller';
+import { GetTicketsByOccurrenceResponse } from './controllers/getTicketsByOccurrence/response';
 
 @ApiTags('events')
 @ApiBearerAuth()
@@ -22,6 +31,7 @@ export class EventsRouter {
   constructor(
     private getRecentsByHostCtx: GetRecentEventsByHostController,
     private getTicketsByHostCtx: GetTicketsByHostController,
+    private getTicketsByOccurrenceCtx: GetTicketsByOccurrenceController,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -44,5 +54,19 @@ export class EventsRouter {
     @Query('size', ParseIntPipe) size = 0,
   ): Promise<PaginatedFindResult<GetTicketsByHostResponse>> {
     return this.getTicketsByHostCtx.execute({ hostId: user.id, from, size });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/occurrences/:id/tickets')
+  @ApiParam({ name: 'id' })
+  @ApiResponse({ status: 200, type: GetTicketsByOccurrenceResponse })
+  async getTicketsByOccurrence(
+    @CurrentUser() user: JWTClaims,
+    @Param('id') id: string,
+  ): Promise<GetTicketsByOccurrenceResponse> {
+    return this.getTicketsByOccurrenceCtx.execute({
+      hostId: user.id,
+      occurrenceId: id,
+    });
   }
 }
