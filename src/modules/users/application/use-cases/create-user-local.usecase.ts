@@ -13,7 +13,6 @@ import { IUserRepository } from '../../infrastructure/repositories/interface/use
 import { AppError } from 'src/shared/core/errors/AppError';
 import { UserErrors } from '../../domain/errors/user.errors';
 import { Username } from '../../domain/value-objects/username.value';
-import { UserFullname } from '../../domain/value-objects/user-fullname.value';
 import { UserEmail } from '../../domain/value-objects/user-email.value';
 import { UserPassword } from '../../domain/value-objects/user-password.value';
 import { UserProfileImg } from '../../domain/value-objects/user-profile-img.value';
@@ -47,7 +46,6 @@ export class CreateUserLocalUseCase
   ): Promise<CreateUserLocalUseCaseResponse> {
     this._logger.log('Executing...');
     const usernameOrError = Username.create(request.username);
-    const fullnameOrError = UserFullname.create(request.fullname);
     const profileImageUrlOrError = UserProfileImg.create(
       request.profileImageUrl,
     );
@@ -62,7 +60,6 @@ export class CreateUserLocalUseCase
 
     const combineResult = Result.combine([
       usernameOrError,
-      fullnameOrError,
       profileImageUrlOrError,
       emailOrError,
       firebasePushIdOrError,
@@ -75,7 +72,6 @@ export class CreateUserLocalUseCase
 
     const userOrErr: Result<User> = User.new({
       username: usernameOrError.getValue(),
-      fullname: fullnameOrError.getValue(),
       profileImageUrl: profileImageUrlOrError.getValue(),
       email: emailOrError.getValue(),
       firebasePushId: firebasePushIdOrError.getValue(),

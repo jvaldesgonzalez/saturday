@@ -8,11 +8,7 @@ import { Result } from 'src/shared/core/Result';
 import { Changes, IWithChanges } from 'src/shared/core/WithChanges';
 import { User } from '../../domain/entities/user.entity';
 import { UserErrors } from '../../domain/errors/user.errors';
-import {
-  UserEmail,
-  UserFullname,
-  UserProfileImg,
-} from '../../domain/value-objects';
+import { UserEmail, UserProfileImg } from '../../domain/value-objects';
 import { IUserRepository } from '../../infrastructure/repositories/interface/user.repository.interface';
 import { UpdateProfileDto } from '../dtos/update-profile.dto';
 
@@ -63,13 +59,6 @@ export class UpdateProfileUseCase
         if (emailOrError.isFailure)
           return left(Result.fail<unknown>(emailOrError.error.toString()));
         this.changes.addChange(user.changeEmail(emailOrError.getValue()));
-      }
-
-      if (request.fullname) {
-        const fullnameOrError = UserFullname.create(request.fullname);
-        if (fullnameOrError.isFailure)
-          return left(Result.fail<unknown>(fullnameOrError.error.toString()));
-        this.changes.addChange(user.changeFullname(fullnameOrError.getValue()));
       }
 
       if (request.profileImageUrl) {

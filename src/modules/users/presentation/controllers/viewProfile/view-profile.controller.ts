@@ -33,7 +33,6 @@ export class ViewProfileController extends BaseController<
     if (result.isRight()) {
       const user = result.value.getValue();
       return {
-        fullname: user.fullname.value,
         email: user.email.value,
         profileImageUrl: user.profileImageUrl.value,
         username: user.username.value,

@@ -9,7 +9,6 @@ import {
 } from '../../domain/value-objects/user-auth-provider.value';
 import { UserEmail } from '../../domain/value-objects/user-email.value';
 import { FirebasePushId } from '../../domain/value-objects/user-firebase-push-id.value';
-import { UserFullname } from '../../domain/value-objects/user-fullname.value';
 import { UserPassword } from '../../domain/value-objects/user-password.value';
 import { UserProfileImg } from '../../domain/value-objects/user-profile-img.value';
 import { Username } from '../../domain/value-objects/username.value';
@@ -17,7 +16,6 @@ import { UserEntity } from '../entities/user.entity';
 
 export class UserMapper {
   public static PersistentToDomain(p: UserEntity): User {
-    const fullnameOrError = UserFullname.create(p.fullname);
     const usernameOrError = Username.create(p.username);
     const profileImageUrlOrError = UserProfileImg.create(p.profileImageUrl);
     const emailOrError = UserEmail.create(p.email);
@@ -30,7 +28,6 @@ export class UserMapper {
     });
 
     const combinedResult = Result.combine([
-      fullnameOrError,
       usernameOrError,
       profileImageUrlOrError,
       firebasePushIdOrError,
@@ -42,7 +39,6 @@ export class UserMapper {
 
     return User.create(
       {
-        fullname: fullnameOrError.getValue(),
         username: usernameOrError.getValue(),
         profileImageUrl: profileImageUrlOrError.getValue(),
         email: emailOrError.getValue(),
@@ -62,7 +58,6 @@ export class UserMapper {
   public static async DomainToPersistent(d: User): Promise<UserEntity> {
     return {
       id: d._id.toString(),
-      fullname: d.fullname.value,
       username: d.username.value,
       profileImageUrl: d.profileImageUrl.value,
       email: d.email.value,

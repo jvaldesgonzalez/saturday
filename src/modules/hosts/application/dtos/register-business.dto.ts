@@ -5,13 +5,14 @@ type DescriptionField = {
 };
 
 export type RegisterBusinessDto = {
-	userId: string;
-	description:DescriptionField;
-	aditionalBusinessData:DescriptionField[];
-	place?:{
-		name:string;
-		address:string;
-		longitude: string;
-		latitude: string;
-	}
-}
+  userId: string;
+  businessName: string;
+  description: DescriptionField;
+  aditionalBusinessData: DescriptionField[];
+  place?: {
+    name: string;
+    address: string;
+    longitude: string;
+    latitude: string;
+  };
+};

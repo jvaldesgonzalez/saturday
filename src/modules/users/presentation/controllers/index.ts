@@ -6,6 +6,8 @@ import { CreateUserProviderController } from './createUserProvider/create-user-p
 import { EditProfileController } from './editProfile/edit-profile.controller';
 import { LoginUserController } from './loginUser/login-user.controller';
 import { RefreshTokenController } from './refreshToken/refresh-token.controller';
+import { UpdateAppVersionController } from './updateAppVersion/update-app-version.controller';
+import { UpdateFirebasePushIdController } from './updateFirebasePushId/update-firebase-id.controller';
 import { ViewProfileController } from './viewProfile/view-profile.controller';
 
 const usersControllers = [
@@ -18,6 +20,8 @@ const usersControllers = [
   RefreshTokenController,
   ViewProfileController,
   EditProfileController,
+  UpdateFirebasePushIdController,
+  UpdateAppVersionController,
 ];
 
 export default usersControllers;

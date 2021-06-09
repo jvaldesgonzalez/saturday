@@ -16,6 +16,7 @@ export class DescriptionFieldRaw {
 }
 
 export class HostEntity extends PersistentEntity {
+  businessName: string;
   businessDescription: string;
   aditionalBusinessData: string;
 

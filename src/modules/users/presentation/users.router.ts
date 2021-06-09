@@ -24,6 +24,12 @@ import { LoginUserResponse } from './controllers/loginUser/response';
 import { RefreshTokenController } from './controllers/refreshToken/refresh-token.controller';
 import { RefreshTokenRequest } from './controllers/refreshToken/request';
 import { RefreshTokenResponse } from './controllers/refreshToken/response';
+import { UpdateAppVersionRequest } from './controllers/updateAppVersion/request';
+import { UpdateAppVersionResponse } from './controllers/updateAppVersion/response';
+import { UpdateAppVersionController } from './controllers/updateAppVersion/update-app-version.controller';
+import { UpdateFirebasePushIdRequest } from './controllers/updateFirebasePushId/request';
+import { UpdateFirebasePushIdResponse } from './controllers/updateFirebasePushId/response';
+import { UpdateFirebasePushIdController } from './controllers/updateFirebasePushId/update-firebase-id.controller';
 import { ViewProfileResponse } from './controllers/viewProfile/response';
 import { ViewProfileController } from './controllers/viewProfile/view-profile.controller';
 
@@ -40,6 +46,8 @@ export class UsersController {
     private viewProfileCtx: ViewProfileController,
     private changePassCtx: ChangePasswordController,
     private editProfileCtx: EditProfileController,
+    private updateFirebaseIdCtx: UpdateFirebasePushIdController,
+    private updateAppVersionCtx: UpdateAppVersionController,
   ) {}
   @Post('/local')
   async createLocal(
@@ -100,5 +108,23 @@ export class UsersController {
     @Body() data: EditProfileBody,
   ): Promise<EditProfileResponse> {
     return this.editProfileCtx.execute({ userId: user.id, ...data });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/app-version')
+  async changeVersion(
+    @CurrentUser() user: JWTClaims,
+    @Body() data: UpdateAppVersionRequest,
+  ): Promise<UpdateAppVersionResponse> {
+    return this.updateAppVersionCtx.execute({ userId: user.id, ...data });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/firebase-push-id')
+  async updateFirebaseId(
+    @CurrentUser() user: JWTClaims,
+    @Body() data: UpdateFirebasePushIdRequest,
+  ): Promise<UpdateFirebasePushIdResponse> {
+    return this.updateFirebaseIdCtx.execute({ userId: user.id, ...data });
   }
 }

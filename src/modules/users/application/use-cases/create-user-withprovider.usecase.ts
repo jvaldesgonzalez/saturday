@@ -15,7 +15,6 @@ import { UserErrors } from '../../domain/errors/user.errors';
 import {
   FirebasePushId,
   UserEmail,
-  UserFullname,
   Username,
   UserProfileImg,
   UserProvider,
@@ -48,7 +47,6 @@ export class CreateUserWithProviderUseCase
     this._logger.log('Executing...');
 
     const usernameOrError = Username.create(request.username);
-    const fullnameOrError = UserFullname.create(request.fullname);
     const profileImageUrlOrError = UserProfileImg.create(
       request.profileImageUrl,
     );
@@ -60,7 +58,6 @@ export class CreateUserWithProviderUseCase
 
     const combineResult = Result.combine([
       usernameOrError,
-      fullnameOrError,
       profileImageUrlOrError,
       emailOrError,
       firebasePushIdOrError,
@@ -72,7 +69,6 @@ export class CreateUserWithProviderUseCase
 
     const userOrErr = User.new({
       username: usernameOrError.getValue(),
-      fullname: fullnameOrError.getValue(),
       profileImageUrl: profileImageUrlOrError.getValue(),
       email: emailOrError.getValue(),
       firebasePushId: firebasePushIdOrError.getValue(),

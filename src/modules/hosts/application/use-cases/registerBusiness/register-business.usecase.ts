@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Host } from 'src/modules/hosts/domain/entities/host.entity';
 import { UserRef } from 'src/modules/hosts/domain/entities/userRef.entity';
+import { BusinessName } from 'src/modules/hosts/domain/value-objects/business-name.value';
 import { DescriptionField } from 'src/modules/hosts/domain/value-objects/description-fields.value';
 import { HostPlace } from 'src/modules/hosts/domain/value-objects/host-place.value';
 import { IHostRepository } from 'src/modules/hosts/infrastructure/interfaces/host.repository.interface';
@@ -40,6 +41,7 @@ export class RegisterBusinessUseCase
       return left(new RegisterBusinessErrors.UserDoesntExists(request.userId));
 
     const userRefOrError = UserRef.create(request.userId);
+    const businessNameOrError = BusinessName.create(request.businessName);
     const descOrError = DescriptionField.create(request.description);
     const aditionalDataOrError = Join(
       request.aditionalBusinessData.map((data) =>
@@ -51,6 +53,7 @@ export class RegisterBusinessUseCase
       : Ok(undefined);
 
     const combined = Result.combine([
+      businessNameOrError,
       userRefOrError,
       descOrError,
       aditionalDataOrError,
@@ -61,6 +64,7 @@ export class RegisterBusinessUseCase
 
     const host = Host.create({
       userRef: userRefOrError.getValue(),
+      businessName: businessNameOrError.getValue(),
       businessDescription: descOrError.getValue(),
       aditionalBusinessData: aditionalDataOrError.getValue(),
       place: placeOrError.getValue(),

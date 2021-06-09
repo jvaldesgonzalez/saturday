@@ -29,6 +29,10 @@ export class RegisterBusinessRequest {
   @IsString()
   userId: string;
 
+  @ApiProperty()
+  @IsString()
+  businessName: string;
+
   @ApiProperty({ type: DescriptionField })
   @Type(() => DescriptionField)
   @IsNotEmpty()
@@ -46,4 +50,5 @@ export class RegisterBusinessBody extends PickType(RegisterBusinessRequest, [
   'description',
   'aditionalBusinessData',
   'place',
+  'businessName',
 ] as const) {}

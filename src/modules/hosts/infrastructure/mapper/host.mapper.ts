@@ -1,6 +1,7 @@
 import { Join, Ok } from 'src/shared/core/Result';
 import { Host } from '../../domain/entities/host.entity';
 import { UserRef } from '../../domain/entities/userRef.entity';
+import { BusinessName } from '../../domain/value-objects/business-name.value';
 import { DescriptionField } from '../../domain/value-objects/description-fields.value';
 import { HostPlace } from '../../domain/value-objects/host-place.value';
 import { DescriptionFieldRaw, HostEntity } from '../entities/host.entity';
@@ -8,6 +9,7 @@ import { DescriptionFieldRaw, HostEntity } from '../entities/host.entity';
 export class HostMapper {
   public static PersistentToDomain(p: HostEntity): Host {
     const userRefOrError = UserRef.create(p.id);
+    const businessNameOrError = BusinessName.create(p.businessName);
     const descOrError = DescriptionField.create(
       JSON.parse(p.businessDescription),
     );
@@ -19,6 +21,7 @@ export class HostMapper {
     const placeOrError = p.place ? HostPlace.create(p.place) : Ok(undefined);
 
     return Host.create({
+      businessName: businessNameOrError.getValue(),
       userRef: userRefOrError.getValue(),
       businessDescription: descOrError.getValue(),
       aditionalBusinessData: aditionalDataOrError.getValue(),
@@ -30,6 +33,7 @@ export class HostMapper {
 
   public static DomainToPersistent(d: Host): HostEntity {
     return {
+      businessName: d.businessName.value,
       id: d._id.toString(),
       createdAt: d.createdAt.toISOString(),
       updatedAt: d.updatedAt.toISOString(),

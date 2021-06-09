@@ -2,7 +2,6 @@ import { Version } from 'src/shared/domain/version.value-object';
 import { UserProvider } from '../value-objects/user-auth-provider.value';
 import { UserEmail } from '../value-objects/user-email.value';
 import { FirebasePushId } from '../value-objects/user-firebase-push-id.value';
-import { UserFullname } from '../value-objects/user-fullname.value';
 import { UserPassword } from '../value-objects/user-password.value';
 import { UserProfileImg } from '../value-objects/user-profile-img.value';
 import { Username } from '../value-objects/username.value';
@@ -19,7 +18,6 @@ import { Guard, GuardArgumentCollection } from 'src/shared/core/Guard';
 import { AggregateDomainEntity } from 'src/shared/domain/aggregate-entity.abstract';
 
 type UserProps = {
-  fullname: UserFullname;
   username: Username;
   profileImageUrl: UserProfileImg;
   email: UserEmail;
@@ -54,11 +52,7 @@ export class User extends AggregateDomainEntity<UserProps> {
     return this.props.provider;
   }
 
-  public get fullname(): UserFullname {
-    return this.props.fullname;
-  }
-
-  public get username(): UserFullname {
+  public get username(): Username {
     return this.props.username;
   }
 
@@ -87,6 +81,16 @@ export class User extends AggregateDomainEntity<UserProps> {
     return this.props.role;
   }
 
+  updateVersion(version: Version): Result<void> {
+    this.props.appVersion = version;
+    return Result.ok();
+  }
+
+  updateFirebasePushId(fcmToken: FirebasePushId): Result<void> {
+    this.props.firebasePushId = fcmToken;
+    return Result.ok();
+  }
+
   changeEmail(newEmail: UserEmail): Result<void> {
     this.props.email = newEmail;
     this.props.updatedAt = new Date();
@@ -95,12 +99,6 @@ export class User extends AggregateDomainEntity<UserProps> {
 
   changeUsername(newUsername: Username): Result<void> {
     this.props.username = newUsername;
-    this.props.updatedAt = new Date();
-    return Result.ok();
-  }
-
-  changeFullname(newFullname: UserFullname): Result<void> {
-    this.props.fullname = newFullname;
     this.props.updatedAt = new Date();
     return Result.ok();
   }
@@ -176,7 +174,6 @@ export class User extends AggregateDomainEntity<UserProps> {
   public static create(props: UserProps, id: UniqueEntityID): Result<User> {
     const args: GuardArgumentCollection = [
       { argument: props.username, argumentPath: 'username' },
-      { argument: props.fullname, argumentPath: 'fullname' },
       { argument: props.email, argumentPath: 'email' },
       { argument: props.role, argumentPath: 'role' },
       { argument: props.createdAt, argumentPath: 'createdAt' },
