@@ -3,6 +3,7 @@ import { Host } from 'src/modules/hosts/domain/entities/host.entity';
 import { UserRef } from 'src/modules/hosts/domain/entities/userRef.entity';
 import { BusinessName } from 'src/modules/hosts/domain/value-objects/business-name.value';
 import { DescriptionField } from 'src/modules/hosts/domain/value-objects/description-fields.value';
+import { HostPhone } from 'src/modules/hosts/domain/value-objects/host-phone.value';
 import { HostPlace } from 'src/modules/hosts/domain/value-objects/host-place.value';
 import { IHostRepository } from 'src/modules/hosts/infrastructure/interfaces/host.repository.interface';
 import { Either, left, right } from 'src/shared/core/Either';
@@ -42,6 +43,7 @@ export class RegisterBusinessUseCase
 
     const userRefOrError = UserRef.create(request.userId);
     const businessNameOrError = BusinessName.create(request.businessName);
+    const hostPhoneOrError = HostPhone.create(request.phoneNumber);
     const descOrError = DescriptionField.create(request.description);
     const aditionalDataOrError = Join(
       request.aditionalBusinessData.map((data) =>
@@ -54,6 +56,7 @@ export class RegisterBusinessUseCase
 
     const combined = Result.combine([
       businessNameOrError,
+      hostPhoneOrError,
       userRefOrError,
       descOrError,
       aditionalDataOrError,
@@ -64,6 +67,7 @@ export class RegisterBusinessUseCase
 
     const host = Host.create({
       userRef: userRefOrError.getValue(),
+      phoneNumber: hostPhoneOrError.getValue(),
       businessName: businessNameOrError.getValue(),
       businessDescription: descOrError.getValue(),
       aditionalBusinessData: aditionalDataOrError.getValue(),

@@ -1,6 +1,11 @@
 import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+} from 'class-validator';
 
 class DescriptionField {
   @ApiProperty()
@@ -33,6 +38,10 @@ export class RegisterBusinessRequest {
   @IsString()
   businessName: string;
 
+  @ApiProperty()
+  @IsPhoneNumber()
+  phoneNumber: string;
+
   @ApiProperty({ type: DescriptionField })
   @Type(() => DescriptionField)
   @IsNotEmpty()
@@ -51,4 +60,5 @@ export class RegisterBusinessBody extends PickType(RegisterBusinessRequest, [
   'aditionalBusinessData',
   'place',
   'businessName',
+  'phoneNumber',
 ] as const) {}

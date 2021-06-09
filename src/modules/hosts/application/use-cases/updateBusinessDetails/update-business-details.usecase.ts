@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { BusinessName } from 'src/modules/hosts/domain/value-objects/business-name.value';
 import { DescriptionField } from 'src/modules/hosts/domain/value-objects/description-fields.value';
+import { HostPhone } from 'src/modules/hosts/domain/value-objects/host-phone.value';
 import { HostPlace } from 'src/modules/hosts/domain/value-objects/host-place.value';
 import { IHostRepository } from 'src/modules/hosts/infrastructure/interfaces/host.repository.interface';
 import { Either, left, right } from 'src/shared/core/Either';
@@ -80,6 +81,13 @@ export class UpdateBusinessDetailsUseCase
         if (placeOrError.isFailure)
           return left(Fail(placeOrError.error.toString()));
         this.changes.addChange(host.changePlace(placeOrError.getValue()));
+      }
+
+      if (request.phoneNumber) {
+        const phoneOrError = HostPhone.create(request.phoneNumber);
+        if (phoneOrError.isFailure)
+          return left(Fail(phoneOrError.error.toString()));
+        this.changes.addChange(host.changePhoneNumber(phoneOrError.getValue()));
       }
 
       const changesResult = this.changes.getChangeResult();

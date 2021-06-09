@@ -6,6 +6,7 @@ type DescriptionField = {
 
 export type RegisterBusinessDto = {
   userId: string;
+  phoneNumber: string;
   businessName: string;
   description: DescriptionField;
   aditionalBusinessData: DescriptionField[];
