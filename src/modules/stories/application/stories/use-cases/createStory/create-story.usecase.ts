@@ -30,6 +30,7 @@ export class CreateStoryUseCase
 
     const publisherOrError = PublisherRef.create(request.publisher);
     const multimediaOrError = Multimedia.create(request.multimedia);
+    const textOrError = request.attachedText ? request.attachedText : null;
     const combinedResult = Result.combine([
       multimediaOrError,
       publisherOrError,
@@ -38,6 +39,7 @@ export class CreateStoryUseCase
     const storyOrError = Story.new({
       publisher: publisherOrError.getValue(),
       multimedia: multimediaOrError.getValue(),
+      attachedText: textOrError,
     });
     if (storyOrError.isFailure)
       return left(Fail(storyOrError.error.toString()));

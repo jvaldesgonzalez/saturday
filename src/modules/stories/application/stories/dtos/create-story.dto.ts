@@ -7,4 +7,5 @@ type MultimediaRaw = {
 export type CreateStoryDto = {
   publisher: string;
   multimedia: MultimediaRaw;
+  attachedText: string;
 };

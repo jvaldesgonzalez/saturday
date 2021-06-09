@@ -12,5 +12,5 @@ export class StoryEntity extends PersistentEntity {
   @Type(() => MultimediaEntity)
   multimedia: MultimediaEntity;
 
-  attachedText: string;
+  attachedText?: string;
 }

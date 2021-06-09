@@ -15,7 +15,7 @@ export class Multimedia extends ValueObject<MultimediaProps> {
   }
 
   get url(): string {
-    return this.props.type;
+    return this.props.url;
   }
 
   public static create(props: MultimediaProps): Result<Multimedia> {

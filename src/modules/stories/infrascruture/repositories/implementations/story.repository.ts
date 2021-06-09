@@ -47,7 +47,7 @@ export class StoryRepository
   }
 
   async save(story: Story): Promise<void> {
-    this._logger.log(`Save entity with id: {${story._id}}`);
+    this._logger.log(`Save story with id: {${story._id}}`);
     const persistent = await this._domainToPersistentFunc(story);
     const { multimedia, publisher, ...storyRaw } = persistent;
     await this.persistenceManager.execute(
@@ -55,14 +55,14 @@ export class StoryRepository
         `
         MATCH (u:User)
         WHERE u.id = $publisher
-        MERGE (m:Multimedia)<-[:CONTAINS_MEDIA]-(s:Story)-[:PUBLISHED_BY]->(u)
-        SET m += $multimedia
+        CREATE (s:Story)<-[edge:PUBLISH_STORY ]-(u)
         SET s += $story
+        SET edge+= $edge
         `,
       ).bind({
         publisher: publisher,
-        multimedia: multimedia,
-        story: storyRaw,
+        story: { url: multimedia.url, ...storyRaw },
+        edge: { type: multimedia.type },
       }),
     );
   }
@@ -82,7 +82,7 @@ export class StoryRepository
   }
 
   //view part
-  async getByHost(hostId: string): Promise<GetStoriesFromHostResponse[]> {
+  async getByHost(_hostId: string): Promise<GetStoriesFromHostResponse[]> {
     const arr = Array(faker.datatype.number(10));
     for (let i = 0; i < arr.length; i++) {
       arr[i] = {
