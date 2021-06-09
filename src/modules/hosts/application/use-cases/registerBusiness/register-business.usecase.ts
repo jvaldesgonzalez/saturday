@@ -12,7 +12,9 @@ import { RegisterBusinessDto } from '../../dtos/register-business.dto';
 import { RegisterBusinessErrors } from './register-business.error';
 
 export type RegisterBusinessUseCaseResponse = Either<
-  AppError.UnexpectedError | Result<any>,
+  | AppError.UnexpectedError
+  | RegisterBusinessErrors.UserDoesntExists
+  | Result<any>,
   Result<void>
 >;
 

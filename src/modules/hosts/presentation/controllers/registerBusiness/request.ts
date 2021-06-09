@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
@@ -34,7 +34,7 @@ export class RegisterBusinessRequest {
   @IsNotEmpty()
   description: DescriptionField;
 
-  @ApiProperty({ type: [DescriptionField] })
+  @ApiPropertyOptional({ type: [DescriptionField] })
   aditionalBusinessData: DescriptionField[];
 
   @ApiPropertyOptional()
@@ -42,6 +42,8 @@ export class RegisterBusinessRequest {
   place: Place;
 }
 
-export class RegisterBusinessBody extends OmitType(RegisterBusinessRequest, [
-  'userId',
+export class RegisterBusinessBody extends PickType(RegisterBusinessRequest, [
+  'description',
+  'aditionalBusinessData',
+  'place',
 ] as const) {}
