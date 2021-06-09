@@ -1,3 +1,3 @@
-import {DescriptionField} from "./description-fields.value";
+import { DescriptionField } from './description-fields.value';
 
 export type BusinessData = DescriptionField[];

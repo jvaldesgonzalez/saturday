@@ -1,12 +1,12 @@
 import { Guard } from 'src/shared/core/Guard';
 import { Fail, Ok, Result } from 'src/shared/core/Result';
-import {AggregateDomainEntity} from 'src/shared/domain/aggregate-entity.abstract';
+import { AggregateDomainEntity } from 'src/shared/domain/aggregate-entity.abstract';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import {EventRef} from './eventRef.entity';
+import { EventRef } from './eventRef.entity';
 import { Ticket, TicketCollection } from './ticket.entity';
 
 type EventOccurrenceProps = {
-	eventId:EventRef
+  eventId: EventRef;
   dateTimeInit: Date;
   dateTimeEnd: Date;
   tickets: TicketCollection;
@@ -82,4 +82,3 @@ export class EventOccurrence extends AggregateDomainEntity<EventOccurrenceProps>
     return Fail(againstNil.message);
   }
 }
-

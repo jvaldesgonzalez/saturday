@@ -1,8 +1,8 @@
 import { Ok, Result } from 'src/shared/core/Result';
-import {AggregateDomainEntity} from 'src/shared/domain/aggregate-entity.abstract';
-import {IIdentifier} from 'src/shared/domain/Identifier';
+import { AggregateDomainEntity } from 'src/shared/domain/aggregate-entity.abstract';
+import { IIdentifier } from 'src/shared/domain/Identifier';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import {Empty} from 'src/shared/typedefs/empty';
+import { Empty } from 'src/shared/typedefs/empty';
 
 export class AttentionTagRef extends AggregateDomainEntity<Empty> {
   get id(): IIdentifier {

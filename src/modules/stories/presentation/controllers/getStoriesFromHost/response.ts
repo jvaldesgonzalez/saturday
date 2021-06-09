@@ -1,15 +1,15 @@
-import {ApiResponseProperty} from "@nestjs/swagger";
+import { ApiResponseProperty } from '@nestjs/swagger';
 
 export class GetStoriesFromHostResponse {
-	@ApiResponseProperty()
-	id:string;
+  @ApiResponseProperty()
+  id: string;
 
-	@ApiResponseProperty()
-	url:string;
+  @ApiResponseProperty()
+  url: string;
 
-	@ApiResponseProperty()
-	type:string;
-	
-	@ApiResponseProperty()
-	views:number;
+  @ApiResponseProperty()
+  type: string;
+
+  @ApiResponseProperty()
+  views: number;
 }

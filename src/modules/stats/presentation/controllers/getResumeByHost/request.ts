@@ -1,3 +1,3 @@
 export class GetResumeByHostRequest {
-	hostId:string;
+  hostId: string;
 }

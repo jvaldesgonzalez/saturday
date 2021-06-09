@@ -1,6 +1,6 @@
-import {IUseCaseError} from "src/shared/core/interfaces/IUseCaseError";
-import {Result} from "src/shared/core/Result";
-import {UniqueEntityID} from "src/shared/domain/UniqueEntityID";
+import { IUseCaseError } from 'src/shared/core/interfaces/IUseCaseError';
+import { Result } from 'src/shared/core/Result';
+import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 
 export namespace RegisterBusinessErrors {
   const _context = 'RegisterBusinessErrors';
