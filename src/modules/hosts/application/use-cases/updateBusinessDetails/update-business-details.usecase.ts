@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { BusinessName } from 'src/modules/hosts/domain/value-objects/business-name.value';
 import { DescriptionField } from 'src/modules/hosts/domain/value-objects/description-fields.value';
 import { HostPlace } from 'src/modules/hosts/domain/value-objects/host-place.value';
 import { IHostRepository } from 'src/modules/hosts/infrastructure/interfaces/host.repository.interface';
@@ -49,6 +50,15 @@ export class UpdateBusinessDetailsUseCase
           return left(Fail(descOrError.error.toString()));
         this.changes.addChange(
           host.changeBusinessDescription(descOrError.getValue()),
+        );
+      }
+
+      if (request.businessName) {
+        const bnameOrError = BusinessName.create(request.businessName);
+        if (bnameOrError.isFailure)
+          return left(Fail(bnameOrError.error.toString()));
+        this.changes.addChange(
+          host.changeBusinessName(bnameOrError.getValue()),
         );
       }
 
