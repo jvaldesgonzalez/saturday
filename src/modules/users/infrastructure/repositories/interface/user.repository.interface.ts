@@ -8,5 +8,7 @@ export interface IUserRepository extends IRepository<User> {
   existByUsername(email: Username | string): Promise<boolean>;
   existsById(id: string): Promise<boolean>;
   findById(id: string): Promise<User>;
-  findOneByEmail(emailOrUsername: UserEmail | string): Promise<User>;
+  findOneByEmailOrUsername(
+    emailOrUsername: UserEmail | Username,
+  ): Promise<User>;
 }

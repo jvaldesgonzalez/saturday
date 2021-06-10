@@ -45,15 +45,6 @@ export class UpdateBusinessDetailsUseCase
           new UpdateBusinessDetailsErrors.HostDoesntExists(request.userId),
         );
 
-      if (request.description) {
-        const descOrError = DescriptionField.create(request.description);
-        if (descOrError.isFailure)
-          return left(Fail(descOrError.error.toString()));
-        this.changes.addChange(
-          host.changeBusinessDescription(descOrError.getValue()),
-        );
-      }
-
       if (request.businessName) {
         const bnameOrError = BusinessName.create(request.businessName);
         if (bnameOrError.isFailure)

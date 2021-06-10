@@ -11,6 +11,8 @@ import { EventEntity } from '../../entities/event.entity';
 import { EventMapper } from '../../mapper/event.mapper';
 import { IEventRepository } from '../interfaces/IEventRepository';
 import * as faker from 'faker';
+import { PaginatedGetHostPublicationsResponse } from 'src/modules/events/presentation/controllers/getHostPublications/get-host-publications.controller';
+import { GetHostPublicationsResponse } from 'src/modules/events/presentation/controllers/getHostPublications/response';
 
 export class EventRepository
   extends BaseRepository<Event, EventEntity>
@@ -107,5 +109,33 @@ export class EventRepository
       };
     }
     return arr;
+  }
+
+  async getPaginatedPublications(
+    hostId: string,
+    from: number,
+    size: number,
+  ): Promise<PaginatedGetHostPublicationsResponse> {
+    const arr: GetHostPublicationsResponse[] = Array(size);
+    for (let i = 0; i < arr.length; i++) {
+      arr[i] = {
+        name: faker.name.title(),
+        category: faker.name.jobType(),
+        dateTimeInit: faker.date.recent(),
+        place: faker.address.streetName(),
+        imageUrl: faker.image.nightlife(),
+        stats: {
+          reached: faker.datatype.number(),
+          interested: faker.datatype.number(),
+          sharedTimes: faker.datatype.number(),
+        },
+      };
+    }
+    return {
+      items: arr,
+      total: 100,
+      current: from,
+      pageSize: size,
+    };
   }
 }

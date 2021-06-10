@@ -66,7 +66,9 @@ export class UserRepository
     return !!res ? true : false;
   }
 
-  public async findOneByEmail(emailOrUsername: UserEmail): Promise<User> {
+  public async findOneByEmailOrUsername(
+    emailOrUsername: UserEmail | Username,
+  ): Promise<User> {
     const res = await this.persistenceManager.maybeGetOne<UserEntity>(
       QuerySpecification.withStatement(
         `

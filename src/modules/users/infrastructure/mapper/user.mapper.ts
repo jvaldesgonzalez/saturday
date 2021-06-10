@@ -10,14 +10,12 @@ import {
 import { UserEmail } from '../../domain/value-objects/user-email.value';
 import { FirebasePushId } from '../../domain/value-objects/user-firebase-push-id.value';
 import { UserPassword } from '../../domain/value-objects/user-password.value';
-import { UserProfileImg } from '../../domain/value-objects/user-profile-img.value';
 import { Username } from '../../domain/value-objects/username.value';
 import { UserEntity } from '../entities/user.entity';
 
 export class UserMapper {
   public static PersistentToDomain(p: UserEntity): User {
     const usernameOrError = Username.create(p.username);
-    const profileImageUrlOrError = UserProfileImg.create(p.profileImageUrl);
     const emailOrError = UserEmail.create(p.email);
     const firebasePushIdOrError = FirebasePushId.create(p.firebasePushId);
     const appVersionOrError = Version.create(p.appVersion);
@@ -29,7 +27,6 @@ export class UserMapper {
 
     const combinedResult = Result.combine([
       usernameOrError,
-      profileImageUrlOrError,
       firebasePushIdOrError,
       providerOrError,
       appVersionOrError,
@@ -40,7 +37,6 @@ export class UserMapper {
     return User.create(
       {
         username: usernameOrError.getValue(),
-        profileImageUrl: profileImageUrlOrError.getValue(),
         email: emailOrError.getValue(),
         firebasePushId: firebasePushIdOrError.getValue(),
         appVersion: appVersionOrError.getValue(),
@@ -59,7 +55,6 @@ export class UserMapper {
     return {
       id: d._id.toString(),
       username: d.username.value,
-      profileImageUrl: d.profileImageUrl.value,
       email: d.email.value,
       firebasePushId: d.firebasePushId.value,
       appVersion: d.appVersion.value,

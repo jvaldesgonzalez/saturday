@@ -1,20 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEmail, IsInt, IsString, IsUrl } from 'class-validator';
+import { IsEmail, IsEnum, IsInt, IsString, Min } from 'class-validator';
 import { EnumRoles } from 'src/shared/domain/roles.enum';
 
 export class CreateUserLocalRequest {
   @ApiProperty()
   @IsString()
-  fullname: string;
-
-  @ApiProperty()
-  @IsString()
   username: string;
-
-  @ApiProperty()
-  @IsUrl()
-  profileImageUrl: string;
 
   @ApiProperty()
   @IsEmail()
@@ -26,13 +18,18 @@ export class CreateUserLocalRequest {
 
   @ApiProperty()
   @IsInt()
+  @Min(1)
   appVersion: number;
 
   @ApiProperty()
   @IsString()
   password: string;
 
-  @ApiProperty({ enum: EnumRoles })
-  @Type(() => (r: string): EnumRoles => r as EnumRoles)
+  @IsEnum(EnumRoles)
+  @Type(() => (t: string): EnumRoles => t as EnumRoles)
   role: EnumRoles;
 }
+
+export class CreateUserLocalBody extends OmitType(CreateUserLocalRequest, [
+  'role',
+] as const) {}

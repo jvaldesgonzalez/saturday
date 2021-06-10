@@ -3,7 +3,6 @@ import { UserProvider } from '../value-objects/user-auth-provider.value';
 import { UserEmail } from '../value-objects/user-email.value';
 import { FirebasePushId } from '../value-objects/user-firebase-push-id.value';
 import { UserPassword } from '../value-objects/user-password.value';
-import { UserProfileImg } from '../value-objects/user-profile-img.value';
 import { Username } from '../value-objects/username.value';
 import { Result } from 'src/shared/core/Result';
 import {
@@ -19,7 +18,6 @@ import { AggregateDomainEntity } from 'src/shared/domain/aggregate-entity.abstra
 
 type UserProps = {
   username: Username;
-  profileImageUrl: UserProfileImg;
   email: UserEmail;
   firebasePushId: FirebasePushId;
   appVersion: Version;
@@ -38,10 +36,6 @@ export class User extends AggregateDomainEntity<UserProps> {
 
   public get firebasePushId(): FirebasePushId {
     return this.props.firebasePushId;
-  }
-
-  public get profileImageUrl(): UserProfileImg {
-    return this.props.profileImageUrl;
   }
 
   public get appVersion(): Version {
@@ -99,12 +93,6 @@ export class User extends AggregateDomainEntity<UserProps> {
 
   changeUsername(newUsername: Username): Result<void> {
     this.props.username = newUsername;
-    this.props.updatedAt = new Date();
-    return Result.ok();
-  }
-
-  changeProfileImage(newImage: UserProfileImg): Result<void> {
-    this.props.profileImageUrl = newImage;
     this.props.updatedAt = new Date();
     return Result.ok();
   }
@@ -178,10 +166,6 @@ export class User extends AggregateDomainEntity<UserProps> {
       { argument: props.role, argumentPath: 'role' },
       { argument: props.createdAt, argumentPath: 'createdAt' },
       { argument: props.updatedAt, argumentPath: 'updatedAt' },
-      {
-        argument: props.profileImageUrl,
-        argumentPath: 'profileImageUrl',
-      },
     ];
     const nullGuard = Guard.againstNullOrUndefinedBulk(args);
     if (!nullGuard.succeeded) return Result.fail(nullGuard.message);

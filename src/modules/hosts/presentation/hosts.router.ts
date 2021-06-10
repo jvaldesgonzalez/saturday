@@ -8,7 +8,7 @@ import { GetHostProfileResponse } from './controllers/getProfile/response';
 import { RegisterBusinessController } from './controllers/registerBusiness/register-business.controller';
 import { RegisterBusinessBody } from './controllers/registerBusiness/request';
 import { RegisterBusinessResponse } from './controllers/registerBusiness/response';
-import { UpdateBusinessDetailsRequest } from './controllers/updateBusinessDetails/request';
+import { UpdateBusinessDetailsBody } from './controllers/updateBusinessDetails/request';
 import { UpdateBusinessDetailsResponse } from './controllers/updateBusinessDetails/response';
 import { UpdateBusinessDetailsController } from './controllers/updateBusinessDetails/update-business-details.controller';
 
@@ -24,6 +24,7 @@ export class HostsRouter {
 
   @UseGuards(JwtAuthGuard)
   @Post('/business/register')
+  // @ApiOperation({ deprecated: true })
   @ApiOkResponse({ type: RegisterBusinessResponse })
   async registerBusiness(
     @CurrentUser() user: JWTClaims,
@@ -37,7 +38,7 @@ export class HostsRouter {
   @ApiOkResponse({ type: UpdateBusinessDetailsResponse })
   async updateBusiness(
     @CurrentUser() user: JWTClaims,
-    @Body() data: UpdateBusinessDetailsRequest,
+    @Body() data: UpdateBusinessDetailsBody,
   ): Promise<UpdateBusinessDetailsResponse> {
     return this.updateBusinessCtx.execute({ userId: user.id, ...data });
   }

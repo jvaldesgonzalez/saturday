@@ -18,7 +18,7 @@ export class DescriptionFieldRaw {
 export class HostEntity extends PersistentEntity {
   businessName: string;
   phoneNumber: string;
-  businessDescription: string;
+  profileImage?: string;
   aditionalBusinessData: string;
 
   @Type(() => HostPlace)

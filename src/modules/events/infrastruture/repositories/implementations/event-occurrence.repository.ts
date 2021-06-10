@@ -10,6 +10,7 @@ import {
   PersistenceManager,
 } from '@liberation-data/drivine';
 import { GetTicketsByOccurrenceResponse } from 'src/modules/events/presentation/controllers/getTicketsByOccurrence/response';
+import { ChartsBuilder } from 'src/modules/stats/charts/charts.buider';
 
 export class EventOccurrenceRepository
   extends BaseRepository<EventOccurrence, EventOccurrenceEntity>
@@ -57,18 +58,49 @@ export class EventOccurrenceRepository
   async getTicketsByOccurrence(
     _ocurrenceId: string,
   ): Promise<GetTicketsByOccurrenceResponse> {
-    const arr: GetTicketsByOccurrenceResponse['tickets'] = Array(
+    const arr: GetTicketsByOccurrenceResponse['occurrences'] = Array(
       faker.datatype.number({ min: 1, max: 4 }),
     );
 
     for (let i = 0; i < arr.length; i++) {
       arr[i] = {
-        name: faker.name.title(),
-        price: `${faker.datatype.number(300)} CUP`,
-        sold: faker.datatype.number(200),
-        total: 200 + faker.datatype.number(500),
+        id: faker.datatype.uuid(),
+        tickets: Array(3).fill({
+          name: faker.name.title(),
+          price: `${faker.datatype.number(300)} CUP`,
+          sold: faker.datatype.number(200),
+          total: 200 + faker.datatype.number(500),
+        }),
+        dateTime: faker.date.future(1),
+        stats: new ChartsBuilder()
+          .makePieBar()
+          .withName('Sexo y edad')
+          .withCategories(['Mujeres', 'Hombres', 'Non-Binary'])
+          .addEntries([
+            {
+              range: [18, 20],
+              values: [10, 50, 30],
+            },
+            {
+              range: [20, 25],
+              values: [200, 400, 36],
+            },
+            {
+              range: [25, 30],
+              values: [150, 160, 200],
+            },
+            {
+              range: [30, 40],
+              values: [300, 160, 3.0],
+            },
+            {
+              range: [40, 60],
+              values: [40, 20, 0],
+            },
+          ])
+          .build(),
       };
     }
-    return { tickets: arr };
+    return { occurrences: arr };
   }
 }

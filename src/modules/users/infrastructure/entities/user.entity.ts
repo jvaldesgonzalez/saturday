@@ -3,7 +3,6 @@ import { PersistentEntity } from 'src/shared/modules/data-access/neo4j/base.enti
 export class UserEntity extends PersistentEntity {
   username: string;
   email: string;
-  profileImageUrl: string;
   firebasePushId: string;
   appVersion: number;
   password: string;

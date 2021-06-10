@@ -25,8 +25,9 @@ export class CreateUserLocalController extends BaseController<
         default:
           this.fail(error.errorValue());
       }
-    } else {
-      return;
+    }
+    if (result.isRight()) {
+      return result.value.getValue();
     }
   }
 }

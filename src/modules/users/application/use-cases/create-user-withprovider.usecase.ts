@@ -16,7 +16,6 @@ import {
   FirebasePushId,
   UserEmail,
   Username,
-  UserProfileImg,
   UserProvider,
 } from '../../domain/value-objects';
 import { IUserRepository } from '../../infrastructure/repositories/interface/user.repository.interface';
@@ -47,9 +46,6 @@ export class CreateUserWithProviderUseCase
     this._logger.log('Executing...');
 
     const usernameOrError = Username.create(request.username);
-    const profileImageUrlOrError = UserProfileImg.create(
-      request.profileImageUrl,
-    );
     const emailOrError = UserEmail.create(request.email);
     const firebasePushIdOrError = FirebasePushId.create(request.firebasePushId);
     const appVersionOrError = Version.create(request.appVersion);
@@ -58,7 +54,6 @@ export class CreateUserWithProviderUseCase
 
     const combineResult = Result.combine([
       usernameOrError,
-      profileImageUrlOrError,
       emailOrError,
       firebasePushIdOrError,
       appVersionOrError,
@@ -69,7 +64,6 @@ export class CreateUserWithProviderUseCase
 
     const userOrErr = User.new({
       username: usernameOrError.getValue(),
-      profileImageUrl: profileImageUrlOrError.getValue(),
       email: emailOrError.getValue(),
       firebasePushId: firebasePushIdOrError.getValue(),
       appVersion: appVersionOrError.getValue(),

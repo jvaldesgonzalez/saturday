@@ -17,6 +17,10 @@ import { JWTClaims } from 'src/modules/users/domain/value-objects/token.value';
 import { CurrentUser } from 'src/shared/core/auth/current-user.decorator';
 import { JwtAuthGuard } from 'src/shared/core/auth/JwtAuth.guard';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
+import {
+  GetHostPublicationsController,
+  PaginatedGetHostPublicationsResponse,
+} from './controllers/getHostPublications/get-host-publications.controller';
 import { GetRecentEventsByHostController } from './controllers/getRecentHostEvents/get-recent-host-events.controller';
 import { GetRecentHostEventsResponse } from './controllers/getRecentHostEvents/response';
 import { GetTicketsByHostController } from './controllers/getTicketsByHost/get-tickets-by-host.controller';
@@ -32,6 +36,7 @@ export class EventsRouter {
     private getRecentsByHostCtx: GetRecentEventsByHostController,
     private getTicketsByHostCtx: GetTicketsByHostController,
     private getTicketsByOccurrenceCtx: GetTicketsByOccurrenceController,
+    private getHostPublicationsCtx: GetHostPublicationsController,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -68,5 +73,18 @@ export class EventsRouter {
       hostId: user.id,
       occurrenceId: id,
     });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/me')
+  @ApiQuery({ name: 'from' })
+  @ApiQuery({ name: 'size' })
+  // @ApiResponse({ status: 200, type: Paginatedd})
+  async getPublications(
+    @CurrentUser() user: JWTClaims,
+    @Query('from', ParseIntPipe) from = 0,
+    @Query('size', ParseIntPipe) size = 0,
+  ): Promise<PaginatedGetHostPublicationsResponse> {
+    return this.getHostPublicationsCtx.execute({ hostId: user.id, from, size });
   }
 }

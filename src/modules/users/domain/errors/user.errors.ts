@@ -19,7 +19,7 @@ export namespace UserErrors {
     readonly message: string;
     constructor(emailOrUsername: UserEmail | Username) {
       super(false, {
-        message: `Doesn't exist user with email ${emailOrUsername.value}`,
+        message: `Doesn't exist user with email or username ${emailOrUsername.value}`,
         context: _context,
       });
     }

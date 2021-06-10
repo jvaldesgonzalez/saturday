@@ -3,7 +3,6 @@ import { AuthProvider } from '../../domain/value-objects/user-auth-provider.valu
 
 export type CreateUserWithProviderDto = {
   username: string;
-  profileImageUrl: string;
   email: string;
   firebasePushId: string;
   appVersion: number;

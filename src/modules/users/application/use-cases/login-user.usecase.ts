@@ -5,12 +5,12 @@ import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { Result } from 'src/shared/core/Result';
 import { UserErrors } from '../../domain/errors/user.errors';
-import { UserEmail, UserPassword } from '../../domain/value-objects';
+import { UserEmail, Username, UserPassword } from '../../domain/value-objects';
 import { JWTToken, RefreshToken } from '../../domain/value-objects/token.value';
 import { IUserRepository } from '../../infrastructure/repositories/interface/user.repository.interface';
 import { LoginUserDto } from '../dtos/login-user.dto';
 
-type LoginResponseDto = {
+export type LoginResponseDto = {
   accessToken: JWTToken;
   refreshToken: RefreshToken;
 };
@@ -33,21 +33,34 @@ export class LoginUserUseCase
   }
   async execute(request: LoginUserDto): Promise<Response> {
     try {
-      const emailOrError = UserEmail.create(request.email);
+      const emailOrError = UserEmail.create(request.emailOrUsername);
+      const usernameOrError = Username.create(request.emailOrUsername);
+      const emailOrUsernameOrError = Result.combineOr([
+        emailOrError,
+        usernameOrError,
+      ]);
+
       const passwordOrError = UserPassword.create({ value: request.password });
-      const combinedResult = Result.combine([emailOrError, passwordOrError]);
+      const combinedResult = Result.combine([
+        emailOrUsernameOrError,
+        passwordOrError,
+      ]);
       if (combinedResult.isFailure) {
-        console.log(combinedResult.error);
+        this._logger.log(combinedResult.error);
         return left(Result.fail<void>(combinedResult.error));
       }
-      const email = emailOrError.getValue();
+      const emailOrUsername = emailOrUsernameOrError.getValue();
       const password = passwordOrError.getValue();
 
-      const user = await this._userRepository.findOneByEmail(email);
+      const user = await this._userRepository.findOneByEmailOrUsername(
+        emailOrUsername,
+      );
       const userFound = !!user;
 
       if (!userFound) {
-        return left(new UserErrors.UserWithEmailOrUsernameDoesNotExist(email));
+        return left(
+          new UserErrors.UserWithEmailOrUsernameDoesNotExist(emailOrUsername),
+        );
       }
 
       const passwordValid = await user.password.comparePassword(password.value);

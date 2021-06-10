@@ -6,7 +6,4 @@ export class ViewProfileResponse {
 
   @ApiProperty()
   email: string;
-
-  @ApiProperty()
-  profileImageUrl: string;
 }

@@ -119,7 +119,6 @@ export class HostRepository
       username: res.username,
       email: res.email,
       profileImageUrl: res.profileImageUrl,
-      businessDescription: JSON.parse(res.businessDescription),
       aditionalBusinessData: JSON.parse(res.aditionalBusinessData),
       place: res.place,
       followers: faker.datatype.number(15329),

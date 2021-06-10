@@ -1,8 +1,11 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
 class Stats {
+  @ApiResponseProperty()
   reached: number;
+  @ApiResponseProperty()
   interested: number;
+  @ApiResponseProperty()
   sharedTimes: number;
 }
 

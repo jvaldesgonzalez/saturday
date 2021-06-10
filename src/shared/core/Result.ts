@@ -53,6 +53,13 @@ export class Result<T> {
     }
     return Result.ok();
   }
+
+  public static combineOr(results: Result<any>[]): Result<any> {
+    for (const result of results) {
+      if (result.isSuccess) return result;
+    }
+    return results[0];
+  }
 }
 
 export function Ok<U>(value?: U): Result<U> {

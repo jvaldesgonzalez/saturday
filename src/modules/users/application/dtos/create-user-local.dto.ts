@@ -2,7 +2,6 @@ import { EnumRoles } from 'src/shared/domain/roles.enum';
 
 export type CreateUserDto = {
   username: string;
-  profileImageUrl: string;
   email: string;
   firebasePushId: string;
   appVersion: number;

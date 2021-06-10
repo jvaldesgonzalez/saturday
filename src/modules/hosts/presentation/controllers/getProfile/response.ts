@@ -1,5 +1,5 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 
 class DescriptionField {
   @ApiResponseProperty()
@@ -33,9 +33,6 @@ export class GetHostProfileResponse {
 
   @ApiResponseProperty()
   profileImageUrl: string;
-
-  @ApiResponseProperty({ type: DescriptionField })
-  businessDescription: DescriptionField;
 
   @ApiResponseProperty({ type: [DescriptionField] })
   aditionalBusinessData: DescriptionField[];

@@ -1,7 +1,21 @@
-import { Get, Body, Controller, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  Get,
+  Body,
+  Controller,
+  Post,
+  Put,
+  UseGuards,
+  Param,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CurrentUser } from 'src/shared/core/auth/current-user.decorator';
 import { JwtAuthGuard } from 'src/shared/core/auth/JwtAuth.guard';
+import { EnumRoles } from 'src/shared/domain/roles.enum';
 import { JWTClaims } from '../domain/value-objects/token.value';
 import { ChangePasswordController } from './controllers/changePassword/change-password.controller';
 import { ChangePasswordBody } from './controllers/changePassword/request';
@@ -13,7 +27,7 @@ import { CHeckUsernameController } from './controllers/checkUsername/check-usern
 import { CheckUsernameRequest } from './controllers/checkUsername/request';
 import { CheckUsernameResponse } from './controllers/checkUsername/response';
 import { CreateUserLocalController } from './controllers/createUserLocal/create-user-local.controller';
-import { CreateUserLocalRequest } from './controllers/createUserLocal/request';
+import { CreateUserLocalBody } from './controllers/createUserLocal/request';
 import { CreateUserLocalResponse } from './controllers/createUserLocal/response';
 import { EditProfileController } from './controllers/editProfile/edit-profile.controller';
 import { EditProfileBody } from './controllers/editProfile/request';
@@ -38,7 +52,7 @@ import { ViewProfileController } from './controllers/viewProfile/view-profile.co
 @Controller('auth')
 export class UsersController {
   constructor(
-    private createUserCtx: CreateUserLocalController,
+    private createHostCtx: CreateUserLocalController,
     private loginUserCtx: LoginUserController,
     private refreshTokenCtx: RefreshTokenController,
     private checkUsernameCtx: CHeckUsernameController,
@@ -49,11 +63,13 @@ export class UsersController {
     private updateFirebaseIdCtx: UpdateFirebasePushIdController,
     private updateAppVersionCtx: UpdateAppVersionController,
   ) {}
-  @Post('/local')
+  @Post('/local/:role/register')
+  @ApiParam({ name: 'role', enum: EnumRoles })
   async createLocal(
-    @Body() data: CreateUserLocalRequest,
+    @Body() data: CreateUserLocalBody,
+    @Param('role') role: string,
   ): Promise<CreateUserLocalResponse> {
-    return this.createUserCtx.execute(data);
+    return this.createHostCtx.execute({ role: role as EnumRoles, ...data });
   }
 
   @Post('/local/login')
@@ -86,6 +102,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
+  @ApiOperation({ deprecated: true })
   async viewProfile(
     @CurrentUser() user: JWTClaims,
   ): Promise<ViewProfileResponse> {
@@ -103,6 +120,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Put('/profile')
+  @ApiOperation({ deprecated: true })
   async editProfile(
     @CurrentUser() user: JWTClaims,
     @Body() data: EditProfileBody,

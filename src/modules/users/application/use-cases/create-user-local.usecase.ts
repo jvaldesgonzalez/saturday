@@ -1,6 +1,6 @@
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { CreateUserDto } from '../dtos/create-user-local.dto';
-import { Result } from 'src/shared/core/Result';
+import { Ok, Result } from 'src/shared/core/Result';
 import { Either, left, right } from 'src/shared/core/Either';
 import { User } from '../../domain/entities/user.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
@@ -15,17 +15,17 @@ import { UserErrors } from '../../domain/errors/user.errors';
 import { Username } from '../../domain/value-objects/username.value';
 import { UserEmail } from '../../domain/value-objects/user-email.value';
 import { UserPassword } from '../../domain/value-objects/user-password.value';
-import { UserProfileImg } from '../../domain/value-objects/user-profile-img.value';
 import { FirebasePushId } from '../../domain/value-objects/user-firebase-push-id.value';
 import { Version } from 'src/shared/domain/version.value-object';
 import {
   AuthProvider,
   UserProvider,
 } from '../../domain/value-objects/user-auth-provider.value';
+import { LoginResponseDto } from './login-user.usecase';
 
 export type CreateUserLocalUseCaseResponse = Either<
   AppError.UnexpectedError | UserErrors.EmailExistsError | Result<any>,
-  Result<User>
+  Result<LoginResponseDto>
 >;
 
 @Injectable()
@@ -46,9 +46,6 @@ export class CreateUserLocalUseCase
   ): Promise<CreateUserLocalUseCaseResponse> {
     this._logger.log('Executing...');
     const usernameOrError = Username.create(request.username);
-    const profileImageUrlOrError = UserProfileImg.create(
-      request.profileImageUrl,
-    );
     const emailOrError = UserEmail.create(request.email);
     const firebasePushIdOrError = FirebasePushId.create(request.firebasePushId);
     const appVersionOrError = Version.create(request.appVersion);
@@ -60,7 +57,6 @@ export class CreateUserLocalUseCase
 
     const combineResult = Result.combine([
       usernameOrError,
-      profileImageUrlOrError,
       emailOrError,
       firebasePushIdOrError,
       appVersionOrError,
@@ -72,7 +68,6 @@ export class CreateUserLocalUseCase
 
     const userOrErr: Result<User> = User.new({
       username: usernameOrError.getValue(),
-      profileImageUrl: profileImageUrlOrError.getValue(),
       email: emailOrError.getValue(),
       firebasePushId: firebasePushIdOrError.getValue(),
       appVersion: appVersionOrError.getValue(),
@@ -105,6 +100,11 @@ export class CreateUserLocalUseCase
     const emailExist: boolean = await userRepo.existByEmail(user.email);
     if (emailExist) return left(new UserErrors.EmailExistsError(user.email));
     await userRepo.save(user);
-    return right(Result.ok(user));
+    return right(
+      Ok<LoginResponseDto>({
+        accessToken: user.getUserToken(),
+        refreshToken: user.getRefreshToken(),
+      }),
+    );
   }
 }

@@ -1,18 +1,18 @@
 import { Result } from 'src/shared/core/Result';
 import { ValueObject } from 'src/shared/domain/value-object.abstract';
 
-type UserProfileImgProps = {
+type HostProfileImgProps = {
   value: string;
 };
 
-export class UserProfileImg extends ValueObject<UserProfileImgProps> {
+export class HostProfileImg extends ValueObject<HostProfileImgProps> {
   //TODO: Validate URL-type
 
   public get value(): string {
     return this.props.value;
   }
 
-  public static create(value: string): Result<UserProfileImg> {
-    return Result.ok(new UserProfileImg({ value }));
+  public static create(value: string): Result<HostProfileImg> {
+    return Result.ok(new HostProfileImg({ value }));
   }
 }

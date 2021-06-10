@@ -8,7 +8,7 @@ export type RegisterBusinessDto = {
   userId: string;
   phoneNumber: string;
   businessName: string;
-  description: DescriptionField;
+  profileImage?: string;
   aditionalBusinessData: DescriptionField[];
   place?: {
     name: string;
