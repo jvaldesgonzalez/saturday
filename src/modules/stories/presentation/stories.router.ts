@@ -19,7 +19,7 @@ export class StoriesRouter {
   ) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get('/me')
+  @Get('/')
   @ApiResponse({ status: 200, type: [GetStoriesFromHostResponse] })
   async getMyStories(
     @CurrentUser() user: JWTClaims,
@@ -28,7 +28,7 @@ export class StoriesRouter {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/new')
+  @Post('/')
   @ApiResponse({ status: 200, type: CreateStoryResponse })
   async createStory(
     @CurrentUser() user: JWTClaims,

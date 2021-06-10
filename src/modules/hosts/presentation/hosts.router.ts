@@ -1,8 +1,25 @@
-import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { JWTClaims } from 'src/modules/users/domain/value-objects/token.value';
 import { CurrentUser } from 'src/shared/core/auth/current-user.decorator';
 import { JwtAuthGuard } from 'src/shared/core/auth/JwtAuth.guard';
+import { GetResumeByHostResponse } from 'src/shared/modules/stats/types/responses/get-host-stats-resume';
+import { GetHostStatsResponse } from 'src/shared/modules/stats/types/responses/get-host-stats.response';
+import { GetHostStatsController } from './controllers/getHostStats/get-host-stats.controller';
+import { GetHostStatsResumeController } from './controllers/getHostStatsResume/get-host-stats-resume.controller';
 import { GetHostProfileController } from './controllers/getProfile/get-profile.controller';
 import { GetHostProfileResponse } from './controllers/getProfile/response';
 import { RegisterBusinessController } from './controllers/registerBusiness/register-business.controller';
@@ -20,10 +37,12 @@ export class HostsRouter {
     private registerBusinessCtx: RegisterBusinessController,
     private updateBusinessCtx: UpdateBusinessDetailsController,
     private getHostProfileCtx: GetHostProfileController,
+    private getHostStatsResumeCtx: GetHostStatsResumeController,
+    private getHostStatsCtx: GetHostStatsController,
   ) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post('/business/register')
+  @Post('/business/')
   // @ApiOperation({ deprecated: true })
   @ApiOkResponse({ type: RegisterBusinessResponse })
   async registerBusiness(
@@ -50,5 +69,27 @@ export class HostsRouter {
     @CurrentUser() user: JWTClaims,
   ): Promise<GetHostProfileResponse> {
     return this.getHostProfileCtx.execute({ hostId: user.id });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/stats/preview')
+  @ApiOkResponse({ type: GetResumeByHostResponse })
+  async getMyResume(
+    @CurrentUser() user: JWTClaims,
+  ): Promise<GetResumeByHostResponse> {
+    return this.getHostStatsResumeCtx.execute({ hostId: user.id });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/stats')
+  @ApiQuery({ name: 'fromDate', type: Date })
+  @ApiQuery({ name: 'toDate', type: Date })
+  @ApiOkResponse({ type: GetHostStatsResponse })
+  async getHostStats(
+    @CurrentUser() user: JWTClaims,
+    @Query('fromDate') fromDate: Date,
+    @Query('toDate') toDate: Date,
+  ): Promise<GetHostStatsResponse> {
+    return this.getHostStatsCtx.execute({ hostId: user.id, fromDate, toDate });
   }
 }

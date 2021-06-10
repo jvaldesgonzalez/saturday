@@ -1,7 +1,7 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
-import { PieBarChartJSON } from 'src/modules/stats/charts/bar.chart';
-import { LinearChartJSON } from 'src/modules/stats/charts/linear.chart';
-import { ListChartJSON } from 'src/modules/stats/charts/list.chart';
+import { PieBarChartJSON } from '../../charts/bar.chart';
+import { LinearChartJSON } from '../../charts/linear.chart';
+import { ListChartJSON } from '../../charts/list.chart';
 
 export class GetHostStatsResponse {
   @ApiResponseProperty({ type: [ListChartJSON] })

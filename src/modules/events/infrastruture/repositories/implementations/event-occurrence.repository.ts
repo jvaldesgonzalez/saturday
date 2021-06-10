@@ -10,7 +10,7 @@ import {
   PersistenceManager,
 } from '@liberation-data/drivine';
 import { GetTicketsByOccurrenceResponse } from 'src/modules/events/presentation/controllers/getTicketsByOccurrence/response';
-import { ChartsBuilder } from 'src/modules/stats/charts/charts.buider';
+import { ChartsBuilder } from 'src/shared/modules/stats/charts/charts.buider';
 
 export class EventOccurrenceRepository
   extends BaseRepository<EventOccurrence, EventOccurrenceEntity>

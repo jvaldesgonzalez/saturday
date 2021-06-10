@@ -1,5 +1,5 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
-import { PieBarChartJSON } from 'src/modules/stats/charts/bar.chart';
+import { PieBarChartJSON } from 'src/shared/modules/stats/charts/bar.chart';
 
 class Ticket {
   @ApiResponseProperty()

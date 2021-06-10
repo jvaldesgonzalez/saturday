@@ -1,23 +1,21 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { IStatsRepository } from 'src/modules/stats/infrastructure/interfaces/stats.repository.interface';
+import { Injectable } from '@nestjs/common';
 import { BaseController } from 'src/shared/http/BaseController';
+import { StatsService } from 'src/shared/modules/stats/stats.service';
+import { GetHostStatsResponse } from 'src/shared/modules/stats/types/responses/get-host-stats.response';
 import { GetHostStatsRequest } from './request';
-import { GetHostStatsResponse } from './response';
 
 @Injectable()
 export class GetHostStatsController extends BaseController<
   GetHostStatsRequest,
   GetHostStatsResponse
 > {
-  constructor(
-    @Inject('IStatsRepository') private _statsRepo: IStatsRepository,
-  ) {
+  constructor(private stats: StatsService) {
     super();
   }
 
   protected async executeImpl(
     req: GetHostStatsRequest,
   ): Promise<GetHostStatsResponse> {
-    return await this._statsRepo.getHostStats(req.hostId);
+    return await this.stats.getHostStats(req.hostId);
   }
 }

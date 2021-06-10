@@ -1,9 +1,9 @@
-import { GetResumeByHostResponse } from '../../presentation/controllers/getResumeByHost/response';
 import { IStatsRepository } from '../interfaces/stats.repository.interface';
 import * as faker from 'faker';
 import { ChartsBuilder } from '../../charts/charts.buider';
-import { GetEventStatsResponse } from '../../presentation/controllers/getEventStats/response';
-import { GetHostStatsResponse } from '../../presentation/controllers/getHostStats/response';
+import { GetHostStatsResponse } from '../../types/responses/get-host-stats.response';
+import { GetEventStatsResponse } from '../../types/responses/get-event-stats.response';
+import { GetResumeByHostResponse } from '../../types/responses/get-host-stats-resume';
 
 export class StatsRepository implements IStatsRepository {
   async getHostStats(_hostId: string): Promise<GetHostStatsResponse> {
@@ -234,6 +234,7 @@ export class StatsRepository implements IStatsRepository {
       },
     };
   }
+
   async getResumeByHost(_hostId: string): Promise<GetResumeByHostResponse> {
     return {
       followers: {

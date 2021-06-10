@@ -1,3 +1,4 @@
+import { GetEventDetailsController } from './getEventDetails/get-event-details.controller';
 import { GetHostPublicationsController } from './getHostPublications/get-host-publications.controller';
 import { GetRecentEventsByHostController } from './getRecentHostEvents/get-recent-host-events.controller';
 import { GetTicketsByHostController } from './getTicketsByHost/get-tickets-by-host.controller';
@@ -8,6 +9,7 @@ const eventsControllers = [
   GetTicketsByHostController,
   GetTicketsByOccurrenceController,
   GetHostPublicationsController,
+  GetEventDetailsController,
 ];
 
 export default eventsControllers;

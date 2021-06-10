@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DataAccessModule } from 'src/shared/modules/data-access/data-access.module';
 import { StatsRepository } from './infrastructure/implementation/stats.repository';
-import statsControllers from './presentation/controllers';
-import { StatsRouter } from './presentation/stats.router';
+import { StatsService } from './stats.service';
 
 @Module({
   imports: [DataAccessModule],
@@ -11,8 +10,8 @@ import { StatsRouter } from './presentation/stats.router';
       provide: 'IStatsRepository',
       useClass: StatsRepository,
     },
-    ...statsControllers,
+    StatsService,
   ],
-  controllers: [StatsRouter],
+  exports: [StatsService],
 })
 export class StatsModule {}
