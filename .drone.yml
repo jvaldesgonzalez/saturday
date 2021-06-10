@@ -1,6 +1,7 @@
 kind: pipeline
 name: default
 
+# build from heavy image
 steps:
 - name: build
   image: docker.uclv.cu/node
