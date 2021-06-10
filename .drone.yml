@@ -6,8 +6,8 @@ steps:
 - name: build
   image: docker.uclv.cu/node
   commands:
-  - yarn add @liberation-data/agensgraph
   - yarn install
+  - yarn add @liberation-data/agensgraph
   - yarn build
   
 - name: run
