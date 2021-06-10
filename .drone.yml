@@ -1,0 +1,17 @@
+kind: pipeline
+name: default
+
+# build from heavy image
+steps:
+- name: build
+  image: docker.uclv.cu/node
+  failure: ignore
+  commands:
+  - yarn install
+  - yarn add @liberation-data/agensgraph
+  - yarn build
+  
+- name: run
+  image: docker.uclv.cu/node:alpine
+  commands:
+  - node dist/main.js
