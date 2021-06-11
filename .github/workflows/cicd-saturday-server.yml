@@ -10,7 +10,9 @@ jobs:
       with:
         to: 806567508  
         token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
-        args: 💻 New commit pushed!! 
+        args: |
+          "💻 New commit pushed!!"
+          "message: ${{ github.event.head_commit.message }}"
     # Build and check if succeeded, test to be added
     - uses: actions/checkout@v2
     - name: Use Node.js 14
