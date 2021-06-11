@@ -8,7 +8,7 @@ jobs:
     - name: notify process initialization
       uses: appleboy/telegram-action@master
       with:
-        to: 806567508  
+        to: -583932975 #806567508  
         token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
         args: |
           "💻 New commit pushed!!"
@@ -26,6 +26,6 @@ jobs:
     - name: send custom message with args
       uses: appleboy/telegram-action@master
       with:
-        to: 806567508  
+        to: -583932975 #806567508  
         token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
         args: ✅ Tests run successfully
