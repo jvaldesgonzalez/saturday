@@ -23,9 +23,25 @@ jobs:
     - run: npm install --quiet
     - run: npm run build
     # Notify test succeeded
-    - name: send custom message with args
+    - name: notify tests succeded
       uses: appleboy/telegram-action@master
       with:
         to: -583932975 #806567508  
         token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
         args: ✅ Tests run successfully
+    - name: Deploy to AWS
+      uses: easingthemes/ssh-deploy@main
+      env:
+          SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_KEY }}
+          ARGS: "-rltgoDzvO --delete"
+          SOURCE: "dist/"
+          REMOTE_HOST: ${{ secrets.AWS_SSH_HOST }}
+          REMOTE_USER: ${{ secrets.AWS_SSH_USER }}
+          EXCLUDE: "/dist/, /node_modules/"
+    # Notify server deploy
+    - name: notify tests succeded
+      uses: appleboy/telegram-action@master
+      with:
+        to: -583932975 #806567508  
+        token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
+        args: 🚀 folder transfered to server
