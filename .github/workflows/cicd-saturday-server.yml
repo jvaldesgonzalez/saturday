@@ -18,7 +18,7 @@ jobs:
       with:
         node-version: 14
     - run: npm install -g pegjs
-    - run: npm install
+    - run: npm install --quiet
     - run: npm run build
     # Notify test succeeded
     - name: send custom message with args
