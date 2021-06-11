@@ -1,0 +1,29 @@
+name: cicd-saturday-server
+on: [push]
+jobs:
+  test-and-deploy-to-ec2:
+    runs-on: ubuntu-latest
+    steps:
+    # Nofify process initialization
+    - name: notify process initialization
+      uses: appleboy/telegram-action@master
+      with:
+        to: 806567508  
+        token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
+        args: 💻 New commit pushed!! 
+    # Build and check if succeeded, test to be added
+    - uses: actions/checkout@v2
+    - name: Use Node.js 14
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+    - run: npm install -g pegjs
+    - run: npm install
+    - run: npm run build
+    # Notify test succeeded
+    - name: send custom message with args
+      uses: appleboy/telegram-action@master
+      with:
+        to: 806567508  
+        token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
+        args: ✅ Tests run successfully
