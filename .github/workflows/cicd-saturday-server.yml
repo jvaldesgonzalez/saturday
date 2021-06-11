@@ -5,14 +5,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     # Nofify process initialization
-    - name: notify process initialization
-      uses: appleboy/telegram-action@master
-      with:
-        to: -583932975 #806567508  
-        token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
-        args: |
-          "💻 New commit pushed!!"
-          "message: ${{ github.event.head_commit.message }}"
+    #- name: notify process initialization
+    #  uses: appleboy/telegram-action@master
+    #  with:
+    #    to: -583932975 #806567508  
+    #    token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
+    #    args: |
+    #      "💻 New commit pushed!!"
+    #      "message: ${{ github.event.head_commit.message }}"
     # Build and check if succeeded, test to be added
     - uses: actions/checkout@v2
     - name: Use Node.js 14
@@ -23,12 +23,19 @@ jobs:
     - run: npm install --quiet
     - run: npm run build
     # Notify test succeeded
-    - name: notify tests succeded
-      uses: appleboy/telegram-action@master
-      with:
-        to: -583932975 #806567508  
-        token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
-        args: ✅ Tests run successfully
+    #- name: notify tests succeded
+    #  uses: appleboy/telegram-action@master
+    #  with:
+    #    to: -583932975 #806567508  
+    #    token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
+    #    args: ✅ Tests run successfully
+    - name: Prepare SSH
+        run: >
+          cd ~ && mkdir .ssh &&
+          touch ~/.ssh/known_hosts &&
+          ssh-keyscan -H "$IP" >>~/.ssh/known_hosts
+        env:
+          IP: ${{ secrets.IP }}
     - name: Deploy to AWS
       uses: easingthemes/ssh-deploy@main
       env:
