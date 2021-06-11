@@ -6,7 +6,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
-  const port = 3000;
+  const port = 80;
 
   app.useGlobalPipes(new ValidationPipe());
 
