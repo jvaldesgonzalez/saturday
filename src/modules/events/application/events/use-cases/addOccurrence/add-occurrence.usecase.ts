@@ -58,7 +58,7 @@ export class AddOccurrenceUseCase
     const occurrenceOrError = EventOccurrence.new({
       ...request,
       eventId: EventRef.create(request.eventId).getValue(),
-      tickets: new TicketCollection(ticketsOrError.getValue()),
+      tickets: new TicketCollection(ticketsOrError.getValue(), true),
     });
 
     if (occurrenceOrError.isFailure)

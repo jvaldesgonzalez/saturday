@@ -9,6 +9,7 @@ export interface IEventOccurrenceRepository
   extends IRepository<EventOccurrence> {
   findById(id: IIdentifier | string): Promise<EventOccurrence>;
   eventExists(id: IIdentifier | string): Promise<boolean>;
+  save(entity: EventOccurrence, expandToAll?: boolean): Promise<void>;
 
   //view repo
   getTicketsByHost(

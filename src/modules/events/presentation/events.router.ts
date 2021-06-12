@@ -9,6 +9,7 @@ import {
   Body,
   Put,
   Delete,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -26,6 +27,9 @@ import { GetEventStatsResponse } from 'src/shared/modules/stats/types/responses/
 import { AddOccurrenceController } from './controllers/addOccurrence/add-occurrence.controller';
 import { AddOccurrenceRequest } from './controllers/addOccurrence/request';
 import { AddOccurrenceResponse } from './controllers/addOccurrence/response';
+import { AddTicketController } from './controllers/addTicket/add-ticket.controller';
+import { AddTicketBody } from './controllers/addTicket/request';
+import { AddTicketResponse } from './controllers/addTicket/response';
 import { CreateEventController } from './controllers/createEvent/create-event.controller';
 import { CreateEventBody } from './controllers/createEvent/request';
 import { CreateEventResponse } from './controllers/createEvent/response';
@@ -59,6 +63,7 @@ export class EventsRouter {
     private editEventCtx: EditEventController,
     private addOccurrenceCtx: AddOccurrenceController,
     private deleteOccurrenceCtx: DeleteOccurrenceController,
+    private addTicketCtx: AddTicketController,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -176,6 +181,25 @@ export class EventsRouter {
     return this.deleteOccurrenceCtx.execute({
       occurrenceId: id,
       publisher: user.id,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/:id/occurrences')
+  @ApiParam({ name: 'id' })
+  @ApiQuery({ name: 'expand-to-all', type: Boolean })
+  @ApiResponse({ status: 200, type: [AddTicketResponse] })
+  async addTicket(
+    @CurrentUser() user: JWTClaims,
+    @Param('id') id: string,
+    @Query('expand-to-all', ParseBoolPipe) expandToAll = false,
+    @Body() data: AddTicketBody,
+  ): Promise<AddTicketResponse> {
+    return this.addTicketCtx.execute({
+      occurrenceId: id,
+      publisher: user.id,
+      expandToAll,
+      ...data,
     });
   }
 }

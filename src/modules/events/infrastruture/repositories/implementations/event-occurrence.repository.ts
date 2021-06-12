@@ -55,7 +55,7 @@ export class EventOccurrenceRepository
   }
 
   @Transactional()
-  async save(occurrence: EventOccurrence): Promise<void> {
+  async save(occurrence: EventOccurrence, expandToAll = false): Promise<void> {
     this._logger.log('Saving occurrence...');
     const persistent: EventOccurrenceEntity = EventOccurrenceMapper.DomainToPersistence(
       occurrence,
@@ -74,7 +74,7 @@ export class EventOccurrenceRepository
         eventId,
       }),
     );
-    for (const ticket of occurrence.tickets.getItems()) {
+    for (const ticket of occurrence.tickets.getNewItems()) {
       await this.saveTicket(ticket, occurrence._id.toString());
     }
   }

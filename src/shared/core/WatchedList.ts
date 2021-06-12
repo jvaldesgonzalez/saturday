@@ -4,11 +4,12 @@ export abstract class WatchedList<T> {
   private new: T[];
   private removed: T[];
 
-  constructor(initialItems?: T[]) {
+  constructor(initialItems?: T[], saveAsNew = false) {
     this.currentItems = initialItems ? initialItems : [];
     this.initial = initialItems ? initialItems : [];
-    this.new = [];
+    this.new = saveAsNew ? initialItems : [];
     this.removed = [];
+    if (saveAsNew) this.initial = [];
   }
 
   abstract compareItems(a: T, b: T): boolean;

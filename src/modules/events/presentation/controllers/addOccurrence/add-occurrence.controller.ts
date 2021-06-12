@@ -15,8 +15,9 @@ export class AddOccurrenceController extends BaseController<
   protected async executeImpl(
     req: AddOccurrenceRequest,
   ): Promise<AddOccurrenceResponse> {
-    console.log(req);
-    return;
+    req.dateTimeEnd = new Date(req.dateTimeEnd);
+    req.dateTimeInit = new Date(req.dateTimeInit);
+
     const result = await this.useCase.execute(req);
     if (result.isLeft()) {
       const error = result.value;

@@ -1,5 +1,6 @@
 export type RemoveTicketDto = {
-  eventId: string;
+  publisher: string;
   occurrenceId: string;
   ticketId: string;
+  expandToAll: boolean;
 };
