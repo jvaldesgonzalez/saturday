@@ -1,4 +1,4 @@
-import { Fail, Join, Result } from 'src/shared/core/Result';
+import { Fail, Join, Ok, Result } from 'src/shared/core/Result';
 import { Multimedia, MultimediaType } from 'src/shared/domain/multimedia.value';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { CategoryRef } from '../../domain/entities/categoryRef.entity';
@@ -71,10 +71,12 @@ export class EventMapper {
     const categoriesOrError = Join(
       p.categories.map((ct) => CategoryRef.create(ct)),
     );
-    const placeOrError = EventPlace.create({
-      ...p.place,
-      hostRef: p.place.hostRef ? new UniqueEntityID(p.place.hostRef) : null,
-    });
+    const placeOrError = p.place
+      ? EventPlace.create({
+          ...p.place,
+          hostRef: p.place.hostRef ? new UniqueEntityID(p.place.hostRef) : null,
+        })
+      : Ok(undefined);
     const collaboratorsOrError = Join(
       p.collaborators.map((col) => PublisherRef.create(col)),
     );
@@ -117,13 +119,15 @@ export class EventMapper {
         }),
       ),
       categories: d.categories.map((ct) => ct.id.toString()),
-      place: {
-        name: d.place.name,
-        address: d.place.address,
-        longitude: d.place.longitude,
-        latitude: d.place.latitude,
-        hostRef: d.place.hostRef.toString(),
-      },
+      place: d.place
+        ? {
+            name: d.place.name,
+            address: d.place.address,
+            longitude: d.place.longitude,
+            latitude: d.place.latitude,
+            hostRef: d.place.hostRef.toString(),
+          }
+        : null,
       collaborators: d.collaborators.map((cb) => cb._id.toString()),
       multimedia: JSON.stringify(
         d.multimedia.map((mtm) => {

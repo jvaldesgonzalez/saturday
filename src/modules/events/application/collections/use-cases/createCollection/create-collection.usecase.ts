@@ -6,7 +6,6 @@ import {
   EventRefCollection,
 } from 'src/modules/events/domain/entities/eventRef.entity';
 import { PublisherRef } from 'src/modules/events/domain/entities/publisherRef.entity';
-import { ICollectionRepository } from 'src/modules/events/infrastruture/repositories/interfaces/ICollectionRepository';
 import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
@@ -28,43 +27,41 @@ export class CreateCollectionUseCase
   private _logger: Logger;
   constructor(
     @Inject('IEventRepository') private _eventRepo: IEventRepository,
-    @Inject('ICollectionRepository')
-    private _collectionRepository: ICollectionRepository,
   ) {
     this._logger = new Logger('CreateCollectionUseCase');
   }
   async execute(
     request: CreateCollectionDto,
   ): Promise<CreateCollectionUseCaseResponse> {
-    this._logger.log('Executing...');
+    // this._logger.log('Executing...');
 
-    const existsEvents = await Promise.all(
-      request.eventsId.map((id) => this._eventRepo.exists(id)),
-    );
-    if (!existsEvents.every((e) => e))
-      return left(new CreateCollectionErrors.AllEventMustExists());
+    // const existsEvents = await Promise.all(
+    //   request.eventsId.map((id) => this._eventRepo.exists(id)),
+    // );
+    // if (!existsEvents.every((e) => e))
+    //   return left(new CreateCollectionErrors.AllEventMustExists());
 
-    const eventsIdOrError = Join(
-      request.eventsId.map((id) => EventRef.create(id)),
-    );
-    const publisherOrError = PublisherRef.create(request.publisher);
+    // const eventsIdOrError = Join(
+    //   request.eventsId.map((id) => EventRef.create(id)),
+    // );
+    // const publisherOrError = PublisherRef.create(request.publisher);
 
-    const combinedResult = Result.combine([publisherOrError, eventsIdOrError]);
-    if (combinedResult.isFailure)
-      return left(Fail(eventsIdOrError.error.toString()));
+    // const combinedResult = Result.combine([publisherOrError, eventsIdOrError]);
+    // if (combinedResult.isFailure)
+    //   return left(Fail(eventsIdOrError.error.toString()));
 
-    const collectionOrError = Collection.new({
-      events: new EventRefCollection(eventsIdOrError.getValue()),
-      name: request.name,
-      description: request.description,
-      publisher: publisherOrError.getValue(),
-    });
+    // const collectionOrError = Collection.new({
+    //   events: new EventRefCollection(eventsIdOrError.getValue()),
+    //   name: request.name,
+    //   description: request.description,
+    //   publisher: publisherOrError.getValue(),
+    // });
 
-    if (collectionOrError.isFailure)
-      return left(Fail(collectionOrError.error.toString()));
+    // if (collectionOrError.isFailure)
+    //   return left(Fail(collectionOrError.error.toString()));
 
-    const collection = collectionOrError.getValue();
-    await this._collectionRepository.save(collection);
+    // const collection = collectionOrError.getValue();
+    // await this._collectionRepository.save(collection);
     return right(Ok());
   }
 }

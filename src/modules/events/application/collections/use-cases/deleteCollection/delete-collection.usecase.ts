@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
 import { Collection } from 'src/modules/events/domain/entities/collection.entity';
-import { ICollectionRepository } from 'src/modules/events/infrastruture/repositories/interfaces/ICollectionRepository';
+import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
@@ -21,8 +21,8 @@ export class DeleteCollectionUseCase
   implements IUseCase<DeleteCollectionDto, DeleteCollectionUseCaseResponse> {
   private _logger: Logger;
   constructor(
-    @Inject('ICollectionRepository')
-    private _collectionRepo: ICollectionRepository,
+    @Inject('IEventRepository')
+    private _collectionRepo: IEventRepository,
   ) {
     this._logger = new Logger('DeleteCollectionUseCase');
   }
@@ -30,16 +30,16 @@ export class DeleteCollectionUseCase
   async execute(
     request: DeleteCollectionDto,
   ): Promise<DeleteCollectionUseCaseResponse> {
-    const collection: Collection = await this._collectionRepo.findById(
-      request.collectionId,
-    );
-    if (!collection)
-      return left(
-        new DeleteCollectionErrors.CollectionNotFound(request.collectionId),
-      );
+    // const collection: Collection = await this._collectionRepo.findById(
+    //   request.collectionId,
+    // );
+    // if (!collection)
+    //   return left(
+    //     new DeleteCollectionErrors.CollectionNotFound(request.collectionId),
+    //   );
 
-    collection.markDeleted();
-    await this._collectionRepo.drop(collection);
+    // collection.markDeleted();
+    // await this._collectionRepo.drop(collection);
     return right(Ok());
   }
 }

@@ -37,8 +37,8 @@ export type CreateEventDto = {
   name: string;
   description: UnknownField[];
   categories: string[];
-  place: PlaceRaw;
-  collaborators: string[];
+  place?: PlaceRaw;
+  collaborators?: string[];
   multimedia: MultimediaRaw[];
   occurrences: OccurrenceRaw[];
 };

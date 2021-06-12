@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   InjectPersistenceManager,
   PersistenceManager,
@@ -37,14 +38,20 @@ export class EventRepository
       collaborators,
       multimedia,
       attentionTags,
+      publisher,
       ...data
     } = persistent;
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(
-        `
-        
+        `MATCH (h:User)
+        WHERE h.id = $publisher
+        CREATE (h)-[:PUBLISH_EVENT]->(event:Event)
+        SET event+= $data
         `,
-      ),
+      ).bind({
+        data: { description, multimedia, ...data },
+        publisher: publisher,
+      }),
     );
   }
   async findById(id: string): Promise<Event> {

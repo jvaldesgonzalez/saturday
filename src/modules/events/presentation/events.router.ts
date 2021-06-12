@@ -5,6 +5,8 @@ import {
   Query,
   ParseIntPipe,
   Param,
+  Post,
+  Body,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -19,6 +21,12 @@ import { CurrentUser } from 'src/shared/core/auth/current-user.decorator';
 import { JwtAuthGuard } from 'src/shared/core/auth/JwtAuth.guard';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { GetEventStatsResponse } from 'src/shared/modules/stats/types/responses/get-event-stats.response';
+import { CreateEventController } from './controllers/createEvent/create-event.controller';
+import {
+  CreateEventBody,
+  CreateEventRequest,
+} from './controllers/createEvent/request';
+import { CreateEventResponse } from './controllers/createEvent/response';
 import { GetEventDetailsController } from './controllers/getEventDetails/get-event-details.controller';
 import {
   GetHostPublicationsController,
@@ -41,6 +49,7 @@ export class EventsRouter {
     private getTicketsByOccurrenceCtx: GetTicketsByOccurrenceController,
     private getHostPublicationsCtx: GetHostPublicationsController,
     private getEventDetailsCtx: GetEventDetailsController,
+    private createEventCtx: CreateEventController,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -103,5 +112,15 @@ export class EventsRouter {
       hostId: user.id,
       eventId: id,
     });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/')
+  @ApiResponse({ status: 200, type: [CreateEventResponse] })
+  async createEvent(
+    @CurrentUser() user: JWTClaims,
+    @Body() data: CreateEventBody,
+  ): Promise<CreateEventResponse> {
+    return this.createEventCtx.execute({ publisher: user.id, ...data });
   }
 }

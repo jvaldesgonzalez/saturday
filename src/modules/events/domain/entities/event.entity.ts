@@ -19,7 +19,7 @@ type EventProps = {
   name: EventName;
   description: UnknownFieldCollection;
   categories: CategoryRefCollection;
-  place: EventPlace;
+  place?: EventPlace;
   collaborators?: CollaboratorsCollection;
   multimedia: MultimediaCollection;
   attentionTags?: AttentionTagRefCollection;

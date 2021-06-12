@@ -1,6 +1,6 @@
 import { Inject, Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
-import { ICollectionRepository } from 'src/modules/events/infrastruture/repositories/interfaces/ICollectionRepository';
+import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
@@ -24,8 +24,8 @@ export class UpdateCollectionUseCase
   private _logger: Logger;
   public changes: Changes;
   constructor(
-    @Inject('ICollectionRepository')
-    private _collectionRepo: ICollectionRepository,
+    @Inject('IEventRepository')
+    private _collectionRepo: IEventRepository,
   ) {
     this._logger = new Logger('UpdateCollectionUseCase');
     this.changes = new Changes();
@@ -34,22 +34,20 @@ export class UpdateCollectionUseCase
   async execute(
     request: UpdateCollectionDto,
   ): Promise<UpdateCollectionUseCaseResponse> {
-    const collection = await this._collectionRepo.findById(
-      request.collectionId,
-    );
-    if (!collection)
-      return left(
-        new UpdateCollectionErrors.CollectionNotFound(request.collectionId),
-      );
-    if (request.description)
-      this.changes.addChange(collection.changeDescription(request.description));
-    if (request.name)
-      this.changes.addChange(collection.changeName(request.name));
-
-    if (this.changes.getChangeResult().isFailure)
-      return left(Fail(this.changes.getChangeResult().error.toString()));
-
-    await this._collectionRepo.save(collection);
+    // const collection = await this._collectionRepo.findById(
+    //   request.collectionId,
+    // );
+    // if (!collection)
+    //   return left(
+    //     new UpdateCollectionErrors.CollectionNotFound(request.collectionId),
+    //   );
+    // if (request.description)
+    //   this.changes.addChange(collection.changeDescription(request.description));
+    // if (request.name)
+    //   this.changes.addChange(collection.changeName(request.name));
+    // if (this.changes.getChangeResult().isFailure)
+    //   return left(Fail(this.changes.getChangeResult().error.toString()));
+    // await this._collectionRepo.save(collection);
     return right(Ok());
   }
 }

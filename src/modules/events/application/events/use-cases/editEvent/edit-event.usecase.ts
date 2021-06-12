@@ -30,7 +30,7 @@ export class EditEventUseCase
   private _logger: Logger;
   constructor(
     @Inject('IUnitOfWorkFactory') private _unitOfWorkFact: IUnitOfWorkFactory,
-    @Inject('IRespositoryFactory')
+    @Inject('IRepositoryFactory')
     private _repositoryFact: IRepositoryFactory<Event, IEventRepository>,
   ) {
     this._logger = new Logger('EditEventUseCase');
