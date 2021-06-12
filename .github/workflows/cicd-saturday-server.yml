@@ -4,15 +4,15 @@ jobs:
   test-and-deploy-to-ec2:
     runs-on: ubuntu-latest
     steps:
-    Nofify process initialization
+    #Nofify process initialization
     - name: notify process initialization
-		uses: appleboy/telegram-action@master
-		with:
-		to: -583932975 #806567508  
-		token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
-		args: |
-        "💻 New commit pushed!!"
-        "message: ${{ github.event.head_commit.message }}"
+      uses: appleboy/telegram-action@master
+      with:
+        to: -583932975 #806567508  
+        token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
+        args: |
+          "💻 New commit pushed!!"
+          "message: ${{ github.event.head_commit.message }}"
 
     # Build and check if succeeded, test to be added
 #     - uses: actions/checkout@v2
