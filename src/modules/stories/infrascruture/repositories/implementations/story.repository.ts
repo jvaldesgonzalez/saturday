@@ -28,12 +28,13 @@ export class StoryRepository
     const res = await this.persistenceManager.maybeGetOne<StoryEntity>(
       QuerySpecification.withStatement(
         `
-        MATCH (m:Multimedia)<-[:CONTAINS_MEDIA]- (s:Story) -[:PUBLISHED_BY]->(u:User)
+        MATCH (s:Story)<-[edge:PUBLISH_STORY]-(u:User)
         WHERE s.id = $id
         RETURN {
           id:s.id,
           publisher:u.id,
-          multimedia:m,
+          type:edge.type,
+          url:s.url,
           createdAt:s.createdAt,
           updatedAt:s.updatedAt,
           attachedText:s.attachedText
@@ -49,7 +50,7 @@ export class StoryRepository
   async save(story: Story): Promise<void> {
     this._logger.log(`Save story with id: {${story._id}}`);
     const persistent = await this._domainToPersistentFunc(story);
-    const { multimedia, publisher, ...storyRaw } = persistent;
+    const { url, type, publisher, ...storyRaw } = persistent;
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(
         `
@@ -61,25 +62,25 @@ export class StoryRepository
         `,
       ).bind({
         publisher: publisher,
-        story: { url: multimedia.url, ...storyRaw },
-        edge: { type: multimedia.type },
+        story: { url: url, ...storyRaw },
+        edge: { type: type },
       }),
     );
   }
 
-  async delete(story: Story): Promise<void> {
-    this._logger.log(`Drop entity with id: {${story._id}}`);
-    await this.persistenceManager.execute(
-      QuerySpecification.withStatement<void>(
-        `
-        MATCH (n:Story)-[:CONTAINS_MEDIA]->(m:Multimedia)
-        WHERE n.id = $id
-        DETACH DELETE n
-        DETACH DELETE m
-        `,
-      ).bind({ id: story._id.toString() }),
-    );
-  }
+  // async delete(story: Story): Promise<void> {
+  //   this._logger.log(`Drop entity with id: {${story._id}}`);
+  //   await this.persistenceManager.execute(
+  //     QuerySpecification.withStatement<void>(
+  //       `
+  //       MATCH (n:Story)-[:CONTAINS_MEDIA]->(m:Multimedia)
+  //       WHERE n.id = $id
+  //       DETACH DELETE n
+  //       DETACH DELETE m
+  //       `,
+  //     ).bind({ id: story._id.toString() }),
+  //   );
+  // }
 
   //view part
   async getByHost(hostId: string): Promise<GetStoriesFromHostResponse[]> {
@@ -92,6 +93,7 @@ export class StoryRepository
           id:s.id,
           type:edge.type,
           url:s.url,
+          attachedText: s.attachedText,
           views:0
         }
         `,

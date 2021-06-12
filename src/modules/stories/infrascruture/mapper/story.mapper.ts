@@ -10,7 +10,7 @@ export class StoryMapper {
     return Story.create(
       {
         publisher: publisherOrError.getValue(),
-        multimedia: s.multimedia as Multimedia,
+        multimedia: { type: s.type, url: s.url } as Multimedia,
         attachedText: s.attachedText,
         createdAt: new Date(s.createdAt),
         updatedAt: new Date(s.updatedAt),
@@ -23,7 +23,8 @@ export class StoryMapper {
     return {
       id: s._id.toString(),
       publisher: s.publisher._id.toString(),
-      multimedia: { type: s.multimedia.type, url: s.multimedia.url },
+      type: s.multimedia.type,
+      url: s.multimedia.url,
       attachedText: s.attachedText,
       createdAt: s.createdAt.toISOString(),
       updatedAt: s.updatedAt.toISOString(),

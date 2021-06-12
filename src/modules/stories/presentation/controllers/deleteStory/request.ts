@@ -1,4 +1,4 @@
-export type DeleteStoryDto = {
+export class DeleteStoryRequest {
   hostId: string;
   storyId: string;
-};
+}
