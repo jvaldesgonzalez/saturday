@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Body,
+  Put,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,11 +23,10 @@ import { JwtAuthGuard } from 'src/shared/core/auth/JwtAuth.guard';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { GetEventStatsResponse } from 'src/shared/modules/stats/types/responses/get-event-stats.response';
 import { CreateEventController } from './controllers/createEvent/create-event.controller';
-import {
-  CreateEventBody,
-  CreateEventRequest,
-} from './controllers/createEvent/request';
+import { CreateEventBody } from './controllers/createEvent/request';
 import { CreateEventResponse } from './controllers/createEvent/response';
+import { EditEventController } from './controllers/editEvent/edit-event.controller';
+import { EditEventResponse } from './controllers/editEvent/response';
 import { GetEventDetailsController } from './controllers/getEventDetails/get-event-details.controller';
 import {
   GetHostPublicationsController,
@@ -50,6 +50,7 @@ export class EventsRouter {
     private getHostPublicationsCtx: GetHostPublicationsController,
     private getEventDetailsCtx: GetEventDetailsController,
     private createEventCtx: CreateEventController,
+    private editEventCtx: EditEventController,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -122,5 +123,21 @@ export class EventsRouter {
     @Body() data: CreateEventBody,
   ): Promise<CreateEventResponse> {
     return this.createEventCtx.execute({ publisher: user.id, ...data });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/:id')
+  @ApiParam({ name: 'id' })
+  @ApiResponse({ status: 200, type: [EditEventResponse] })
+  async editEvent(
+    @CurrentUser() user: JWTClaims,
+    @Param('id') id: string,
+    @Body() data: EditEventResponse,
+  ): Promise<EditEventResponse> {
+    return this.editEventCtx.execute({
+      eventId: id,
+      publisher: user.id,
+      ...data,
+    });
   }
 }

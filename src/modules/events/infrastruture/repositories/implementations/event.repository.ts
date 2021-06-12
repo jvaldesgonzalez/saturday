@@ -30,7 +30,9 @@ export class EventRepository
   }
   @Transactional()
   async save(event: Event): Promise<void> {
+    this._logger.log('saving...');
     const persistent = EventMapper.DomainToPersistence(event);
+    this._logger.log(JSON.stringify(persistent));
     const {
       description,
       categories,
@@ -45,36 +47,34 @@ export class EventRepository
       QuerySpecification.withStatement(
         `MATCH (h:User)
         WHERE h.id = $publisher
-        CREATE (h)-[:PUBLISH_EVENT]->(event:Event)
+        MERGE (h)-[:PUBLISH_EVENT]->(event:Event {id:"${data.id}"})
         SET event+= $data
         `,
       ).bind({
         data: { description, multimedia, ...data },
         publisher: publisher,
+        id: data.id,
       }),
     );
   }
   async findById(id: string): Promise<Event> {
+    // return null;
     const res = await this.persistenceManager.maybeGetOne<EventEntity>(
       QuerySpecification.withStatement(
         `
-        MATCH (t:Ticket)<-[:HAS_TICKETS]-(o:EventOccurrence)<-[:HAS_OCCURRENCES]-(n:Event)-[:HAS_CATEGORY]->(c:Category)
-        MATCH (p:Place)<-[:HAS_LOCATION]-(n:Event)-[:MAIN_PUBLISHER]->(h:User)
-        MATCH (at:AttentionTag)<-[:HAS_TAG]-(n:Event)->[:HAS_COLLABORATOR]->(coll:User)
+        MATCH (h:User)-[:PUBLISH_EVENT]->(n:Event)
         WHERE n.id = $id
         RETURN {
           id:n.id,
-          publisher:n.publisher,
+          publisher:h.id,
           name:n.name,
           createdAt:n.createdAt,
           updatedAt:n.updatedAt,
           description:n.description,
-          categories:collect(c.id),
-          place:p,
-          collaborators:collect(coll.id),
+          categories:[],
+          collaborators:[],
           multimedia:n.multimedia,
-          attentionTags:collect(at),
-          occurrences:collect(o)
+          attentionTags:[]
         }
         `,
       )

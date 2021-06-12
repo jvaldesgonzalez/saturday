@@ -79,6 +79,7 @@ export class CreateEventUseCase
     }).getValue();
 
     try {
+      this._logger.log(event);
       await this._repository.save(event);
       return right(Ok());
     } catch (error) {

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { IsInstance, IsNotEmptyObject, IsOptional } from 'class-validator';
 import { MultimediaType } from 'src/shared/domain/multimedia.value';
 
 class Place {
@@ -12,7 +13,7 @@ class Place {
   @ApiProperty()
   latitude: string;
   @ApiProperty()
-  hostRef: string;
+  hostRef?: string;
 }
 
 class EventDescription {
@@ -62,6 +63,10 @@ export class CreateEventRequest {
   @ApiProperty()
   categories: string[];
   @ApiPropertyOptional({ type: Place })
+  @Type(() => Place)
+  @IsInstance(Place)
+  @IsOptional()
+  @IsNotEmptyObject()
   place?: Place;
   @ApiPropertyOptional()
   collaborators?: string[];

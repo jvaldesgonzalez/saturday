@@ -11,7 +11,7 @@ type PlaceRaw = {
   address: string;
   longitude: string;
   latitude: string;
-  hostRef: string;
+  hostRef?: string;
 };
 
 export type MultimediaRaw = {
