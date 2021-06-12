@@ -1,4 +1,6 @@
+import { AddOccurrenceController } from './addOccurrence/add-occurrence.controller';
 import { CreateEventController } from './createEvent/create-event.controller';
+import { DeleteOccurrenceController } from './deleteOccurrence/delete-occurrence.controller';
 import { EditEventController } from './editEvent/edit-event.controller';
 import { GetEventDetailsController } from './getEventDetails/get-event-details.controller';
 import { GetHostPublicationsController } from './getHostPublications/get-host-publications.controller';
@@ -14,6 +16,8 @@ const eventsControllers = [
   GetEventDetailsController,
   CreateEventController,
   EditEventController,
+  AddOccurrenceController,
+  DeleteOccurrenceController,
 ];
 
 export default eventsControllers;

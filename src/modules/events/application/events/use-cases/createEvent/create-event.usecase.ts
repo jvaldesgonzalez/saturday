@@ -14,6 +14,7 @@ import { Fail, Join, Ok, Result } from 'src/shared/core/Result';
 import { Multimedia } from 'src/shared/domain/multimedia.value';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { CreateEventDto } from '../../dtos/create-event.dto';
+import { AddOccurrenceUseCase } from '../addOccurrence/add-occurrence.usecase';
 
 export type CreateEventUseCaseResponse = Either<
   AppError.UnexpectedError | Result<any>,
@@ -26,6 +27,7 @@ export class CreateEventUseCase
   private _logger: Logger;
   constructor(
     @Inject('IEventRepository') private readonly _repository: IEventRepository,
+    private createOccurrenceUseCase: AddOccurrenceUseCase,
   ) {
     this._logger = new Logger('CreateEventUseCase');
   }
@@ -81,6 +83,12 @@ export class CreateEventUseCase
     try {
       this._logger.log(event);
       await this._repository.save(event);
+      for (const occurrence of request.occurrences) {
+        await this.createOccurrenceUseCase.execute({
+          eventId: event._id.toString(),
+          ...occurrence,
+        });
+      }
       return right(Ok());
     } catch (error) {
       return left(new AppError.UnexpectedError());

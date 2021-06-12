@@ -15,6 +15,10 @@ export class CreateEventController extends BaseController<
   protected async executeImpl(
     req: CreateEventRequest,
   ): Promise<CreateEventResponse> {
+    for (const occur of req.occurrences) {
+      occur.dateTimeEnd = new Date(occur.dateTimeEnd);
+      occur.dateTimeInit = new Date(occur.dateTimeInit);
+    }
     const result = await this.useCase.execute(req);
     if (result.isLeft()) {
       const error = result.value;

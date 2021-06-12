@@ -1,20 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Event } from 'src/modules/events/domain/entities/event.entity';
-import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
+import { IEventOccurrenceRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventOccurrenceRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
-import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';
-import { IUnitOfWorkFactory } from 'src/shared/core/interfaces/IUnitOfWork';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { Ok, Result } from 'src/shared/core/Result';
-import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { DeleteOccurrenceDto } from '../../dtos/delete-occurrence.dto';
 import { DeleteOccurrenceErrors } from './delete-occurrence.errors';
 
 type DeleteOccurrenceUseCaseResponse = Either<
   | AppError.UnexpectedError
-  | DeleteOccurrenceErrors.EventDoestnExists
-  | DeleteOccurrenceErrors.OccurrenceDoesntExistInEvent
+  | DeleteOccurrenceErrors.OccurrenceDoesntExist
   | Result<any>,
   Result<void>
 >;
@@ -24,10 +19,8 @@ export class DeleteOccurrenceUseCase
   implements IUseCase<DeleteOccurrenceDto, DeleteOccurrenceUseCaseResponse> {
   private _logger: Logger;
   constructor(
-    @Inject('IRepositoryFactory')
-    private _repositoryFact: IRepositoryFactory<Event, IEventRepository>,
-    @Inject('IUnitOfWorkFactory')
-    private _unitOfWorkFact: IUnitOfWorkFactory,
+    @Inject('IEventOccurrenceRepository')
+    private _occurrenceRepository: IEventOccurrenceRepository,
   ) {
     this._logger = new Logger('AddOccurrenceUseCase');
   }
@@ -35,29 +28,20 @@ export class DeleteOccurrenceUseCase
     request: DeleteOccurrenceDto,
   ): Promise<DeleteOccurrenceUseCaseResponse> {
     try {
-      const unitOfWork = this._unitOfWorkFact.build();
-      await unitOfWork.start();
-      const eventRepo = unitOfWork.getRepository(this._repositoryFact);
-      return await unitOfWork.commit(() => this.work(request, eventRepo));
+      const occurrence = await this._occurrenceRepository.findById(
+        request.occurrenceId,
+      );
+      if (!occurrence)
+        return left(
+          new DeleteOccurrenceErrors.OccurrenceDoesntExist(
+            request.occurrenceId,
+          ),
+        );
+      await this._occurrenceRepository.drop(occurrence);
+      return right(Ok());
     } catch (err) {
       console.log(err);
       return left(new AppError.UnexpectedError());
     }
-  }
-
-  private async work(
-    req: DeleteOccurrenceDto,
-    eventRepo: IEventRepository,
-  ): Promise<DeleteOccurrenceUseCaseResponse> {
-    const eventOrNone = await eventRepo.findById(req.eventId);
-    if (!eventOrNone)
-      return left(new DeleteOccurrenceErrors.EventDoestnExists(req.eventId));
-
-    // const addResult = eventOrNone.deleteOccurrence(
-    //   new UniqueEntityID(req.occurrenceId),
-    // );
-    // if (addResult.isFailure) return left(addResult);
-    // await eventRepo.save(eventOrNone);
-    return right(Ok());
   }
 }

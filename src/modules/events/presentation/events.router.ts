@@ -8,6 +8,7 @@ import {
   Post,
   Body,
   Put,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,9 +23,14 @@ import { CurrentUser } from 'src/shared/core/auth/current-user.decorator';
 import { JwtAuthGuard } from 'src/shared/core/auth/JwtAuth.guard';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { GetEventStatsResponse } from 'src/shared/modules/stats/types/responses/get-event-stats.response';
+import { AddOccurrenceController } from './controllers/addOccurrence/add-occurrence.controller';
+import { AddOccurrenceRequest } from './controllers/addOccurrence/request';
+import { AddOccurrenceResponse } from './controllers/addOccurrence/response';
 import { CreateEventController } from './controllers/createEvent/create-event.controller';
 import { CreateEventBody } from './controllers/createEvent/request';
 import { CreateEventResponse } from './controllers/createEvent/response';
+import { DeleteOccurrenceController } from './controllers/deleteOccurrence/delete-occurrence.controller';
+import { DeleteOccurrenceResponse } from './controllers/deleteOccurrence/response';
 import { EditEventController } from './controllers/editEvent/edit-event.controller';
 import { EditEventResponse } from './controllers/editEvent/response';
 import { GetEventDetailsController } from './controllers/getEventDetails/get-event-details.controller';
@@ -51,6 +57,8 @@ export class EventsRouter {
     private getEventDetailsCtx: GetEventDetailsController,
     private createEventCtx: CreateEventController,
     private editEventCtx: EditEventController,
+    private addOccurrenceCtx: AddOccurrenceController,
+    private deleteOccurrenceCtx: DeleteOccurrenceController,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -138,6 +146,36 @@ export class EventsRouter {
       eventId: id,
       publisher: user.id,
       ...data,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/:id/occurrences')
+  @ApiParam({ name: 'id' })
+  @ApiResponse({ status: 200, type: [AddOccurrenceResponse] })
+  async addOccurrence(
+    @CurrentUser() user: JWTClaims,
+    @Param('id') id: string,
+    @Body() data: AddOccurrenceRequest,
+  ): Promise<AddOccurrenceResponse> {
+    return this.addOccurrenceCtx.execute({
+      eventId: id,
+      publisher: user.id,
+      ...data,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('/occurrences/:id')
+  @ApiParam({ name: 'id' })
+  @ApiResponse({ status: 200, type: [DeleteOccurrenceResponse] })
+  async deleteOccurrence(
+    @CurrentUser() user: JWTClaims,
+    @Param('id') id: string,
+  ): Promise<DeleteOccurrenceResponse> {
+    return this.deleteOccurrenceCtx.execute({
+      occurrenceId: id,
+      publisher: user.id,
     });
   }
 }

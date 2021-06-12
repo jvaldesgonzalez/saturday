@@ -1,6 +1,13 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInstance, IsNotEmptyObject, IsOptional } from 'class-validator';
+import {
+  IsDate,
+  IsInstance,
+  IsNotEmptyObject,
+  IsOptional,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 import { MultimediaType } from 'src/shared/domain/multimedia.value';
 
 class Place {
@@ -35,6 +42,7 @@ class Multimedia {
 
 class Ticket {
   @ApiProperty()
+  @Min(1)
   price: number;
   @ApiProperty()
   name: string;
@@ -46,10 +54,16 @@ class Ticket {
 
 class Occurrence {
   @ApiProperty()
+  @IsDate()
+  @Type(() => Date)
   dateTimeInit: Date;
   @ApiProperty()
+  @IsDate()
+  @Type(() => Date)
   dateTimeEnd: Date;
   @ApiProperty({ type: [Ticket] })
+  @ValidateNested()
+  @Type(() => Ticket)
   tickets: Ticket[];
 }
 
@@ -73,6 +87,8 @@ export class CreateEventRequest {
   @ApiProperty({ type: [Multimedia] })
   multimedia: Multimedia[];
   @ApiPropertyOptional({ type: [Occurrence] })
+  @ValidateNested()
+  @Type(() => Occurrence)
   occurrences: Occurrence[];
 }
 

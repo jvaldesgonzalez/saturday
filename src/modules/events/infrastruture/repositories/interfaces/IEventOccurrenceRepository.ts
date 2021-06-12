@@ -3,11 +3,12 @@ import { GetTicketsByHostResponse } from 'src/modules/events/presentation/contro
 import { GetTicketsByOccurrenceResponse } from 'src/modules/events/presentation/controllers/getTicketsByOccurrence/response';
 import { IRepository } from 'src/shared/core/interfaces/IRepository';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
+import { IIdentifier } from 'src/shared/domain/Identifier';
 
 export interface IEventOccurrenceRepository
   extends IRepository<EventOccurrence> {
-  //findById(id: IIdentifier | string): Promise<EventOccurrence>;
-  //exists(id: IIdentifier | string): Promise<boolean>;
+  findById(id: IIdentifier | string): Promise<EventOccurrence>;
+  eventExists(id: IIdentifier | string): Promise<boolean>;
 
   //view repo
   getTicketsByHost(

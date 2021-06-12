@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
 import { EventOccurrence } from 'src/modules/events/domain/entities/event-ocurrency.entity';
-import { Event } from 'src/modules/events/domain/entities/event.entity';
 import { EventRef } from 'src/modules/events/domain/entities/eventRef.entity';
 import {
   Ticket,
@@ -9,11 +8,9 @@ import {
 } from 'src/modules/events/domain/entities/ticket.entity';
 import { TicketAmount } from 'src/modules/events/domain/value-objects/ticket-amount.value';
 import { TicketPrice } from 'src/modules/events/domain/value-objects/ticket-price.value';
-import { IEventRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventRepository';
+import { IEventOccurrenceRepository } from 'src/modules/events/infrastruture/repositories/interfaces/IEventOccurrenceRepository';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
-import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';
-import { IUnitOfWorkFactory } from 'src/shared/core/interfaces/IUnitOfWork';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { Fail, Join, Ok, Result } from 'src/shared/core/Result';
 import { AddOccurrenceDto } from '../../dtos/add-occurrence.dto';
@@ -31,10 +28,8 @@ export class AddOccurrenceUseCase
   implements IUseCase<AddOccurrenceDto, AddOccurrenceUseCaseResponse> {
   private _logger: Logger;
   constructor(
-    @Inject('IRepositoryFactory')
-    private _repositoryFact: IRepositoryFactory<Event, IEventRepository>,
-    @Inject('IUnitOfWorkFactory')
-    private _unitOfWorkFact: IUnitOfWorkFactory,
+    @Inject('IEventOccurrenceRepository')
+    private _occurrRepository: IEventOccurrenceRepository,
   ) {
     this._logger = new Logger('AddOccurrenceUseCase');
   }
@@ -69,30 +64,21 @@ export class AddOccurrenceUseCase
     if (occurrenceOrError.isFailure)
       return left(Fail<EventOccurrence>(occurrenceOrError.error.toString()));
 
+    const occurrence = occurrenceOrError.getValue();
     try {
-      const unitOfWork = this._unitOfWorkFact.build();
-      await unitOfWork.start();
-      const eventRepo = unitOfWork.getRepository(this._repositoryFact);
-      return await unitOfWork.commit(() =>
-        this.work(occurrenceOrError.getValue(), eventRepo),
+      const eventOrNone = await this._occurrRepository.eventExists(
+        occurrence.eventId._id.toString(),
       );
+      if (!eventOrNone)
+        return left(
+          new AddOccurrenceErrors.EventDoestnExists(occurrence._id.toString()),
+        );
+      console.log(occurrence);
+      await this._occurrRepository.save(occurrence);
+      return right(Ok());
     } catch (err) {
       console.log(err);
       return left(new AppError.UnexpectedError());
     }
-  }
-
-  private async work(
-    occurrence: EventOccurrence,
-    eventRepo: IEventRepository,
-  ): Promise<AddOccurrenceUseCaseResponse> {
-    const eventOrNone = await eventRepo.findById(occurrence._id.toString());
-    if (!eventOrNone)
-      return left(
-        new AddOccurrenceErrors.EventDoestnExists(occurrence._id.toString()),
-      );
-
-    await eventRepo.save(eventOrNone);
-    return right(Ok());
   }
 }

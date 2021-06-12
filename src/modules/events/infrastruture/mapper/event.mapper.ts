@@ -103,8 +103,6 @@ export class EventMapper {
   }
 
   public static DomainToPersistence(d: Event): EventEntity {
-    console.log('toy aqui');
-    console.log(d.place);
     return {
       id: d._id.toString(),
       createdAt: d.createdAt.toISOString(),

@@ -15,6 +15,10 @@ type EventOccurrenceProps = {
 };
 
 export class EventOccurrence extends AggregateDomainEntity<EventOccurrenceProps> {
+  get eventId(): EventRef {
+    return this.props.eventId;
+  }
+
   get dateTimeInit(): Date {
     return this.props.dateTimeInit;
   }
