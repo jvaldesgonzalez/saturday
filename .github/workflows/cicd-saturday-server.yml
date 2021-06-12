@@ -4,15 +4,16 @@ jobs:
   test-and-deploy-to-ec2:
     runs-on: ubuntu-latest
     steps:
-    # Nofify process initialization
-    #- name: notify process initialization
-    #  uses: appleboy/telegram-action@master
-    #  with:
-    #    to: -583932975 #806567508  
-    #    token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
-    #    args: |
-    #      "💻 New commit pushed!!"
-    #      "message: ${{ github.event.head_commit.message }}"
+    Nofify process initialization
+    - name: notify process initialization
+		uses: appleboy/telegram-action@master
+		with:
+		to: -583932975 #806567508  
+		token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
+		args: |
+        "💻 New commit pushed!!"
+        "message: ${{ github.event.head_commit.message }}"
+
     # Build and check if succeeded, test to be added
 #     - uses: actions/checkout@v2
 #     - name: Use Node.js 14
@@ -36,15 +37,15 @@ jobs:
 #           ssh-keyscan -H "$IP" >>~/.ssh/known_hosts
 #       env:
 #          IP: ${{ secrets.AWS_SSH_HOST }}
-    - name: Deploy to AWS
-      uses: easingthemes/ssh-deploy@main
-      env:
-          SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_KEY }}
-          ARGS: "-rltgoDzvO --delete"
-          SOURCE: "src/"
-          REMOTE_HOST: ${{ secrets.AWS_SSH_HOST }}
-          REMOTE_USER: ${{ secrets.AWS_SSH_USER }}
-          EXCLUDE: "/dist/, /node_modules/"
+    # - name: Deploy to AWS
+    #   uses: easingthemes/ssh-deploy@main
+    #   env:
+    #       SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_KEY }}
+    #       ARGS: "-rltgoDzvO --delete"
+    #       SOURCE: "src/"
+    #       REMOTE_HOST: ${{ secrets.AWS_SSH_HOST }}
+    #       REMOTE_USER: ${{ secrets.AWS_SSH_USER }}
+    #       EXCLUDE: "/dist/, /node_modules/"
 #     - name: Execute SSH commmands on remote server
 #       uses: JimCronqvist/action-ssh@master
 #       with:
@@ -52,9 +53,9 @@ jobs:
 #         privateKey: ${{ secrets.AWS_SSH_KEY }}
 #         command: ls -lah
     # Notify server deploy
-    - name: notify tests succeded
-      uses: appleboy/telegram-action@master
-      with:
-        to: -583932975 #806567508  
-        token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
-        args: 🚀 folder transfered to server
+    # - name: notify tests succeded
+    #   uses: appleboy/telegram-action@master
+    #   with:
+    #     to: -583932975 #806567508  
+    #     token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w  
+    #     args: 🚀 folder transfered to server

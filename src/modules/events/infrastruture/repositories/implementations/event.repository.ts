@@ -96,6 +96,7 @@ export class EventRepository
     const arr: GetRecentHostEventsResponse[] = Array(faker.datatype.number(5));
     for (let i = 0; i < arr.length; i++) {
       arr[i] = {
+        id: faker.datatype.uuid(),
         name: faker.name.title(),
         category: faker.name.jobType(),
         dateTimeInit: faker.date.recent(),
@@ -119,6 +120,7 @@ export class EventRepository
     const arr: GetHostPublicationsResponse[] = Array(size);
     for (let i = 0; i < arr.length; i++) {
       arr[i] = {
+        id: faker.datatype.uuid(),
         name: faker.name.title(),
         category: faker.name.jobType(),
         dateTimeInit: faker.date.recent(),

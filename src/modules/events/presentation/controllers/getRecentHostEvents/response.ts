@@ -13,6 +13,8 @@ export class GetRecentHostEventsResponse {
   @ApiResponseProperty()
   name: string;
   @ApiResponseProperty()
+  id: string;
+  @ApiResponseProperty()
   category: string;
   @ApiResponseProperty()
   dateTimeInit: Date;
