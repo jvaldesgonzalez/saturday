@@ -58,6 +58,7 @@ export class EventRepository
     return res ? CollectionMapper.PersistentToDomain(res) : null;
   }
 
+  @Transactional()
   async saveCollection(collection: Collection): Promise<void> {
     const persistent = CollectionMapper.DomainToPersistence(collection);
     const { publisher, events, ...data } = persistent;
@@ -160,6 +161,7 @@ export class EventRepository
       }),
     );
   }
+
   async findById(id: string): Promise<Event> {
     // return null;
     const res = await this.persistenceManager.maybeGetOne<EventEntity>(
