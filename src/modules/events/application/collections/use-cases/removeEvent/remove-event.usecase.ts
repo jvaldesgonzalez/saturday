@@ -28,18 +28,19 @@ export class RemoveEventUseCase
     this._logger = new Logger('AddEventUseCase');
   }
   async execute(request: AddEventDto): Promise<RemoveEventUseCaseResponse> {
-    // const [collection, eventExists] = await Promise.all([
-    //   this._eventRepo.exists(request.eventId),
-    // ]);
-    // if (!collection)
-    //   return left(
-    //     new RemoveEventErrors.CollectionNotFound(request.collectionId),
-    //   );
-    // if (!eventExists)
-    //   return left(new RemoveEventErrors.EventNotFound(request.eventId));
+    const [collection, eventExists] = await Promise.all([
+      this._eventRepo.findCollectionById(request.collectionId),
+      this._eventRepo.exists(request.eventId),
+    ]);
+    if (!collection)
+      return left(
+        new RemoveEventErrors.CollectionNotFound(request.collectionId),
+      );
+    if (!eventExists)
+      return left(new RemoveEventErrors.EventNotFound(request.eventId));
 
-    // collection.deleteEvent(EventRef.create(request.eventId).getValue());
-    // await this._eventRepo.createCollection(collection);
+    collection.deleteEvent(EventRef.create(request.eventId).getValue());
+    await this._eventRepo.saveCollection(collection);
     return right(Ok());
   }
 }

@@ -35,8 +35,13 @@ import { CreateEventBody } from './controllers/createEvent/request';
 import { CreateEventResponse } from './controllers/createEvent/response';
 import { DeleteOccurrenceController } from './controllers/deleteOccurrence/delete-occurrence.controller';
 import { DeleteOccurrenceResponse } from './controllers/deleteOccurrence/response';
+import { DeleteTicketController } from './controllers/deleteTicket/delete-ticket.controller';
+import { DeleteTicketResponse } from './controllers/deleteTicket/response';
 import { EditEventController } from './controllers/editEvent/edit-event.controller';
 import { EditEventResponse } from './controllers/editEvent/response';
+import { EditTicketController } from './controllers/editTicket/edit-ticket.controller';
+import { EditTicketBody } from './controllers/editTicket/request';
+import { EditTicketResponse } from './controllers/editTicket/response';
 import { GetEventDetailsController } from './controllers/getEventDetails/get-event-details.controller';
 import {
   GetHostPublicationsController,
@@ -64,6 +69,8 @@ export class EventsRouter {
     private addOccurrenceCtx: AddOccurrenceController,
     private deleteOccurrenceCtx: DeleteOccurrenceController,
     private addTicketCtx: AddTicketController,
+    private deleteTicketCtx: DeleteTicketController,
+    private editTicketCtx: EditTicketController,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -185,7 +192,7 @@ export class EventsRouter {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/:id/occurrences')
+  @Post('/:id/occurrences/tickets')
   @ApiParam({ name: 'id' })
   @ApiQuery({ name: 'expand-to-all', type: Boolean })
   @ApiResponse({ status: 200, type: [AddTicketResponse] })
@@ -200,6 +207,48 @@ export class EventsRouter {
       publisher: user.id,
       expandToAll,
       ...data,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('/occurrences/:occurId/tickets/:ticketId')
+  @ApiParam({ name: 'occurId' })
+  @ApiParam({ name: 'ticketId' })
+  @ApiQuery({ name: 'expand-to-all', type: Boolean })
+  @ApiResponse({ status: 200, type: [DeleteTicketResponse] })
+  async deleteTicket(
+    @CurrentUser() user: JWTClaims,
+    @Param('occurId') occurId: string,
+    @Param('ticketId') ticketId: string,
+    @Query('expand-to-all', ParseBoolPipe) expandToAll = false,
+  ): Promise<DeleteTicketResponse> {
+    return this.deleteTicketCtx.execute({
+      occurrenceId: occurId,
+      ticketId,
+      expandToAll,
+      publisher: user.id,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/occurrences/:occurId/tickets/:ticketId')
+  @ApiParam({ name: 'occurId' })
+  @ApiParam({ name: 'ticketId' })
+  @ApiQuery({ name: 'expand-to-all', type: Boolean })
+  @ApiResponse({ status: 200, type: [EditTicketResponse] })
+  async editTicket(
+    @CurrentUser() user: JWTClaims,
+    @Param('occurId') occurId: string,
+    @Param('ticketId') ticketId: string,
+    @Query('expand-to-all', ParseBoolPipe) expandToAll = false,
+    @Body() data: EditTicketBody,
+  ): Promise<EditTicketResponse> {
+    return this.editTicketCtx.execute({
+      occurrenceId: occurId,
+      ticketId,
+      expandToAll,
+      publisher: user.id,
+      ticket: data,
     });
   }
 }

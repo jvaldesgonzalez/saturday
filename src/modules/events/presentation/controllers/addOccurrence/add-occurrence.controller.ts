@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { AddOccurrenceErrors } from 'src/modules/events/application/events/use-cases/addOccurrence/add-occurrence.errors';
 import { AddOccurrenceUseCase } from 'src/modules/events/application/events/use-cases/addOccurrence/add-occurrence.usecase';
 import { BaseController } from 'src/shared/http/BaseController';
 import { AddOccurrenceRequest } from './request';
@@ -22,6 +23,8 @@ export class AddOccurrenceController extends BaseController<
     if (result.isLeft()) {
       const error = result.value;
       switch (error.constructor) {
+        case AddOccurrenceErrors.EventDoestnExists:
+          this.notFound(error.errorValue().message);
         default:
           this.fail(error.errorValue().message);
           break;

@@ -1,6 +1,6 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
-class StatResume {
+export class StatResume {
   @ApiResponseProperty()
   since: Date;
   @ApiResponseProperty()

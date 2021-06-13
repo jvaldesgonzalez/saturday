@@ -9,8 +9,7 @@ import { RemoveTicketErrors } from './remove-ticket.errors';
 
 type RemoveTicketUseCaseResponse = Either<
   | AppError.UnexpectedError
-  | RemoveTicketErrors.EventDoestnExists
-  | RemoveTicketErrors.OccurrenceDoesntExistInEvent
+  | RemoveTicketErrors.OccurrenceDoesntExists
   | Result<any>,
   Result<void>
 >;
@@ -36,9 +35,7 @@ export class RemoveTicketUseCase
       );
       if (!occurrence)
         return left(
-          new RemoveTicketErrors.OccurrenceDoesntExistInEvent(
-            request.occurrenceId,
-          ),
+          new RemoveTicketErrors.OccurrenceDoesntExists(request.occurrenceId),
         );
       const ticket = occurrence.findTicketById(request.ticketId);
       if (ticket) occurrence.removeTicket(ticket);

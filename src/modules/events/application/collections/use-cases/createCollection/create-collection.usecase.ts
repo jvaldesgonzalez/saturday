@@ -33,35 +33,35 @@ export class CreateCollectionUseCase
   async execute(
     request: CreateCollectionDto,
   ): Promise<CreateCollectionUseCaseResponse> {
-    // this._logger.log('Executing...');
+    this._logger.log('Executing...');
 
-    // const existsEvents = await Promise.all(
-    //   request.eventsId.map((id) => this._eventRepo.exists(id)),
-    // );
-    // if (!existsEvents.every((e) => e))
-    //   return left(new CreateCollectionErrors.AllEventMustExists());
+    const existsEvents = await Promise.all(
+      request.eventsId.map((id) => this._eventRepo.exists(id)),
+    );
+    if (!existsEvents.every((e) => e))
+      return left(new CreateCollectionErrors.AllEventMustExists());
 
-    // const eventsIdOrError = Join(
-    //   request.eventsId.map((id) => EventRef.create(id)),
-    // );
-    // const publisherOrError = PublisherRef.create(request.publisher);
+    const eventsIdOrError = Join(
+      request.eventsId.map((id) => EventRef.create(id)),
+    );
+    const publisherOrError = PublisherRef.create(request.publisher);
 
-    // const combinedResult = Result.combine([publisherOrError, eventsIdOrError]);
-    // if (combinedResult.isFailure)
-    //   return left(Fail(eventsIdOrError.error.toString()));
+    const combinedResult = Result.combine([publisherOrError, eventsIdOrError]);
+    if (combinedResult.isFailure)
+      return left(Fail(eventsIdOrError.error.toString()));
 
-    // const collectionOrError = Collection.new({
-    //   events: new EventRefCollection(eventsIdOrError.getValue()),
-    //   name: request.name,
-    //   description: request.description,
-    //   publisher: publisherOrError.getValue(),
-    // });
+    const collectionOrError = Collection.new({
+      events: new EventRefCollection(eventsIdOrError.getValue()),
+      name: request.name,
+      description: request.description,
+      publisher: publisherOrError.getValue(),
+    });
 
-    // if (collectionOrError.isFailure)
-    //   return left(Fail(collectionOrError.error.toString()));
+    if (collectionOrError.isFailure)
+      return left(Fail(collectionOrError.error.toString()));
 
-    // const collection = collectionOrError.getValue();
-    // await this._collectionRepository.save(collection);
+    const collection = collectionOrError.getValue();
+    await this._eventRepo.saveCollection(collection);
     return right(Ok());
   }
 }

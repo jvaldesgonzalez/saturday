@@ -2,7 +2,9 @@ import { AddOccurrenceController } from './addOccurrence/add-occurrence.controll
 import { AddTicketController } from './addTicket/add-ticket.controller';
 import { CreateEventController } from './createEvent/create-event.controller';
 import { DeleteOccurrenceController } from './deleteOccurrence/delete-occurrence.controller';
+import { DeleteTicketController } from './deleteTicket/delete-ticket.controller';
 import { EditEventController } from './editEvent/edit-event.controller';
+import { EditTicketController } from './editTicket/edit-ticket.controller';
 import { GetEventDetailsController } from './getEventDetails/get-event-details.controller';
 import { GetHostPublicationsController } from './getHostPublications/get-host-publications.controller';
 import { GetRecentEventsByHostController } from './getRecentHostEvents/get-recent-host-events.controller';
@@ -20,6 +22,8 @@ const eventsControllers = [
   AddOccurrenceController,
   DeleteOccurrenceController,
   AddTicketController,
+  DeleteTicketController,
+  EditTicketController,
 ];
 
 export default eventsControllers;

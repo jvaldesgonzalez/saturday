@@ -14,6 +14,11 @@ import { IEventRepository } from '../interfaces/IEventRepository';
 import * as faker from 'faker';
 import { PaginatedGetHostPublicationsResponse } from 'src/modules/events/presentation/controllers/getHostPublications/get-host-publications.controller';
 import { GetHostPublicationsResponse } from 'src/modules/events/presentation/controllers/getHostPublications/response';
+import { Collection } from 'src/modules/events/domain/entities/collection.entity';
+import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import { CollectionMapper } from '../../mapper/collection.mapper';
+import { EventRef } from 'src/modules/events/domain/entities/eventRef.entity';
+import { CollectionEntity } from '../../entities/collection.entity';
 
 export class EventRepository
   extends BaseRepository<Event, EventEntity>
@@ -28,6 +33,104 @@ export class EventRepository
       persistenceManager,
     );
   }
+
+  //collections
+  async findCollectionById(id: string | UniqueEntityID): Promise<Collection> {
+    const res = await this.persistenceManager.maybeGetOne<CollectionEntity>(
+      QuerySpecification.withStatement(
+        `
+        MATCH (p:User)-[:PUBLISH_COLLECTION]->(col:EventCollection)<-[:IN_COLLECTION]-(e:Event)
+        WHERE col.id = $id
+        RETURN {
+          id:col.id,
+          publisher:p.id,
+          name:col.name,
+          createdAt:col.createdAt,
+          updatedAt:col.updatedAt,
+          description:col.description,
+					events:collect(e.id)
+        }
+        `,
+      )
+        .bind({ id: id })
+        .transform(CollectionEntity),
+    );
+    return res ? CollectionMapper.PersistentToDomain(res) : null;
+  }
+
+  async saveCollection(collection: Collection): Promise<void> {
+    const persistent = CollectionMapper.DomainToPersistence(collection);
+    const { publisher, events, ...data } = persistent;
+    await this.persistenceManager.execute(
+      QuerySpecification.withStatement(
+        `MATCH (h:User)
+        WHERE h.id = $publisher
+        MERGE (h)-[:PUBLISH_COLLECTION]->(col:EventCollection {id:"${persistent.id}"})
+        SET coll+= $data
+        `,
+      ).bind({
+        data,
+        publisher: persistent.publisher,
+      }),
+    );
+    for (const newEvent of collection.events.getNewItems()) {
+      await this.addEventToCollection(newEvent, collection);
+    }
+    for (const removedEvent of collection.events.getRemovedItems()) {
+      await this.removeEventFromCollection(removedEvent, collection);
+    }
+  }
+
+  private async removeEventFromCollection(
+    event: EventRef,
+    collection: Collection,
+  ): Promise<void> {
+    await this.persistenceManager.execute(
+      QuerySpecification.withStatement(
+        `
+        MATCH (e:Event)-[edge:IN_COLLECTION]->(col:EventCollection )
+        WHERE col.id = $colId
+        WHERE e.id =eveId
+        DELETE edge
+        `,
+      ).bind({
+        colId: collection._id.toString(),
+        eveId: event._id.toString(),
+      }),
+    );
+  }
+
+  private async addEventToCollection(
+    event: EventRef,
+    collection: Collection,
+  ): Promise<void> {
+    await this.persistenceManager.execute(
+      QuerySpecification.withStatement(
+        `
+        MERGE (e:Event)-[:IN_COLLECTION]->(col:EventCollection )
+        WHERE col.id = $colId
+        WHERE e.id =eveId
+        `,
+      ).bind({
+        colId: collection._id.toString(),
+        eveId: event._id.toString(),
+      }),
+    );
+  }
+
+  async dropCollection(collection: Collection): Promise<void> {
+    await this.persistenceManager.execute(
+      QuerySpecification.withStatement(
+        `MATCH (c:EventCollection)
+        WHERE c.id = $id
+        DETACH DELETE c
+        `,
+      ).bind({
+        id: collection._id.toString(),
+      }),
+    );
+  }
+
   @Transactional()
   async save(event: Event): Promise<void> {
     this._logger.log('saving...');

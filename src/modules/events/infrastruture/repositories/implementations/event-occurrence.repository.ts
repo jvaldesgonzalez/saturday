@@ -36,7 +36,7 @@ export class EventOccurrenceRepository
       QuerySpecification.withStatement(
         `
         MATCH (e:Event)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-        WHERE id=$id
+        WHERE o.id= $id
         RETURN {
           id:o.id,
           createdAt:o.createdAt,
@@ -54,12 +54,12 @@ export class EventOccurrenceRepository
     return res ? EventOccurrenceMapper.PersistentToDomain(res) : null;
   }
 
-  @Transactional()
   async save(occurrence: EventOccurrence, expandToAll = false): Promise<void> {
     this._logger.log('Saving occurrence...');
     const persistent: EventOccurrenceEntity = EventOccurrenceMapper.DomainToPersistence(
       occurrence,
     );
+    console.log(persistent.createdAt);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { tickets, eventId, ...data } = persistent;
     await this.persistenceManager.execute(
@@ -81,9 +81,10 @@ export class EventOccurrenceRepository
 
   @Transactional()
   async drop(occurrence: EventOccurrence): Promise<void> {
+    console.log(occurrence);
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(
-        `MATCH (o:Occurrence)-[:HAS_TICKET]-(t:Ticket)
+        `MATCH (o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
         WHERE o.id = $occurrenceId
         DETACH DELETE o, t
         `,
@@ -110,6 +111,8 @@ export class EventOccurrenceRepository
           name: ticket.name,
           amount: ticket.amount.value,
           description: ticket.description,
+          createdAt: ticket.createdAt.toISOString(),
+          updatedAt: ticket.updatedAt.toISOString(),
         },
         occurrenceId,
       }),

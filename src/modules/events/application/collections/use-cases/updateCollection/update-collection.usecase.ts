@@ -25,7 +25,7 @@ export class UpdateCollectionUseCase
   public changes: Changes;
   constructor(
     @Inject('IEventRepository')
-    private _collectionRepo: IEventRepository,
+    private _eventRepo: IEventRepository,
   ) {
     this._logger = new Logger('UpdateCollectionUseCase');
     this.changes = new Changes();
@@ -34,20 +34,20 @@ export class UpdateCollectionUseCase
   async execute(
     request: UpdateCollectionDto,
   ): Promise<UpdateCollectionUseCaseResponse> {
-    // const collection = await this._collectionRepo.findById(
-    //   request.collectionId,
-    // );
-    // if (!collection)
-    //   return left(
-    //     new UpdateCollectionErrors.CollectionNotFound(request.collectionId),
-    //   );
-    // if (request.description)
-    //   this.changes.addChange(collection.changeDescription(request.description));
-    // if (request.name)
-    //   this.changes.addChange(collection.changeName(request.name));
-    // if (this.changes.getChangeResult().isFailure)
-    //   return left(Fail(this.changes.getChangeResult().error.toString()));
-    // await this._collectionRepo.save(collection);
+    const collection = await this._eventRepo.findCollectionById(
+      request.collectionId,
+    );
+    if (!collection)
+      return left(
+        new UpdateCollectionErrors.CollectionNotFound(request.collectionId),
+      );
+    if (request.description)
+      this.changes.addChange(collection.changeDescription(request.description));
+    if (request.name)
+      this.changes.addChange(collection.changeName(request.name));
+    if (this.changes.getChangeResult().isFailure)
+      return left(Fail(this.changes.getChangeResult().error.toString()));
+    await this._eventRepo.saveCollection(collection);
     return right(Ok());
   }
 }

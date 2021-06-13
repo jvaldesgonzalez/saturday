@@ -20,4 +20,5 @@ export class AddTicketRequest {
 export class AddTicketBody extends OmitType(AddTicketRequest, [
   'occurrenceId',
   'publisher',
+  'expandToAll',
 ] as const) {}

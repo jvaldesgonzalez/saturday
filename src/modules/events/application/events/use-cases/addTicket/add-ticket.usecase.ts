@@ -35,6 +35,7 @@ export class AddTicketUseCase
       const occurrence = await this._eventOccurrenceRepository.findById(
         request.occurrenceId,
       );
+      console.log(occurrence);
       if (!occurrence)
         return left(
           new AddTicketErrors.OccurrenceDoesntExist(request.occurrenceId),

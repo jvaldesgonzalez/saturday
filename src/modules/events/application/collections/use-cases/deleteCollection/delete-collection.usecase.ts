@@ -22,7 +22,7 @@ export class DeleteCollectionUseCase
   private _logger: Logger;
   constructor(
     @Inject('IEventRepository')
-    private _collectionRepo: IEventRepository,
+    private _eventRepository: IEventRepository,
   ) {
     this._logger = new Logger('DeleteCollectionUseCase');
   }
@@ -30,16 +30,16 @@ export class DeleteCollectionUseCase
   async execute(
     request: DeleteCollectionDto,
   ): Promise<DeleteCollectionUseCaseResponse> {
-    // const collection: Collection = await this._collectionRepo.findById(
-    //   request.collectionId,
-    // );
-    // if (!collection)
-    //   return left(
-    //     new DeleteCollectionErrors.CollectionNotFound(request.collectionId),
-    //   );
+    const collection: Collection = await this._eventRepository.findCollectionById(
+      request.collectionId,
+    );
+    if (!collection)
+      return left(
+        new DeleteCollectionErrors.CollectionNotFound(request.collectionId),
+      );
 
-    // collection.markDeleted();
-    // await this._collectionRepo.drop(collection);
+    collection.markDeleted();
+    await this._eventRepository.dropCollection(collection);
     return right(Ok());
   }
 }

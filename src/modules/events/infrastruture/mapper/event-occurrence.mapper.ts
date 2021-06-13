@@ -44,25 +44,29 @@ export class EventOccurrenceMapper {
   }
 
   public static DomainToPersistence(d: EventOccurrence): EventOccurrenceEntity {
-    console.log(typeof d.dateTimeInit);
-    return {
-      createdAt: d.createdAt.toISOString(),
-      updatedAt: d.updatedAt.toISOString(),
-      id: d._id.toString(),
-      dateTimeInit: d.dateTimeInit.toISOString(),
-      dateTimeEnd: d.dateTimeEnd.toISOString(),
-      eventId: d.eventId._id.toString(),
-      tickets: d.tickets.getItems().map((tkt) => {
-        return {
-          id: tkt._id.toString(),
-          createdAt: tkt.createdAt.toISOString(),
-          updatedAt: tkt.updatedAt.toISOString(),
-          price: tkt.price.value,
-          name: tkt.name,
-          amount: tkt.amount.value,
-          description: tkt.description,
-        };
-      }),
-    };
+    console.log('kkkkkkkkkkkkk');
+    try {
+      return {
+        createdAt: d.createdAt.toISOString(),
+        updatedAt: d.updatedAt.toISOString(),
+        id: d._id.toString(),
+        dateTimeInit: d.dateTimeInit.toISOString(),
+        dateTimeEnd: d.dateTimeEnd.toISOString(),
+        eventId: d.eventId._id.toString(),
+        tickets: d.tickets.getItems().map((tkt) => {
+          return {
+            id: tkt._id.toString(),
+            createdAt: tkt.createdAt.toISOString(),
+            updatedAt: tkt.updatedAt.toISOString(),
+            price: tkt.price.value,
+            name: tkt.name,
+            amount: tkt.amount.value,
+            description: tkt.description,
+          };
+        }),
+      };
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
