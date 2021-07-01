@@ -40,6 +40,10 @@ export class RemoveEventUseCase
       return left(new RemoveEventErrors.EventNotFound(request.eventId));
 
     collection.deleteEvent(EventRef.create(request.eventId).getValue());
+    if (collection.events.getItems().length === 0) {
+      await this._eventRepo.dropCollection(collection);
+      return right(Ok());
+    }
     await this._eventRepo.saveCollection(collection);
     return right(Ok());
   }

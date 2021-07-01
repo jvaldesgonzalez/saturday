@@ -84,7 +84,7 @@ export class CollectionsRouter {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/events')
+  @Post('/:id/events')
   @ApiParam({ name: 'id' })
   @ApiResponse({ status: 200, type: [AddEventToCollectionResponse] })
   async addEventToCollection(

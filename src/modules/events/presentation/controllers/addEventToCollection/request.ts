@@ -10,5 +10,5 @@ export class AddEventToCollectionRequest {
 
 export class AddEventToCollectionBody extends OmitType(
   AddEventToCollectionRequest,
-  ['publisher'] as const,
+  ['publisher', 'collectionId'] as const,
 ) {}

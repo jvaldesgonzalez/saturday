@@ -5,11 +5,15 @@ LABEL maintainer="jvaldesgonzalez9@gmail.com"
 
 WORKDIR /home/node/app
 
-COPY . .
+COPY ./package.json .
+COPY ./yarn.lock .
 
-#RUN yarn install
+RUN yarn global add pegjs \
+		yarn install \
+		yarn run build
+
 
 EXPOSE 3000
 
-CMD ["yarn", "build"]
+CMD ["yarn", "start:prod"]
 

@@ -8,7 +8,7 @@ import * as morgan from 'morgan';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
-  const port = 80;
+  const port = process.env.PORT || 80;
 
   app.useGlobalPipes(new ValidationPipe());
   app.use(morgan('dev'));

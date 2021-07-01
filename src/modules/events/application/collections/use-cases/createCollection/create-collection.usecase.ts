@@ -51,7 +51,7 @@ export class CreateCollectionUseCase
       return left(Fail(eventsIdOrError.error.toString()));
 
     const collectionOrError = Collection.new({
-      events: new EventRefCollection(eventsIdOrError.getValue()),
+      events: new EventRefCollection(eventsIdOrError.getValue(), true),
       name: request.name,
       description: request.description,
       publisher: publisherOrError.getValue(),

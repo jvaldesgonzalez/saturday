@@ -67,14 +67,14 @@ export class EventRepository
         `MATCH (h:User)
         WHERE h.id = $publisher
         MERGE (h)-[:PUBLISH_COLLECTION]->(col:EventCollection {id:"${persistent.id}"})
-        SET coll+= $data
+        SET col+= $data
         `,
       ).bind({
         data,
         publisher: persistent.publisher,
       }),
     );
-    for (const newEvent of collection.events.getNewItems()) {
+    for (const [i, newEvent] of collection.events.getNewItems().entries()) {
       await this.addEventToCollection(newEvent, collection);
     }
     for (const removedEvent of collection.events.getRemovedItems()) {
@@ -90,8 +90,7 @@ export class EventRepository
       QuerySpecification.withStatement(
         `
         MATCH (e:Event)-[edge:IN_COLLECTION]->(col:EventCollection )
-        WHERE col.id = $colId
-        WHERE e.id =eveId
+        WHERE col.id = $colId AND e.id = $eveId
         DELETE edge
         `,
       ).bind({
@@ -108,9 +107,10 @@ export class EventRepository
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(
         `
-        MERGE (e:Event)-[:IN_COLLECTION]->(col:EventCollection )
-        WHERE col.id = $colId
-        WHERE e.id =eveId
+        MATCH (e:Event)
+        MATCH (col:EventCollection)
+        WHERE col.id = $colId AND e.id = $eveId
+        CREATE (e)-[:IN_COLLECTION]->(col)
         `,
       ).bind({
         colId: collection._id.toString(),

@@ -16,6 +16,7 @@ export class AddEventToCollectionController extends BaseController<
   protected async executeImpl(
     req: AddEventToCollectionRequest,
   ): Promise<AddEventToCollectionResponse> {
+    console.log(req);
     const result = await this.useCase.execute(req);
     if (result.isLeft()) {
       const error = result.value;
