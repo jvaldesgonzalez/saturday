@@ -54,7 +54,7 @@ export class EventOccurrenceRepository
     return res ? EventOccurrenceMapper.PersistentToDomain(res) : null;
   }
 
-  async save(occurrence: EventOccurrence, expandToAll = false): Promise<void> {
+  async save(occurrence: EventOccurrence, _expandToAll = false): Promise<void> {
     this._logger.log('Saving occurrence...');
     const persistent: EventOccurrenceEntity = EventOccurrenceMapper.DomainToPersistence(
       occurrence,
@@ -133,7 +133,7 @@ export class EventOccurrenceRepository
   }
 
   async getTicketsByHost(
-    hostId: string,
+    _hostId: string,
     from: number,
     len: number,
   ): Promise<PaginatedFindResult<GetTicketsByHostResponse>> {

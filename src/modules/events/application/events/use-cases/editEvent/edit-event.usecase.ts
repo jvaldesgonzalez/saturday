@@ -38,6 +38,7 @@ export class EditEventUseCase
   }
 
   async execute(request: EditEventDto): Promise<EditEventUseCaseResponse> {
+    this._logger.log('Executing...');
     try {
       const uow = this._unitOfWorkFact.build();
       await uow.start();

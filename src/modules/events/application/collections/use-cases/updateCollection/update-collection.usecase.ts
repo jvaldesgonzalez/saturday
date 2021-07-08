@@ -34,6 +34,7 @@ export class UpdateCollectionUseCase
   async execute(
     request: UpdateCollectionDto,
   ): Promise<UpdateCollectionUseCaseResponse> {
+    this._logger.log('Excecuting...');
     const collection = await this._eventRepo.findCollectionById(
       request.collectionId,
     );
