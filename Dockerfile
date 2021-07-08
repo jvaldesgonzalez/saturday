@@ -8,9 +8,9 @@ WORKDIR /home/node/app
 COPY ./package.json .
 COPY ./yarn.lock .
 
-RUN yarn global add pegjs \
-		yarn install \
-		yarn run build
+RUN yarn global add pegjs
+RUN	yarn install 
+RUN	yarn run build
 
 
 EXPOSE 3000
