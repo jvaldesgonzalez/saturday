@@ -1,9 +1,10 @@
 import { Ok, Result } from 'src/shared/core/Result';
+import { WatchedList } from 'src/shared/core/WatchedList';
 import { DomainEntity } from 'src/shared/domain/entity.abstract';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import { Empty } from 'src/shared/typedefs/empty';
 
-type Empty = Record<never, never>;
-export class ConsumerRef extends DomainEntity<Empty> {
+export class PlanRef extends DomainEntity<Empty> {
   get id(): UniqueEntityID {
     return this.id;
   }
@@ -12,7 +13,7 @@ export class ConsumerRef extends DomainEntity<Empty> {
     super(null, id);
   }
 
-  public static create(id?: string): Result<ConsumerRef> {
-    return Ok(new ConsumerRef(new UniqueEntityID(id)));
+  public static create(id?: string): Result<PlanRef> {
+    return Ok(new PlanRef(new UniqueEntityID(id)));
   }
 }
