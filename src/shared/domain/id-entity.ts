@@ -8,7 +8,7 @@ export class IdEntity extends DomainEntity<Empty> {
     return this.id;
   }
 
-  private constructor(id?: UniqueEntityID) {
+  protected constructor(id?: UniqueEntityID) {
     super(null, id);
   }
 
