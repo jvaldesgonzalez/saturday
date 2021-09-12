@@ -50,8 +50,8 @@ export class EventMapper {
       {
         ...raw,
         eventId: EventRef.create(raw.eventId).getValue(),
-        dateTimeInit: new Date(raw.dateTimeInit),
-        dateTimeEnd: new Date(raw.dateTimeEnd),
+        dateTimeInit: new Date(raw.dateTimeInit.toString()),
+        dateTimeEnd: new Date(raw.dateTimeEnd.toString()),
         createdAt: new Date(raw.createdAt),
         updatedAt: new Date(raw.updatedAt),
         tickets: new TicketCollection(ticketsOrError.getValue()),
@@ -126,6 +126,7 @@ export class EventMapper {
             longitude: d.place.longitude,
             latitude: d.place.latitude,
             hostRef: d.place.hostRef ? d.place.hostRef.toString() : null,
+            locationId: 'fasdf',
           }
         : null,
       collaborators: d.collaborators.map((cb) => cb._id.toString()),

@@ -12,6 +12,7 @@ class EventPlacePersistent {
   address: string;
   longitude: string;
   latitude: string;
+  locationId: string;
   hostRef?: string;
 }
 

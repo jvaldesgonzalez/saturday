@@ -1,3 +1,4 @@
+import { DateTime } from 'neo4j-driver';
 import { Join, Result, Fail } from 'src/shared/core/Result';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { EventOccurrence } from '../../domain/entities/event-ocurrency.entity';
@@ -33,8 +34,8 @@ export class EventOccurrenceMapper {
       {
         ...p,
         eventId: EventRef.create(p.eventId).getValue(),
-        dateTimeInit: new Date(p.dateTimeInit),
-        dateTimeEnd: new Date(p.dateTimeEnd),
+        dateTimeInit: new Date(p.dateTimeInit.toString()),
+        dateTimeEnd: new Date(p.dateTimeEnd.toString()),
         createdAt: new Date(p.createdAt),
         updatedAt: new Date(p.updatedAt),
         tickets: new TicketCollection(ticketsOrError.getValue()),
@@ -50,8 +51,8 @@ export class EventOccurrenceMapper {
         createdAt: d.createdAt.toISOString(),
         updatedAt: d.updatedAt.toISOString(),
         id: d._id.toString(),
-        dateTimeInit: d.dateTimeInit.toISOString(),
-        dateTimeEnd: d.dateTimeEnd.toISOString(),
+        dateTimeInit: DateTime.fromStandardDate(d.dateTimeInit),
+        dateTimeEnd: DateTime.fromStandardDate(d.dateTimeEnd),
         eventId: d.eventId._id.toString(),
         tickets: d.tickets.getItems().map((tkt) => {
           return {

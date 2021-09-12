@@ -1,7 +1,8 @@
+import { DateTime } from 'neo4j-driver';
 import { IPersistentEntity } from 'src/shared/core/interfaces/IPersistentEntity';
 
 export abstract class PersistentEntity implements IPersistentEntity {
   id: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: DateTime<number> | any;
+  updatedAt: DateTime<number> | any;
 }

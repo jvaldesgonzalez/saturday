@@ -13,21 +13,21 @@ export class HostMapper {
     const userRefOrError = UserRef.create(p.id);
     const businessNameOrError = BusinessName.create(p.businessName);
     const aditionalDataOrError = Join(
-      (JSON.parse(
-        p.aditionalBusinessData,
-      ) as DescriptionFieldRaw[]).map((data) => DescriptionField.create(data)),
+      (JSON.parse(p.aditionalBusinessData) as DescriptionFieldRaw[]).map(
+        (data) => DescriptionField.create(data),
+      ),
     );
     const placeOrError = p.place ? HostPlace.create(p.place) : Ok(undefined);
-    const imageOrError = p.profileImage
-      ? HostProfileImg.create(p.profileImage)
-      : Ok(undefined);
+    // const imageOrError = p.profileImage
+    //   ? HostProfileImg.create(p.profileImage)
+    //   : Ok(undefined);
     const phoneOrError = HostPhone.create(p.phoneNumber);
 
     return Host.create({
       phoneNumber: phoneOrError.getValue(),
       businessName: businessNameOrError.getValue(),
       userRef: userRefOrError.getValue(),
-      profileImage: imageOrError.getValue(),
+      // profileImage: imageOrError.getValue(),
       aditionalBusinessData: aditionalDataOrError.getValue(),
       place: placeOrError.getValue(),
       createdAt: new Date(p.createdAt),
@@ -43,13 +43,14 @@ export class HostMapper {
       createdAt: d.createdAt.toISOString(),
       updatedAt: d.updatedAt.toISOString(),
       aditionalBusinessData: JSON.stringify(d.aditionalBusinessData),
-      profileImage: d.profileImage ? d.profileImage.value : null,
+      // profileImage: d.profileImage ? d.profileImage.value : null,
       place: d.place
         ? {
             name: d.place.name,
             address: d.place.address,
             longitude: d.place.longitude,
             latitude: d.place.latitude,
+            locationId: 'fasldkfj',
           }
         : null,
     };

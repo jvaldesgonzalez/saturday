@@ -22,7 +22,8 @@ import { CollectionEntity } from '../../entities/collection.entity';
 
 export class EventRepository
   extends BaseRepository<Event, EventEntity>
-  implements IEventRepository {
+  implements IEventRepository
+{
   constructor(
     @InjectPersistenceManager() persistenceManager: PersistenceManager,
   ) {
