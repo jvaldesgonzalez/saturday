@@ -3,6 +3,6 @@ import { IPersistentEntity } from 'src/shared/core/interfaces/IPersistentEntity'
 
 export abstract class PersistentEntity implements IPersistentEntity {
   id: string;
-  createdAt: DateTime<number> | any;
-  updatedAt: DateTime<number> | any;
+  createdAt: DateTime<number>;
+  updatedAt: DateTime<number>;
 }

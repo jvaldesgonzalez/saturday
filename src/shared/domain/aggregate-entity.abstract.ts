@@ -4,7 +4,8 @@ import { IIdentifier } from './Identifier';
 
 export abstract class AggregateDomainEntity<TProps extends BaseProps>
   extends AggregateRoot
-  implements IEntity {
+  implements IEntity
+{
   public readonly _id: IIdentifier;
   protected readonly props: TProps;
 
