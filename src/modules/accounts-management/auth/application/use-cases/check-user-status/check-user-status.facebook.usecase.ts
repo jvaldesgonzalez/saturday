@@ -30,11 +30,11 @@ export class CheckUserStatusFacebook
     @Inject(UserProviders.IUserRepository) private repo: IUserRepository,
   ) {}
   async execute(request: CheckUserStatusByFacebookDto): Promise<Response> {
-    const providerId = new UniqueEntityID(request.userId);
+    const providerId = new UniqueEntityID(request.authProviderId);
 
     const validInProvider = await this.fbProvider.checkValidAuthToken(
       request.authToken,
-      request.userId,
+      request.authProviderId,
     );
 
     if (!validInProvider)
@@ -50,7 +50,7 @@ export class CheckUserStatusFacebook
 
     const userInfo = await this.fbProvider.getProfileInfo(
       request.authToken,
-      request.userId,
+      request.authProviderId,
     );
     return right(Ok(userInfo));
   }

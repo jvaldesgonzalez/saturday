@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateUserErrors } from '../users/application/use-cases/create-user/create-user.errors';
+import { AuthProvider } from '../users/domain/value-objects/auth-provider.value';
 import { CheckUserStatusErrors } from './application/use-cases/check-user-status/check-user-status.errors';
 import { CheckUserStatusFacebook } from './application/use-cases/check-user-status/check-user-status.facebook.usecase';
 import { LoginUser } from './application/use-cases/login/login.usecase';
@@ -43,7 +44,12 @@ export class AuthController {
 
   @Post('/facebook/register')
   async registerUser(@Body() data: RegisterUserRequest) {
-    const result = await this.registerUserUC.execute(data);
+    const { loginParams, ...rest } = data;
+    const result = await this.registerUserUC.execute({
+      ...rest,
+      ...loginParams,
+      authProvider: AuthProvider.Facebook,
+    });
     if (result.isLeft()) {
       const error = result.value;
       switch (error.constructor) {

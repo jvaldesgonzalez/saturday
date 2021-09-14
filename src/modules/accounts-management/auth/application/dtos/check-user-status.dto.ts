@@ -1,6 +1,6 @@
 export type CheckUserStatusByFacebookDto = {
   authToken: string;
-  userId: string;
+  authProviderId: string;
 };
 
 export type CheckUserStatusByGoogleDto = {

@@ -94,6 +94,7 @@ export class UserRepository
     userId: IIdentifier,
     categories: CategoryId[],
   ): Promise<void> {
+    categories.forEach((c) => console.log(c));
     for (const catId of categories) {
       await this.persistenceManager.execute(
         QuerySpecification.withStatement(

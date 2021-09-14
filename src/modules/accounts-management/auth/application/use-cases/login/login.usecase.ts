@@ -30,11 +30,11 @@ export class LoginUser
     @Inject(UserProviders.IUserRepository) private repo: IUserRepository,
   ) {}
   async execute(request: CheckUserStatusByFacebookDto): Promise<Response> {
-    const providerId = new UniqueEntityID(request.userId);
+    const providerId = new UniqueEntityID(request.authProviderId);
 
     const validInProvider = await this.fbProvider.checkValidAuthToken(
       request.authToken,
-      request.userId,
+      request.authProviderId,
     );
 
     if (!validInProvider)

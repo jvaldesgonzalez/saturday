@@ -1,9 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
 
 export class CheckUserStatusFbRequest {
   @ApiProperty()
+  @IsNotEmpty()
   authToken: string;
 
   @ApiProperty()
-  userId: string;
+  @IsNotEmpty()
+  authProviderId: string;
 }
