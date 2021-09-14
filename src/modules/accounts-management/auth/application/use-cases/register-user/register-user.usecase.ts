@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IUserRepository } from 'src/modules/accounts-management/users/application/interfaces/user.repository.interface';
 import { CreateUserErrors } from 'src/modules/accounts-management/users/application/use-cases/create-user/create-user.errors';
 import { CreateUser } from 'src/modules/accounts-management/users/application/use-cases/create-user/create-user.usecase';
 import { AuthProvider } from 'src/modules/accounts-management/users/domain/value-objects/auth-provider.value';
@@ -8,7 +7,8 @@ import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { Ok, Result } from 'src/shared/core/Result';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import { LoginPayload } from '../../../login-payload.type';
+import { JWTUtils } from '../../../jwt-utils';
+import { JWTClaim, LoginPayload } from '../../../login-payload.type';
 import { IFacebookProvider } from '../../../providers/facebook/facebook.provider';
 import { AuthProviders } from '../../../providers/providers.enum';
 import { RegisterUserDto } from '../../dtos/register-user.dto';
@@ -46,11 +46,22 @@ export class RegisterUser implements IUseCase<RegisterUserDto, Response> {
 
     const userOrError = await this.createUser.execute({
       ...request,
-      refreshToken: 'sfsdkfj:',
+      refreshToken: JWTUtils.signRefresh(),
       username: 'fsldkfjJk:w',
     });
     if (userOrError.isLeft()) return left(userOrError.value);
-    else if (userOrError.isRight())
-      return right(Ok({ accessToken: 'fsdkajl', refreshToken: 'sfsdkfj:' }));
+    else if (userOrError.isRight()) {
+      const user = userOrError.value.getValue();
+      return right(
+        Ok({
+          accessToken: JWTUtils.sign({
+            id: user._id.toString(),
+            email: user.email,
+            username: user.username,
+          }),
+          refreshToken: user.refreshToken,
+        }),
+      );
+    }
   }
 }

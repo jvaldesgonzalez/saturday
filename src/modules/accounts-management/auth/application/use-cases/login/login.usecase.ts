@@ -7,6 +7,7 @@ import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { Ok, Result } from 'src/shared/core/Result';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import { JWTUtils } from '../../../jwt-utils';
 import { LoginPayload } from '../../../login-payload.type';
 import { IFacebookProvider } from '../../../providers/facebook/facebook.provider';
 import { AuthProviders } from '../../../providers/providers.enum';
@@ -49,7 +50,14 @@ export class LoginUser
     if (!userOrNone)
       return left(new CheckUserStatusErrors.UserNotFoundInDatabase(providerId));
     return right(
-      Ok({ accessToken: 'fdfaskdjl', refreshToken: userOrNone.refreshToken }),
+      Ok({
+        accessToken: JWTUtils.sign({
+          id: userOrNone._id.toString(),
+          email: userOrNone.email,
+          username: userOrNone.username,
+        }),
+        refreshToken: userOrNone.refreshToken,
+      }),
     );
   }
 }
