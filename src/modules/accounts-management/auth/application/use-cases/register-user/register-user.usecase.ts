@@ -3,11 +3,10 @@ import { IUserRepository } from 'src/modules/accounts-management/users/applicati
 import { CreateUserErrors } from 'src/modules/accounts-management/users/application/use-cases/create-user/create-user.errors';
 import { CreateUser } from 'src/modules/accounts-management/users/application/use-cases/create-user/create-user.usecase';
 import { AuthProvider } from 'src/modules/accounts-management/users/domain/value-objects/auth-provider.value';
-import { UserProviders } from 'src/modules/accounts-management/users/providers/providers.enum';
-import { Either, left } from 'src/shared/core/Either';
+import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
-import { Result } from 'src/shared/core/Result';
+import { Ok, Result } from 'src/shared/core/Result';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { LoginPayload } from '../../../login-payload.type';
 import { IFacebookProvider } from '../../../providers/facebook/facebook.provider';
@@ -50,5 +49,8 @@ export class RegisterUser implements IUseCase<RegisterUserDto, Response> {
       refreshToken: 'sfsdkfj:',
       username: 'fsldkfjJk:w',
     });
+    if (userOrError.isLeft()) return left(userOrError.value);
+    else if (userOrError.isRight())
+      return right(Ok({ accessToken: 'fsdkajl', refreshToken: 'fjlaskdjf' }));
   }
 }

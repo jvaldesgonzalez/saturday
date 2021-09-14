@@ -10,7 +10,7 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT || 80;
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(morgan('dev'));
   app.use(helmet());
   app.enableCors();

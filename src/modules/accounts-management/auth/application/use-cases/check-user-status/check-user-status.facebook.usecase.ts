@@ -8,6 +8,7 @@ import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { Ok, Result } from 'src/shared/core/Result';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { IFacebookProvider } from '../../../providers/facebook/facebook.provider';
+import { AuthProviders } from '../../../providers/providers.enum';
 import { CheckUserStatusByFacebookDto } from '../../dtos/check-user-status.dto';
 import { RegisterUserDto } from '../../dtos/register-user.dto';
 import { CheckUserStatusErrors } from './check-user-status.errors';
@@ -24,7 +25,8 @@ export class CheckUserStatusFacebook
   implements IUseCase<CheckUserStatusByFacebookDto, Response>
 {
   constructor(
-    @Inject(AuthProvider.Facebook) private fbProvider: IFacebookProvider,
+    @Inject(AuthProviders.IFacebookProvider)
+    private fbProvider: IFacebookProvider,
     @Inject(UserProviders.IUserRepository) private repo: IUserRepository,
   ) {}
   async execute(request: CheckUserStatusByFacebookDto): Promise<Response> {

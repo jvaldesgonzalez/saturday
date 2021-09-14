@@ -1,6 +1,8 @@
-import { DateTime } from 'neo4j-driver';
+import { types } from 'neo4j-driver';
 import { CommonAccount } from '../../domain/common-account.domain';
 import { CommonAccountEntity } from '../entities/common-account.entity';
+
+const { DateTime } = types;
 
 export namespace CommonAccountMappers {
   export function toPersistence(domain: CommonAccount): CommonAccountEntity {

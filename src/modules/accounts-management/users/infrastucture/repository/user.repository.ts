@@ -33,7 +33,8 @@ export class UserRepository
     return (await this.persistenceManager.maybeGetOne<UserEntity>(
       QuerySpecification.withStatement(
         `MATCH (u:User)
-			WHERE u.email = $email`,
+			WHERE u.email = $email
+				RETURN u.id`,
       ).bind({ email: theEmail }),
     ))
       ? true
@@ -46,7 +47,7 @@ export class UserRepository
 				WHERE u.authProviderId = $theId
 				return {
 					fullname:u.fullname,
-					birthdat:u.birthdat,
+					birthday:u.birthday,
 					gender:u.gender,
 					categoryPreferences:collect(c.id),
 					locationId:l.id,
@@ -55,16 +56,20 @@ export class UserRepository
 					username:u.username,
 					email:u.email,
 					firebasePushId: u.firebasePushId,
-					appVersion:u.appVerion,
+					appVersion:u.appVersion,
 					isActive:u.isActive,
 					avatar:u.avatar,
-					refreshToken:u.refreshToken
+					refreshToken:u.refreshToken,
+					createdAt:u.createdAt,
+					updatedAt:u.updatedAt,
+					id:u.id
 				}`,
       )
-        .bind({ theId })
+        .bind({ theId: theId.toString() })
         .transform(UserEntity),
     );
 
+    console.log(persistence);
     return persistence ? UserMappers.fromPersistence(persistence) : null;
   }
 
@@ -89,11 +94,29 @@ export class UserRepository
     userId: IIdentifier,
     categories: CategoryId[],
   ): Promise<void> {
-    return;
+    for (const catId of categories) {
+      await this.persistenceManager.execute(
+        QuerySpecification.withStatement(
+          `MATCH (u:User),(c:Category)
+					WHERE u.id = $uId
+					AND c.id = $cId
+					CREATE (u)-[:PREFER_CATEGORY]->(c)`,
+        ).bind({ uId: userId.toString(), cId: catId.toString() }),
+      );
+    }
   }
 
   private async addLocation(
     userId: IIdentifier,
     locationId: LocationId,
-  ): Promise<void> {}
+  ): Promise<void> {
+    await this.persistenceManager.execute(
+      QuerySpecification.withStatement(
+        `MATCH (u:User),(l:Location)
+					WHERE u.id = $uId
+					AND l.id = $lId
+					CREATE (u)-[:IN_LOCATION]->(l)`,
+      ).bind({ uId: userId.toString(), lId: locationId.toString() }),
+    );
+  }
 }
