@@ -27,7 +27,7 @@ export class LocationController {
       return {
         id: l.id,
         name: l.name,
-        image: _.image.nightlife(),
+        imageUrl: _.image.nightlife(),
       };
     });
   }

@@ -27,7 +27,7 @@ export class CategoryController {
       return {
         id: c.id,
         name: c.name,
-        image: _.image.nightlife(),
+        imageUrl: _.image.nightlife(),
       };
     });
   }
