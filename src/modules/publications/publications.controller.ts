@@ -9,10 +9,10 @@ export class PublicationsController {
 
   @Get('home')
   @ApiQuery({ name: 'skip' })
-  @ApiQuery({ name: 'limit' })
+  @ApiQuery({ name: 'take' })
   async getHome(
     @Query('skip', ParseIntPipe) skip: number,
-    @Query('limit', ParseIntPipe) limit: number,
+    @Query('take', ParseIntPipe) limit: number,
   ) {
     return await this.readService.getHome(limit, skip);
   }
