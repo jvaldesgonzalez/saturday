@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { DataAccessModule } from 'src/shared/modules/data-access/data-access.module';
-import { LocationController } from './location.controller';
+import { CategoriesController } from './categories.controller';
 
 @Module({
   providers: [DataAccessModule],
-  controllers: [LocationController],
+  controllers: [CategoriesController],
 })
-export class LocationModule {}
+export class CategoriesModule {}

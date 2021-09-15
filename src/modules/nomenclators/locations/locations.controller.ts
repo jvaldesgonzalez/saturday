@@ -5,28 +5,28 @@ import {
 } from '@liberation-data/drivine';
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { CategoryEntity } from './infrastructure/entities/category.entity';
 import * as _ from 'faker';
+import { LocationEntity } from './infrastructure/entities/location.entity';
 
-@ApiTags('categories')
-@Controller('categories')
-export class CategoryController {
+@ApiTags('locations')
+@Controller('locations')
+export class LocationsController {
   constructor(
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
 
   @Get('')
   async getAll() {
-    const cats = await this.persistenceManager.query<CategoryEntity>(
+    const locs = await this.persistenceManager.query<LocationEntity>(
       QuerySpecification.withStatement(
-        `MATCH (c:Category)
+        `MATCH (c:Location)
 				return c`,
       ),
     );
-    return cats.map((c) => {
+    return locs.map((l) => {
       return {
-        id: c.id,
-        name: c.name,
+        id: l.id,
+        name: l.name,
         imageUrl: _.image.nightlife(),
       };
     });
