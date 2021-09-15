@@ -71,9 +71,11 @@ export class EventDetails {
   @ApiResponseProperty({ type: PartnerDetails })
   publisher: PartnerDetails;
   @ApiResponseProperty()
+  id: string;
+  @ApiResponseProperty()
   name: string;
   @ApiResponseProperty({ type: [UnknownFieldDetails] })
-  description: UnknownFieldDetails[];
+  info: UnknownFieldDetails[];
   @ApiResponseProperty({ type: CategoryDetails })
   category: CategoryDetails;
   @ApiResponseProperty({ type: PlaceDetails })

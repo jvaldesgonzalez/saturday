@@ -3,6 +3,7 @@ import { DataAccessModule } from './shared/modules/data-access/data-access.modul
 import { AccountsManagementModule } from './modules/accounts-management/accounts-management.module';
 import { NomenclatorsModule } from './modules/nomenclators/nomenclators.module';
 import { PublicationsModule } from './modules/publications/publications.module';
+import { StoriesModule } from './modules/stories/stories.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { PublicationsModule } from './modules/publications/publications.module';
     AccountsManagementModule,
     PublicationsModule,
     NomenclatorsModule,
+    StoriesModule,
   ],
 })
 export class AppModule {}

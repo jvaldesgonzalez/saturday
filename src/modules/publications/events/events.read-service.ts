@@ -28,12 +28,13 @@ export class EventsReadService {
 					id:o.id,
 					dateTimeInit:o.dateTimeInit,
 					dateTimeEnd:o.dateTimeEnd,
-					tickets:collect(t {.price, .name, .amount, .description})
-				} as occ, e, collect(tag.name) as tags, p, pl, cat, collect(c {.id,.avatar,.username}) as coll
+					tickets:collect(t { .id, .price, .name, .amount, .description})
+				} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll
 				return {
+					id:e.id,
 					name:e.name,
 					occurrences:collect(occ),
-					description:e.description,
+					info:e.description,
 					publisher:{
 						id:p.id,
 						avatar:p.avatar,
@@ -51,7 +52,9 @@ export class EventsReadService {
 					},
 					collaborators: coll,
 					multimedia:e.multimedia,
-					attentionTags: tags
+					attentionTags: tags,
+					amIInterested:false,
+					totalUserInterested:34
 				}
 				`,
         )
@@ -59,7 +62,7 @@ export class EventsReadService {
           .map((r) => {
             return {
               ...r,
-              description: JSON.parse(r.description),
+              info: JSON.parse(r.info),
               multimedia: JSON.parse(r.multimedia),
               occurrences: r.occurrences.map((o) => {
                 return {
