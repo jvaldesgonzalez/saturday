@@ -1,6 +1,7 @@
 import { types } from 'neo4j-driver';
 import { CommonAccountMappers } from 'src/modules/accounts-management/common/infrastructure/mappers/common-account.mapper';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { User } from '../../domain/user.domain';
 import { AuthProvider } from '../../domain/value-objects/auth-provider.value';
 import { Gender } from '../../domain/value-objects/gender.value';
@@ -36,9 +37,9 @@ export namespace UserMappers {
         ...p,
         locationId,
         categoryPreferences,
-        createdAt: new Date(p.createdAt.toString()),
-        updatedAt: new Date(p.updatedAt.toString()),
-        birthday: new Date(p.birthday.toString()),
+        createdAt: parseDate(p.createdAt),
+        updatedAt: parseDate(p.updatedAt),
+        birthday: parseDate(p.birthday),
         gender: p.gender as Gender,
         authProvider: p.authProvider as AuthProvider,
         authProviderId,
