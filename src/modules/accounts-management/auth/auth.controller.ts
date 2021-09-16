@@ -2,9 +2,11 @@ import {
   Body,
   ConflictException,
   Controller,
+  Get,
   InternalServerErrorException,
   Post,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateUserErrors } from '../users/application/use-cases/create-user/create-user.errors';
@@ -13,6 +15,7 @@ import { CheckUserStatusErrors } from './application/use-cases/check-user-status
 import { CheckUserStatusFacebook } from './application/use-cases/check-user-status/check-user-status.facebook.usecase';
 import { LoginUser } from './application/use-cases/login/login.usecase';
 import { RegisterUser } from './application/use-cases/register-user/register-user.usecase';
+import { JwtAuthGuard } from './guards/auth.guard';
 import { CheckUserStatusFbRequest } from './presentation/check-user-status';
 import { LoginUserRequest } from './presentation/login-user';
 import { RegisterUserRequest } from './presentation/register-user';
@@ -81,5 +84,11 @@ export class AuthController {
     } else if (result.isRight()) {
       return result.value.getValue();
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('test')
+  testing() {
+    return 'hello';
   }
 }

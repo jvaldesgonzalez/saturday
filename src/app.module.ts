@@ -4,6 +4,7 @@ import { AccountsManagementModule } from './modules/accounts-management/accounts
 import { NomenclatorsModule } from './modules/nomenclators/nomenclators.module';
 import { PublicationsModule } from './modules/publications/publications.module';
 import { StoriesModule } from './modules/stories/stories.module';
+import { CommerceModule } from './modules/commerce/commerce.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { StoriesModule } from './modules/stories/stories.module';
     PublicationsModule,
     NomenclatorsModule,
     StoriesModule,
+    CommerceModule,
   ],
 })
 export class AppModule {}

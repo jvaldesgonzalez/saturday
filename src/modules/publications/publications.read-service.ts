@@ -150,7 +150,7 @@ export class PublicationsReadService {
     );
     return {
       items: items,
-      total: 20,
+      total: 27,
       current: skip,
       pageSize: limit,
     };
