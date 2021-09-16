@@ -4,6 +4,7 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
+import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { Stories } from './presentation/stories';
 
 @Injectable()
@@ -21,10 +22,24 @@ export class StoriesReadService {
 					id:n.id,
 					username:n.username,
 					avatar:n.avatar,
-					stories:collect(s {.type , .url, .id})
+					stories:collect(s {.type , .url, .id, .createdAt, .attachedText})
 			}
 			`,
-      ).transform(Stories),
+      )
+        .map((r) => {
+          return {
+            ...r,
+            stories: r.stories.map((s) => {
+              const result = {
+                ...s,
+                createdAt: parseDate(s.createdAt),
+              };
+              if (!result.attachedText) delete result.attachedText;
+              return result;
+            }),
+          };
+        })
+        .transform(Stories),
     );
   }
 }

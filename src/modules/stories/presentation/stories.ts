@@ -5,6 +5,12 @@ export class StoryDetail {
   type: string;
   @ApiResponseProperty()
   url: string;
+  @ApiResponseProperty()
+  createdAt: Date;
+  @ApiResponseProperty()
+  attachedText?: string;
+  @ApiResponseProperty()
+  id: string;
 }
 
 export class Stories {
