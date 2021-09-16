@@ -1,5 +1,12 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { EventsReadService } from './events.read-service';
 import { EventDetails } from './presentation/event-details';
 
@@ -7,6 +14,16 @@ import { EventDetails } from './presentation/event-details';
 @Controller('events')
 export class EventsController {
   constructor(private readService: EventsReadService) {}
+
+  @Get('/liked')
+  @ApiQuery({ name: 'skip' })
+  @ApiQuery({ name: 'take' })
+  async getHome(
+    @Query('skip', ParseIntPipe) skip: number,
+    @Query('take', ParseIntPipe) limit: number,
+  ) {
+    return await this.readService.getEventsLikedByUser('blabla', skip, limit);
+  }
 
   @Get('/:id')
   @ApiOkResponse({ type: EventDetails })

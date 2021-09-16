@@ -4,6 +4,7 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
+import { Integer } from 'neo4j-driver-core';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { EventDetails } from './presentation/event-details';
@@ -88,10 +89,10 @@ export class EventsReadService {
       QuerySpecification.withStatement(
         `
 					MATCH (pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
-					(e)
+					(u:User)-[like:LIKE]->(e),
 					(e)-[:HAS_CATEGORY]->(cat:Category),
 					(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-					WHERE e.id = $eId
+					WHERE u.id = $uId
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag),
 					(e)<-[:COLLABORATOR]-(c:Partner)
 					WITH {
@@ -99,8 +100,8 @@ export class EventsReadService {
 						dateTimeInit:o.dateTimeInit,
 						dateTimeEnd:o.dateTimeEnd,
 						tickets:collect(t { .id, .price, .name, .amount, .description})
-					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll
-					return {
+					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,like
+					with {
 						id:e.id,
 						name:e.name,
 						occurrences:collect(occ),
@@ -123,13 +124,22 @@ export class EventsReadService {
 						collaborators: coll,
 						multimedia:e.multimedia,
 						attentionTags: tags,
-						amIInterested:false,
+						amIInterested:true,
 						totalUserInterested:34
-					}
+					} as events,like
+					ORDER BY like.likedAt
+					SKIP $skip
+					LIMIT $limit
+					RETURN events
 				`,
       )
-        .bind({ uId: userId })
+        .bind({
+          uId: '8de83b51-04aa-42d8-861e-4289160694ef',
+          limit: Integer.fromInt(limit),
+          skip: Integer.fromInt(skip),
+        })
         .map((r) => {
+          console.log(r);
           return {
             ...r,
             info: JSON.parse(r.info),

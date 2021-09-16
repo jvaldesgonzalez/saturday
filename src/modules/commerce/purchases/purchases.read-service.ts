@@ -43,6 +43,12 @@ export class PurchasesReadService {
 							id:c.id,
 							username:c.username
 						},
+						place:{
+							name:pl.name,
+							latitude:pl.latitude,
+							longitude:pl.longitude,
+							address:pl.address
+						},
 						dateTimeInit:o.dateTimeInit,
 						dateTimeEnd:o.dateTimeEnd,
 						multimedia:e.multimedia,
