@@ -11,6 +11,8 @@ export class StoryDetail {
   attachedText?: string;
   @ApiResponseProperty()
   id: string;
+  @ApiResponseProperty()
+  viewed: boolean;
 }
 export class UserInfo {
   @ApiResponseProperty()
