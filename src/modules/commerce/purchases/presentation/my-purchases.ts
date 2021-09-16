@@ -7,6 +7,13 @@ class PurchasedTicket {
   id: string;
 }
 
+class EventPublisher {
+  name: string;
+  avatar: string;
+  id: string;
+  username: string;
+}
+
 class EventMultimedia {
   @ApiResponseProperty()
   type: string;
@@ -24,6 +31,8 @@ class PurchasedEventInfo {
   dateTimeInit: Date;
   @ApiResponseProperty()
   dateTimeEnd: Date;
+  @ApiResponseProperty({ type: EventPublisher })
+  publisher: EventPublisher;
 }
 
 export class MyPurchases {
@@ -33,4 +42,12 @@ export class MyPurchases {
   amountOfTickets: number;
   @ApiResponseProperty({ type: PurchasedEventInfo })
   event: PurchasedEventInfo;
+  @ApiResponseProperty()
+  userId: string;
+  @ApiResponseProperty()
+  dateTimePurchased: Date;
+  @ApiResponseProperty()
+  id: string;
+  @ApiResponseProperty()
+  transactionId: string;
 }

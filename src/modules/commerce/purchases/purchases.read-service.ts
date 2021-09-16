@@ -23,15 +23,26 @@ export class PurchasesReadService {
     const items = await this.persistenceManager.query<MyPurchases>(
       QuerySpecification.withStatement(
         `
-				MATCH (u:User)--(p:Purchase)--(t:Ticket)--(o:EventOccurrence)--(e:Event)
+				MATCH (u:User)--(p:Purchase)--(t:Ticket)--(o:EventOccurrence)--(e:Event)--(pl:Place),
+				(e)-[:PUBLISH_EVENT]-(c:Partner)
 				WHERE u.id = "8de83b51-04aa-42d8-861e-4289160694ef"
 				RETURN {
 					ticket:{
 						name:t.name,
 						id:t.id
 						},
+					userId:u.id,
+					id:p.id,
+					transactionId:p.transactionId,
+					dateTimePurchased:p.executedAt,
 					amountOfTickets:p.amountOfTickets,
 					event:{
+						publisher:{
+							name:c.businessName,
+							avatar:c.avatar,
+							id:c.id,
+							username:c.username
+						},
 						dateTimeInit:o.dateTimeInit,
 						dateTimeEnd:o.dateTimeEnd,
 						multimedia:e.multimedia,
@@ -52,6 +63,7 @@ export class PurchasesReadService {
         .map((r) => {
           return {
             ...r,
+            dateTimePurchased: parseDate(r.dateTimePurchased),
             event: {
               ...r.event,
               dateTimeInit: parseDate(r.event.dateTimeInit),
