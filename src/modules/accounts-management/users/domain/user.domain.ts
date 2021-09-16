@@ -14,6 +14,7 @@ type UserProps = {
   fullname: string;
   birthday: Date;
   gender: Gender;
+  // description: string;
 
   categoryPreferences: CategoryId[];
   locationId: LocationId;
@@ -37,6 +38,10 @@ export class User extends CommonAccount<UserProps> {
     return this.props.fullname;
   }
 
+  // get description(): string {
+  //   return this.props.description;
+  // }
+
   get birthday(): Date {
     return this.props.birthday;
   }
@@ -59,6 +64,36 @@ export class User extends CommonAccount<UserProps> {
 
   get authProvider(): AuthProvider {
     return this.props.authProvider;
+  }
+
+  changeFullname(newFullname: string): Result<void> {
+    this.props.fullname = newFullname;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
+
+  changeBirthday(newBirthday: Date): Result<void> {
+    this.props.birthday = newBirthday;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
+
+  changeGender(newGender: Gender): Result<void> {
+    this.props.gender = newGender;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
+
+  changeCategories(newCategories: CategoryId[]): Result<void> {
+    this.props.categoryPreferences = newCategories;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
+
+  changeLocation(newLocation: LocationId): Result<void> {
+    this.props.locationId = newLocation;
+    this.props.updatedAt = new Date();
+    return Ok();
   }
 
   public static new(props: NewUserProps): Result<User> {

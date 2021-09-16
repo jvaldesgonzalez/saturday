@@ -4,6 +4,7 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
+import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { Stories } from './presentation/stories';
 
@@ -13,8 +14,8 @@ export class StoriesReadService {
     @InjectPersistenceManager() private persisitenceManager: PersistenceManager,
   ) {}
 
-  async getStories(userId: string): Promise<Stories[]> {
-    return await this.persisitenceManager.query<Stories>(
+  async getStories(userId: string): Promise<PaginatedFindResult<Stories>> {
+    const items = await this.persisitenceManager.query<Stories>(
       QuerySpecification.withStatement(
         `
 				MATCH (n:Partner)--(s:Story)
@@ -41,5 +42,12 @@ export class StoriesReadService {
         })
         .transform(Stories),
     );
+
+    return {
+      items,
+      total: 5,
+      pageSize: 5,
+      current: 0,
+    };
   }
 }

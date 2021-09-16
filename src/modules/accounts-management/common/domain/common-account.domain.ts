@@ -1,3 +1,4 @@
+import { Ok, Result } from 'src/shared/core/Result';
 import { AggregateDomainEntity } from 'src/shared/domain/aggregate-entity.abstract';
 
 export type CommonAccountProps = {
@@ -49,5 +50,23 @@ export class CommonAccount<
 
   get refreshToken(): string {
     return this.props.refreshToken;
+  }
+
+  changeEmail(newEmail: string): Result<void> {
+    this.props.email = newEmail;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
+
+  changeFirebasePushId(newPushId: string): Result<void> {
+    this.props.firebasePushId = newPushId;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
+
+  changeAvatar(newAvatar: string): Result<void> {
+    this.props.firebasePushId = newAvatar;
+    this.props.updatedAt = new Date();
+    return Ok();
   }
 }
