@@ -19,13 +19,16 @@ export class StoriesReadService {
       QuerySpecification.withStatement(
         `
 				MATCH (n:Partner)--(s:Story)
+				WITH n,s
+				OPTIONAL MATCH (u:User {username:"Xavier2"})--(s)
+				WITH collect(apoc.map.merge(s {.type, .url, .id, .createdAt, .attachedText},{viewed:u.username})) as stories, n
 				RETURN {
 					user:{
 						id:n.id,
 						username:n.username,
 						avatar:n.avatar
 					},
-					stories:collect(s {.type , .url, .id, .createdAt, .attachedText})
+					stories:stories
 			}
 			`,
       )
@@ -36,6 +39,7 @@ export class StoriesReadService {
               const result = {
                 ...s,
                 createdAt: parseDate(s.createdAt),
+                viewed: !!s.viewed,
               };
               if (!result.attachedText) delete result.attachedText;
               return result;
