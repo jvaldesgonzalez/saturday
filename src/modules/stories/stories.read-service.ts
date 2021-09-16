@@ -20,9 +20,11 @@ export class StoriesReadService {
         `
 				MATCH (n:Partner)--(s:Story)
 				RETURN {
-					id:n.id,
-					username:n.username,
-					avatar:n.avatar,
+					user:{
+						id:n.id,
+						username:n.username,
+						avatar:n.avatar
+					},
 					stories:collect(s {.type , .url, .id, .createdAt, .attachedText})
 			}
 			`,

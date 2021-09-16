@@ -12,14 +12,18 @@ export class StoryDetail {
   @ApiResponseProperty()
   id: string;
 }
-
-export class Stories {
+export class UserInfo {
   @ApiResponseProperty()
   id: string;
   @ApiResponseProperty()
   username: string;
   @ApiResponseProperty()
   avatar: string;
+}
+
+export class Stories {
+  @ApiResponseProperty({ type: UserInfo })
+  user: UserInfo;
   @ApiResponseProperty({ type: [StoryDetail] })
   stories: StoryDetail[];
 }
