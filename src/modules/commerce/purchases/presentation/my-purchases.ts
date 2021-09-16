@@ -1,17 +1,39 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 class PurchasedTicket {
   @ApiResponseProperty()
   name: string;
   @ApiResponseProperty()
   id: string;
+  @ApiResponseProperty()
+  description: string;
+  @ApiResponseProperty()
+  price: number;
 }
 
 class EventPublisher {
+  @ApiResponseProperty()
   name: string;
+  @ApiResponseProperty()
   avatar: string;
+  @ApiResponseProperty()
   id: string;
+  @ApiResponseProperty()
   username: string;
+}
+
+class EventPlace {
+  @ApiResponseProperty()
+  name: string;
+  @ApiResponseProperty()
+  @Type(() => Number)
+  latitude: number;
+  @ApiResponseProperty()
+  @Type(() => Number)
+  longitude: number;
+  @ApiResponseProperty()
+  address: string;
 }
 
 class EventMultimedia {
@@ -33,6 +55,9 @@ class PurchasedEventInfo {
   dateTimeEnd: Date;
   @ApiResponseProperty({ type: EventPublisher })
   publisher: EventPublisher;
+  @ApiResponseProperty({ type: EventPlace })
+  @Type(() => EventPlace)
+  place: EventPlace;
 }
 
 export class MyPurchases {

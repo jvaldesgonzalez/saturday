@@ -29,8 +29,10 @@ export class PurchasesReadService {
 				RETURN {
 					ticket:{
 						name:t.name,
-						id:t.id
-						},
+						id:t.id,
+						description:t.description,
+						price:t.price
+					},
 					userId:u.id,
 					id:p.id,
 					transactionId:p.transactionId,
@@ -75,9 +77,15 @@ export class PurchasesReadService {
               dateTimeInit: parseDate(r.event.dateTimeInit),
               dateTimeEnd: parseDate(r.event.dateTimeEnd),
               multimedia: JSON.parse(r.event.multimedia)[0],
+              place: {
+                ...r.event.place,
+                latitude: parseFloat(r.event.place.latitude),
+                longitude: parseFloat(r.event.place.longitude),
+              },
             },
           };
-        }),
+        })
+        .transform(MyPurchases),
     );
     return {
       items,
