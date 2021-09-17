@@ -3,12 +3,14 @@ export class UserItem {
   fullname: string;
   username: string;
   id: string;
+  friendshipStatus: 'friends';
 }
 
 export class PartnerItem {
   type: 'partner';
   businessName: string;
   username: string;
+  followers: number;
   id: string;
 }
 

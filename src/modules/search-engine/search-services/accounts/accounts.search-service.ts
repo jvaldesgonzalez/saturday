@@ -14,7 +14,7 @@ import { AccountItem } from '../../search-results/account.search-result';
 import { AccountQuery } from './account.query';
 
 @Injectable()
-export class HashtagSearchService implements ISearchService<AccountItem> {
+export class AccountSearchService implements ISearchService<AccountItem> {
   constructor(
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
@@ -29,9 +29,17 @@ export class HashtagSearchService implements ISearchService<AccountItem> {
     >(
       QuerySpecification.withStatement(
         `
-				CALL db.index.fulltext.queryNodes('accounts',${q.processedQuery}) yield node,score
-				CALL apoc.when(node:User,'return 4 as result','return 3 as result') yield value
-				RETURN value.result
+				CALL db.index.fulltext.queryNodes('accounts','${q.processedQuery}') yield node,score
+				CALL apoc.when(node:User,
+				'return a{.fullname, .username, .id, .avatar, type:"user", friendshipStatus:"friend", privacy:"public"} as result',
+				'return a{.businessName, .username, .id, .avatar, type:"partner", followers:0} as result',
+				{a:node}) yield value
+				RETURN {
+					data: value.result,
+					score:score
+				}
+				SKIP $skip
+				LIMIT $limit
 			`,
       ).bind({ limit: Integer.fromInt(limit), skip: Integer.fromInt(skip) }),
     );
