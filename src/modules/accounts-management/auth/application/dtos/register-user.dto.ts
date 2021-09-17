@@ -4,6 +4,7 @@ import { Gender } from 'src/modules/accounts-management/users/domain/value-objec
 
 export type RegisterUserDto = {
   authToken: string;
+  description: string;
   fullname: string;
   birthday: Date;
   gender: Gender;

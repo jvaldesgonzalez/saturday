@@ -8,7 +8,7 @@ import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { Ok, Result } from 'src/shared/core/Result';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { JWTUtils } from '../../../jwt-utils';
-import { JWTClaim, LoginPayload } from '../../../login-payload.type';
+import { LoginPayload } from '../../../login-payload.type';
 import { IFacebookProvider } from '../../../providers/facebook/facebook.provider';
 import { AuthProviders } from '../../../providers/providers.enum';
 import { RegisterUserDto } from '../../dtos/register-user.dto';

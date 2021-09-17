@@ -1,4 +1,5 @@
-import { Ok, Result } from 'src/shared/core/Result';
+import { AppError } from 'src/shared/core/errors/AppError';
+import { Fail, Ok, Result } from 'src/shared/core/Result';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import {
   CommonAccount,
@@ -14,7 +15,7 @@ type UserProps = {
   fullname: string;
   birthday: Date;
   gender: Gender;
-  // description: string;
+  description: string;
 
   categoryPreferences: CategoryId[];
   locationId: LocationId;
@@ -38,9 +39,9 @@ export class User extends CommonAccount<UserProps> {
     return this.props.fullname;
   }
 
-  // get description(): string {
-  //   return this.props.description;
-  // }
+  get description(): string {
+    return this.props.description;
+  }
 
   get birthday(): Date {
     return this.props.birthday;
@@ -68,6 +69,14 @@ export class User extends CommonAccount<UserProps> {
 
   changeFullname(newFullname: string): Result<void> {
     this.props.fullname = newFullname;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
+
+  changeDescription(newDescription: string): Result<void> {
+    if (newDescription.length >= 120)
+      return Fail('user description cant exceed 120 chars');
+    this.props.description = newDescription;
     this.props.updatedAt = new Date();
     return Ok();
   }

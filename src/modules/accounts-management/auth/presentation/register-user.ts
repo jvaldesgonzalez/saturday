@@ -30,6 +30,10 @@ export class RegisterUserRequest {
 
   @ApiProperty()
   @IsNotEmpty()
+  description: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
   @Type(() => Date)
   birthday: Date;
 

@@ -29,6 +29,37 @@ export class UserRepository
     );
   }
 
+  async findById(theId: UniqueEntityID): Promise<User> {
+    const persistence = await this.persistenceManager.maybeGetOne<UserEntity>(
+      QuerySpecification.withStatement(
+        `MATCH (l:Location)<-[:IN_LOCATION]-(u:User)-[:PREFER_CATEGORY]->(c:Category)
+				WHERE u.authProviderId = $theId
+				return {
+					fullname:u.fullname,
+					birthday:u.birthday,
+					gender:u.gender,
+					categoryPreferences:collect(c.id),
+					locationId:l.id,
+					authProviderId:u.authProviderId,
+					authProvider:u.authProvider,
+					username:u.username,
+					email:u.email,
+					firebasePushId: u.firebasePushId,
+					appVersion:u.appVersion,
+					isActive:u.isActive,
+					avatar:u.avatar,
+					refreshToken:u.refreshToken,
+					createdAt:u.createdAt,
+					updatedAt:u.updatedAt,
+					id:u.id
+				}`,
+      )
+        .bind({ theId: theId.toString() })
+        .transform(UserEntity),
+    );
+    return persistence ? UserMappers.fromPersistence(persistence) : null;
+  }
+
   async emailIsTaken(theEmail: string): Promise<boolean> {
     return (await this.persistenceManager.maybeGetOne<UserEntity>(
       QuerySpecification.withStatement(

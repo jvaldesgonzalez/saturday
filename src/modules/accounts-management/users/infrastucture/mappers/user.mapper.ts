@@ -16,6 +16,7 @@ export namespace UserMappers {
     return {
       ...common,
       fullname: domain.fullname,
+      description: domain.description,
       birthday: DateTime.fromStandardDate(domain.birthday),
       gender: domain.gender,
       categoryPreferences: domain.categoryPreferences.map((p) => p.toString()),

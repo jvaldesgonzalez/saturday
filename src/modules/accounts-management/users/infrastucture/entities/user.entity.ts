@@ -3,6 +3,7 @@ import { CommonAccountEntity } from 'src/modules/accounts-management/common/infr
 
 export class UserEntity extends CommonAccountEntity {
   fullname: string;
+  description: string;
   birthday: DateTime<number>;
   gender: string;
   categoryPreferences: string[];
