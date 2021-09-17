@@ -5,6 +5,7 @@ import { NomenclatorsModule } from './modules/nomenclators/nomenclators.module';
 import { PublicationsModule } from './modules/publications/publications.module';
 import { StoriesModule } from './modules/stories/stories.module';
 import { CommerceModule } from './modules/commerce/commerce.module';
+import { SearchEngineModule } from './modules/search-engine/search-service.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CommerceModule } from './modules/commerce/commerce.module';
     NomenclatorsModule,
     StoriesModule,
     CommerceModule,
+    SearchEngineModule,
   ],
 })
 export class AppModule {}
