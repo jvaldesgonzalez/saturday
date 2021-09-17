@@ -1,14 +1,15 @@
 import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { AccountQuery } from './search-services/accounts/account.query';
 import { HashtagQuery } from './search-services/hashtags/hashtag.query';
 import { HashtagSearchService } from './search-services/hashtags/hashtag.search-service';
 
 @ApiTags('search')
-@Controller('/')
+@Controller('search')
 export class SearchEngineController {
   constructor(private hashtagService: HashtagSearchService) {}
 
-  @Get('/hashtags/search')
+  @Get('hashtag')
   @ApiQuery({ name: 'q' })
   @ApiQuery({ name: 'skip' })
   @ApiQuery({ name: 'take' })
@@ -18,5 +19,10 @@ export class SearchEngineController {
     @Query('take', ParseIntPipe) limit: number,
   ) {
     return this.hashtagService.search(new HashtagQuery(q), skip, limit);
+  }
+
+  @Get('/test')
+  testQuery(@Query('q') q: string) {
+    return new AccountQuery(q).processedQuery;
   }
 }

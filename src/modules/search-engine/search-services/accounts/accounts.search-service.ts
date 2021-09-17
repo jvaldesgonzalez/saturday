@@ -11,7 +11,7 @@ import {
 } from '../../common/search-result.interface';
 import { ISearchService } from '../../common/search-service.interface';
 import { HashtagItem } from '../../search-results/hashtag.search-result';
-import { HashtagQuery } from './hashtag.query';
+import { AccountQuery } from './account.query';
 
 @Injectable()
 export class HashtagSearchService implements ISearchService<HashtagItem> {
@@ -20,7 +20,7 @@ export class HashtagSearchService implements ISearchService<HashtagItem> {
   ) {}
 
   async search(
-    q: HashtagQuery,
+    q: AccountQuery,
     skip: number,
     limit: number,
   ): Promise<ISearchResult<HashtagItem>> {
@@ -29,17 +29,6 @@ export class HashtagSearchService implements ISearchService<HashtagItem> {
     >(
       QuerySpecification.withStatement(
         `
-				CALL db.index.fulltext.queryNodes('hashtags','${q.processedQuery}') yield node, score
-				RETURN {
-    			data: {
-						word:node.word,
-						type:"hashtag",
-						id:node.id
-					},
-    			score:score
-				}
-				SKIP $skip
-				LIMIT $limit
 			`,
       ).bind({ limit: Integer.fromInt(limit), skip: Integer.fromInt(skip) }),
     );
