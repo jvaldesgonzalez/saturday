@@ -1,4 +1,10 @@
-import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AccountQuery } from './search-services/accounts/account.query';
 import { HashtagQuery } from './search-services/hashtags/hashtag.query';
@@ -18,6 +24,9 @@ export class SearchEngineController {
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
   ) {
+    const query = new HashtagQuery(q);
+    if (query.processedQuery.length === 0)
+      throw new BadRequestException('q must not be empty');
     return this.hashtagService.search(new HashtagQuery(q), skip, limit);
   }
 

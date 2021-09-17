@@ -5,6 +5,7 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { Integer } from 'neo4j-driver-core';
+import { getDefaultPaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import {
   ISearchResult,
   ISearchResultItem,

@@ -17,7 +17,7 @@ export class AccountQuery extends Query {
 
     return `username: ${
       sum.length > 4 ? sumAsSubstring : sumAsPrefix
-    } OR username: ${sumFuzzy} OR username: ${termsFuzzy.join(' ')}`;
+    }^3 OR username: ${sumFuzzy}^3 OR username: ${termsFuzzy.join(' ')}`;
   }
 
   private makeNameQuery() {
