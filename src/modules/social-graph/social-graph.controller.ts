@@ -3,10 +3,13 @@ import {
   ConflictException,
   Controller,
   Delete,
+  Get,
   Param,
+  ParseIntPipe,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { FollowInteraction } from './social-services/follow/follow.interaction';
 import { FollowService } from './social-services/follow/follow.service';
@@ -36,7 +39,7 @@ export class SocialGraphController {
     private share: ShareService,
   ) {}
 
-  @Post('/like/:to')
+  @Post('/me/like/:to')
   async makeLike(@Param('to') to: string) {
     const interaction = new LikeInteraction(new UniqueEntityID(to));
     if (!(await this.like.isPosible(interaction)))
@@ -49,7 +52,7 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/share/:to')
+  @Post('/me/share/:to')
   async makeShare(@Param('to') to: string, @Body() data: ShareBody) {
     const interaction = new ShareInteraction(
       new UniqueEntityID(to),
@@ -65,7 +68,7 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/follow/:to')
+  @Post('/me/follow/:to')
   async makeFollow(@Param('to') to: string) {
     const interaction = new FollowInteraction(new UniqueEntityID(to));
     if (!(await this.follow.isPosible(interaction)))
@@ -78,7 +81,7 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/friend-request/:to')
+  @Post('/me/friend-request/:to')
   async makeFriendRequest(@Param('to') to: string) {
     const interaction = new FriendRequestInteraction(new UniqueEntityID(to));
     if (!(await this.friendRequest.isPosible(interaction)))
@@ -91,7 +94,7 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/friend/:to')
+  @Post('/me/friend/:to')
   async makeFriend(@Param('to') to: string) {
     const interaction = new FriendInteraction(new UniqueEntityID(to));
     if (
@@ -109,7 +112,7 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/view-story/:to')
+  @Post('/me/view-story/:to')
   async makeViewStory(@Param('to') to: string) {
     const interaction = new ViewStoryInteraction(new UniqueEntityID(to));
     if (!(await this.viewStory.isPosible(interaction)))
@@ -122,7 +125,7 @@ export class SocialGraphController {
     );
   }
 
-  @Delete('/like/:to')
+  @Delete('/me/like/:to')
   async undoLike(@Param('to') to: string) {
     const interaction = new LikeInteraction(new UniqueEntityID(to));
     await this.like.drop(
@@ -131,7 +134,7 @@ export class SocialGraphController {
     );
   }
 
-  @Delete('/follow/:to')
+  @Delete('/me/follow/:to')
   async undoFollow(@Param('to') to: string) {
     const interaction = new FollowInteraction(new UniqueEntityID(to));
     await this.follow.drop(
@@ -140,7 +143,7 @@ export class SocialGraphController {
     );
   }
 
-  @Delete('/friend-request/:to')
+  @Delete('/me/friend-request/:to')
   async undoFriendRequest(@Param('to') to: string) {
     const interaction = new FriendRequestInteraction(new UniqueEntityID(to));
     await this.friendRequest.drop(
@@ -149,12 +152,60 @@ export class SocialGraphController {
     );
   }
 
-  @Delete('/friend/:to')
+  @Delete('/me/friend/:to')
   async undoFriend(@Param('to') to: string) {
     const interaction = new FriendRequestInteraction(new UniqueEntityID(to));
     await this.friend.drop(
       new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
       interaction,
+    );
+  }
+
+  @Get('/me/follow')
+  @ApiQuery({ name: 'q', allowEmptyValue: true })
+  @ApiQuery({ name: 'take', type: Number })
+  @ApiQuery({ name: 'skip', type: Number })
+  async getFollowees(
+    @Query('q') q = '',
+    @Query('skip', ParseIntPipe) skip: number,
+    @Query('take', ParseIntPipe) limit: number,
+  ) {
+    return this.follow.getOutgoings(
+      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      skip,
+      limit,
+      q,
+    );
+  }
+
+  @Get('/me/friend-request')
+  @ApiQuery({ name: 'q', allowEmptyValue: true })
+  @ApiQuery({ name: 'take', type: Number })
+  @ApiQuery({ name: 'skip', type: Number })
+  async getFriendRequests(
+    @Query('q') q = '',
+    @Query('skip', ParseIntPipe) skip: number,
+    @Query('take', ParseIntPipe) limit: number,
+  ) {
+    return this.friendRequest.getOutgoings(
+      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      skip,
+      limit,
+      q,
+    );
+  }
+
+  @Get('/me/like')
+  @ApiQuery({ name: 'take', type: Number })
+  @ApiQuery({ name: 'skip', type: Number })
+  async getLiked(
+    @Query('skip', ParseIntPipe) skip: number,
+    @Query('take', ParseIntPipe) limit: number,
+  ) {
+    return this.like.getOutgoings(
+      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      skip,
+      limit,
     );
   }
 }

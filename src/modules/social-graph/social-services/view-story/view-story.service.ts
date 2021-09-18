@@ -10,11 +10,12 @@ import { ViewStoryInteraction } from './view-story.interaction';
 
 @Injectable()
 export class ViewStoryService
-  implements ISocialGraphService<ViewStoryInteraction>
+  implements ISocialGraphService<any, ViewStoryInteraction>
 {
   constructor(
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
+
   async save(
     from: UniqueEntityID,
     interaction: ViewStoryInteraction,

@@ -7,3 +7,5 @@ export class FriendInteraction extends SocialGraphInteraction {
     super(to, InteractionType.Friend);
   }
 }
+
+export class Friend {}

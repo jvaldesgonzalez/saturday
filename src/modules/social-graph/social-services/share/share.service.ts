@@ -9,7 +9,9 @@ import { ISocialGraphService } from '../../common/social-graph.service.interface
 import { ShareInteraction } from './share.interaction';
 
 @Injectable()
-export class ShareService implements ISocialGraphService<ShareInteraction> {
+export class ShareService
+  implements ISocialGraphService<any, ShareInteraction>
+{
   constructor(
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
