@@ -32,8 +32,8 @@ export class UsersReadService {
 					gender:u.gender,
 					location:l.id,
 					categoryPreferences:c,
-					friends:count(friend),
-					following:count(follow)
+					friends:count(distinct friend),
+					following:count(distinct follow)
 			}
 			`,
       ).map((r) => {

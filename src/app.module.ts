@@ -6,6 +6,7 @@ import { PublicationsModule } from './modules/publications/publications.module';
 import { StoriesModule } from './modules/stories/stories.module';
 import { CommerceModule } from './modules/commerce/commerce.module';
 import { SearchEngineModule } from './modules/search-engine/search-service.module';
+import { SocialGraphModule } from './modules/social-graph/social-graph.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SearchEngineModule } from './modules/search-engine/search-service.modul
     StoriesModule,
     CommerceModule,
     SearchEngineModule,
+    SocialGraphModule,
   ],
 })
 export class AppModule {}

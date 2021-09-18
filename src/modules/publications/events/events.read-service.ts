@@ -134,7 +134,7 @@ export class EventsReadService {
 				`,
       )
         .bind({
-          uId: '8de83b51-04aa-42d8-861e-4289160694ef',
+          uId: '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
           limit: Integer.fromInt(limit),
           skip: Integer.fromInt(skip),
         })
@@ -154,11 +154,20 @@ export class EventsReadService {
           };
         }),
     );
+    const total = await this.persistenceManager.getOne<number>(
+      QuerySpecification.withStatement(
+        `
+				MATCH (u:User)-[like:LIKE]->(e:Event)
+				WHERE u.id = $uId
+				return count(e)
+				`,
+      ).bind({ uId: '777cc88c-2e3f-4eb4-ac81-14c9323c541d' }),
+    );
     return {
       items,
-      pageSize: limit,
+      pageSize: items.length,
       current: skip,
-      total: 5,
+      total: total,
     };
   }
 }
