@@ -1,3 +1,4 @@
+import { TextUtils } from 'src/shared/utils/text.utils';
 import { Query } from '../../common/search-query.abstract';
 
 export class HashtagQuery extends Query {
@@ -17,7 +18,6 @@ export class HashtagQuery extends Query {
   }
 
   private removeSharpCharacter(s: string) {
-    if (s[0] === '#') return s.slice(1);
-    return s;
+    return TextUtils.removeLeadingSharpCharacter(s);
   }
 }

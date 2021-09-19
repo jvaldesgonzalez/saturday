@@ -43,7 +43,6 @@ export class HashtagSearchService implements ISearchService<HashtagItem> {
 			`,
       ).bind({ limit: Integer.fromInt(limit), skip: Integer.fromInt(skip) }),
     );
-    console.log(items);
     const total = await this.persistenceManager.getOne<number>(
       QuerySpecification.withStatement(`
 				CALL db.index.fulltext.queryNodes('hashtags','${q.processedQuery}') yield node, score
