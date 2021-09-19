@@ -18,6 +18,7 @@ export class FollowService
   constructor(
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
+
   async getOutgoings(
     from: UniqueEntityID,
     skip: number,

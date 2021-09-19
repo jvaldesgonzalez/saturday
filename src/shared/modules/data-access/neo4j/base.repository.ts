@@ -12,8 +12,9 @@ import {
 
 export abstract class BaseRepository<
   E extends IEntity,
-  P extends PersistentEntity
-> implements IRepository<E> {
+  P extends PersistentEntity,
+> implements IRepository<E>
+{
   protected readonly _logger: Logger;
   protected readonly entityName: string;
   constructor(
