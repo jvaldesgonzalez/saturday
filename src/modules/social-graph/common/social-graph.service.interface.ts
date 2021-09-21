@@ -16,8 +16,17 @@ export interface ISocialGraphService<
     limit: number,
     searchTerm?: string,
   ): Promise<PaginatedFindResult<TRead>>;
-  getIngoings?(
-    interaction: T,
-    from?: SocialGraphNode,
-  ): PaginatedFindResult<UserInteractor>;
+  getIngoings?({
+    interaction,
+    from,
+    skip,
+    limit,
+    searchTerm,
+  }: {
+    interaction: T;
+    from: SocialGraphNode;
+    skip: number;
+    limit: number;
+    searchTerm: string;
+  }): Promise<PaginatedFindResult<UserInteractor>>;
 }

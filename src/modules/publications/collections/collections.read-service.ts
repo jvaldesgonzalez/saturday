@@ -56,7 +56,7 @@ export class CollectionsReadService {
 					multimedia:e.multimedia,
 					attentionTags: tags,
 					amIInterested:false,
-					totalUserInterested:34
+					totalUsersInterested:34
 				} AS events,col
 				return {
 					name:col.name,

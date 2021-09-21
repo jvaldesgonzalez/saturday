@@ -10,6 +10,7 @@ import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { ISocialGraphService } from '../../common/social-graph.service.interface';
+import { UserInteractor } from '../../common/user.interactor';
 import { LikeInteraction } from './like.interaction';
 
 @Injectable()
@@ -73,7 +74,7 @@ export class LikeService
 						multimedia:e.multimedia,
 						attentionTags: tags,
 						amIInterested:true,
-						totalUserInterested:usersInterested
+						totalUsersInterested:usersInterested
 					} as events,likedAt
 					ORDER BY likedAt
 					SKIP $skip
@@ -116,6 +117,73 @@ export class LikeService
       pageSize: items.length,
       current: skip,
       total: total,
+    };
+  }
+
+  async getIngoings({
+    interaction,
+    from,
+    skip,
+    limit,
+    searchTerm,
+    onlyFriends = true,
+  }: {
+    interaction: LikeInteraction;
+    from: UniqueEntityID;
+    skip: number;
+    limit: number;
+    searchTerm: string;
+    onlyFriends: boolean;
+  }): Promise<PaginatedFindResult<UserInteractor>> {
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<UserInteractor>(
+        QuerySpecification.withStatement(
+          `MATCH (me:User)
+					WHERE me.id = $meId
+					MATCH (u:User)-[:LIKE]->(e:Event)
+					WHERE e.id = $eId ${onlyFriends ? 'AND (u)-[:FRIEND]-(me)' : ''}
+					AND ( u[toLower(username)] STARTS WITH toLower($search) OR u[toLower(fullname)] STARTS WITH toLower($search) )
+					OPTIONAL MATCH (u)-[:FRIEND]-(common:User)-[:FRIEND]-(me)
+					OPTIONAL MATCH (u)-[r:FRIEND]-(me)
+					WITH u,count(common) as commonFriends
+					RETURN {
+						username:u.username,
+						friendshipStatus:type(r),
+						id:u.id,
+						fullname:u.fullname,
+						friendsInCommon:commonFriends
+					} as result
+					ORDER BY result.friendsInCommon DESC
+					SKIP $skip
+					LIMIT $limit
+					`,
+        ).bind({
+          meId: from.toString(),
+          eId: interaction.to.toString(),
+          search: searchTerm,
+          skip: Integer.fromInt(skip),
+          limit: Integer.fromInt(limit),
+        }),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(
+          `
+					MATCH (u:User)-[:LIKE]->(e:Event)
+					WHERE e.id = $eId ${onlyFriends ? 'AND (u)-[:FRIEND]-(me)' : ''}
+					AND (
+						u[toLower(username) STARTS WITH toLower($search)
+						OR u[toLower(fullname)] STARTS WITH toLower($search)
+					)
+					RETURN count(u)
+					`,
+        ).bind({ search: searchTerm, eId: interaction.to.toString() }),
+      ),
+    ]);
+    return {
+      items,
+      total,
+      pageSize: items.length,
+      current: skip,
     };
   }
 

@@ -67,7 +67,7 @@ export class EventsReadService {
 					multimedia:e.multimedia,
 					attentionTags: tags,
 					amIInterested: rlike IS NOT null,
-					totalUserInterested: usersInterested
+					totalUsersInterested: usersInterested
 				} as eventInfo, me, e
 				CALL {
 					WITH e,me
@@ -162,7 +162,7 @@ export class EventsReadService {
 						multimedia:e.multimedia,
 						attentionTags: tags,
 						amIInterested: rlike IS NOT null,
-						totalUserInterested: usersInterested
+						totalUsersInterested: usersInterested
 					} as eventInfo, me, e
 					call {
 						WITH e,me

@@ -19,7 +19,6 @@ async function bootstrap(): Promise<void> {
     .setTitle('Saturday Backend')
     .setDescription('Saturday apps API description')
     .setVersion('0.0.1')
-    .addTag('users')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);

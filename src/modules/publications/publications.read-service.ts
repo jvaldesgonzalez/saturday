@@ -68,7 +68,7 @@ export class PublicationsReadService {
 						multimedia:e.multimedia,
 						attentionTags: tags,
 						amIInterested: rlike IS NOT null,
-						totalUserInterested: usersInterested
+						totalUsersInterested: usersInterested
 					} as eventInfo, me, e
 					call {
 						WITH e,me
@@ -120,7 +120,7 @@ export class PublicationsReadService {
 						multimedia:e.multimedia,
 						attentionTags: tags,
 						amIInterested: rlike IS NOT null,
-						totalUserInterested: usersInterested
+						totalUsersInterested: usersInterested
 					} as eventInfo, me, e,item
 					call {
 						WITH e,me

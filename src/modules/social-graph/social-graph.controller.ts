@@ -9,7 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { FollowInteraction } from './social-services/follow/follow.interaction';
 import { FollowService } from './social-services/follow/follow.service';
@@ -207,5 +207,28 @@ export class SocialGraphController {
       skip,
       limit,
     );
+  }
+
+  @Get('/:eventId/liked-by')
+  @ApiQuery({ name: 'take', type: Number })
+  @ApiQuery({ name: 'skip', type: Number })
+  @ApiQuery({ name: 'only_friends', type: Boolean, allowEmptyValue: true })
+  @ApiQuery({ name: 'q', type: String, allowEmptyValue: true })
+  @ApiParam({ name: 'eventId', type: String })
+  async getUsersInterested(
+    @Query('skip', ParseIntPipe) skip: number,
+    @Query('take', ParseIntPipe) limit: number,
+    @Query('only_friends') onlyFriends = false,
+    @Query('q') searchTerm = '',
+    @Param('eventId') eventId: string,
+  ) {
+    return this.like.getIngoings({
+      from: new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      skip,
+      limit,
+      onlyFriends,
+      searchTerm,
+      interaction: new LikeInteraction(new UniqueEntityID(eventId)),
+    });
   }
 }
