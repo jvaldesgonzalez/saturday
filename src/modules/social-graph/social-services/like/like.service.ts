@@ -116,7 +116,7 @@ export class LikeService
       items,
       pageSize: items.length,
       current: skip,
-      total: total,
+      total,
     };
   }
 

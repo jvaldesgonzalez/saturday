@@ -27,9 +27,10 @@ export class FriendRequestService
     limit: number,
     searchTerm = '',
   ): Promise<PaginatedFindResult<Requester>> {
-    const items = await this.persistenceManager.query<any>(
-      QuerySpecification.withStatement(
-        `MATCH (u:User)<-[r:FRIEND_REQUEST]-(requester:User)
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<any>(
+        QuerySpecification.withStatement(
+          `MATCH (u:User)<-[r:FRIEND_REQUEST]-(requester:User)
 				WHERE u.id = $uId AND (requester.username STARTS WITH $search OR requester.fullname STARTS WITH $search)
 					WITH u,requester,r
 					OPTIONAL MATCH (requester)-[:FRIEND]-(common:User)-[:FRIEND]-(u)
@@ -46,26 +47,26 @@ export class FriendRequestService
 					SKIP $skip
 					LIMIT $limit
 				`,
-      )
-        .bind({
-          uId: from.toString(),
-          search: searchTerm,
-          skip: Integer.fromInt(skip),
-          limit: Integer.fromInt(limit),
-        })
-        .map((r) => {
-          return { ...r, requestedAt: parseDate(r.requestedAt) };
-        }),
-    );
-    console.log(items);
-    const total = await this.persistenceManager.getOne<number>(
-      QuerySpecification.withStatement(
-        `MATCH (u:User)<-[:FRIEND_REQUEST]-(o:User)
+        )
+          .bind({
+            uId: from.toString(),
+            search: searchTerm,
+            skip: Integer.fromInt(skip),
+            limit: Integer.fromInt(limit),
+          })
+          .map((r) => {
+            return { ...r, requestedAt: parseDate(r.requestedAt) };
+          }),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(
+          `MATCH (u:User)<-[:FRIEND_REQUEST]-(o:User)
 					WHERE u.id = $uId
 				return count(o)
 				`,
-      ).bind({ uId: from.toString() }),
-    );
+        ).bind({ uId: from.toString() }),
+      ),
+    ]);
     return {
       items,
       total,

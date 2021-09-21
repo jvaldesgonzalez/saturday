@@ -25,9 +25,10 @@ export class FollowService
     limit: number,
     searchTerm: string = '',
   ): Promise<PaginatedFindResult<Followee>> {
-    const items = await this.persistenceManager.query<Followee>(
-      QuerySpecification.withStatement(
-        `MATCH (u:User)-[r:FOLLOW]->(p:Partner)
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<Followee>(
+        QuerySpecification.withStatement(
+          `MATCH (u:User)-[r:FOLLOW]->(p:Partner)
 				WHERE u.id = $uId AND (p.username STARTS WITH $search OR p.businessName STARTS WITH $search)
 				OPTIONAL MATCH (p)<-[:FOLLOW]-(o:User)
 
@@ -43,26 +44,26 @@ export class FollowService
 					SKIP $skip
 					LIMIT $limit
 				`,
-      )
-        .bind({
-          uId: from.toString(),
-          search: searchTerm,
-          skip: Integer.fromInt(skip),
-          limit: Integer.fromInt(limit),
-        })
-        .map((r) => {
-          return { ...r, followSince: parseDate(r.followSince) };
-        }),
-    );
-    console.log(items);
-    const total = await this.persistenceManager.getOne<number>(
-      QuerySpecification.withStatement(
-        `MATCH (u:User)-[:FOLLOW]->(p:Partner)
+        )
+          .bind({
+            uId: from.toString(),
+            search: searchTerm,
+            skip: Integer.fromInt(skip),
+            limit: Integer.fromInt(limit),
+          })
+          .map((r) => {
+            return { ...r, followSince: parseDate(r.followSince) };
+          }),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(
+          `MATCH (u:User)-[:FOLLOW]->(p:Partner)
 					WHERE u.id = $uId
 				return count(p)
 				`,
-      ).bind({ uId: from.toString() }),
-    );
+        ).bind({ uId: from.toString() }),
+      ),
+    ]);
     return {
       items,
       total,

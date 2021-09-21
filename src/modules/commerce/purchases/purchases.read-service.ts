@@ -20,9 +20,10 @@ export class PurchasesReadService {
     skip: number,
     limit: number,
   ): Promise<PaginatedFindResult<MyPurchases>> {
-    const items = await this.persistenceManager.query<MyPurchases>(
-      QuerySpecification.withStatement(
-        `
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<MyPurchases>(
+        QuerySpecification.withStatement(
+          `
 				MATCH (u:User)--(p:Purchase)--(t:Ticket)--(o:EventOccurrence)--(e:Event)--(pl:Place),
 				(e)-[:PUBLISH_EVENT]-(c:Partner)
 				WHERE u.id = "8de83b51-04aa-42d8-861e-4289160694ef"
@@ -62,35 +63,45 @@ export class PurchasesReadService {
 				SKIP $skip
 				LIMIT $limit
 			`,
-      )
-        .bind({
-          uId: userId,
-          limit: Integer.fromInt(limit),
-          skip: Integer.fromInt(skip),
-        })
-        .map((r) => {
-          return {
-            ...r,
-            dateTimePurchased: parseDate(r.dateTimePurchased),
-            event: {
-              ...r.event,
-              dateTimeInit: parseDate(r.event.dateTimeInit),
-              dateTimeEnd: parseDate(r.event.dateTimeEnd),
-              multimedia: JSON.parse(r.event.multimedia)[0],
-              place: {
-                ...r.event.place,
-                latitude: parseFloat(r.event.place.latitude),
-                longitude: parseFloat(r.event.place.longitude),
+        )
+          .bind({
+            uId: userId,
+            limit: Integer.fromInt(limit),
+            skip: Integer.fromInt(skip),
+          })
+          .map((r) => {
+            return {
+              ...r,
+              dateTimePurchased: parseDate(r.dateTimePurchased),
+              event: {
+                ...r.event,
+                dateTimeInit: parseDate(r.event.dateTimeInit),
+                dateTimeEnd: parseDate(r.event.dateTimeEnd),
+                multimedia: JSON.parse(r.event.multimedia)[0],
+                place: {
+                  ...r.event.place,
+                  latitude: parseFloat(r.event.place.latitude),
+                  longitude: parseFloat(r.event.place.longitude),
+                },
               },
-            },
-          };
-        })
-        .transform(MyPurchases),
-    );
+            };
+          })
+          .transform(MyPurchases),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(
+          `
+				MATCH (u:User)--(p:Purchase)
+				WHERE u.id = "8de83b51-04aa-42d8-861e-4289160694ef"
+				return count(p)
+				`,
+        ).bind({ uId: userId }),
+      ),
+    ]);
     return {
       items,
-      pageSize: limit,
-      total: 5,
+      pageSize: items.length,
+      total,
       current: skip,
     };
   }
