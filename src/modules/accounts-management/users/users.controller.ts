@@ -7,7 +7,7 @@ import { UsersReadService } from './users.read-service';
 export class UsersController {
   constructor(private readService: UsersReadService) {}
 
-  @Get('/profile/me')
+  @Get('/me/profile')
   async getProfile() {
     return await this.readService.getProfile('blabla');
   }

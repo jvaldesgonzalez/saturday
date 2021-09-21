@@ -154,7 +154,9 @@ export class LikeService
 						friendshipStatus:CASE WHEN r is null THEN "none" ELSE toLower(type(r)) END,
 						id:u.id,
 						fullname:u.fullname,
-						friendsInCommon:commonFriends
+						friendsInCommon:commonFriends,
+						avatar:u.avatar,
+						email:u.email,
 					} as result
 					ORDER BY result.friendsInCommon DESC
 					SKIP $skip

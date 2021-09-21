@@ -7,7 +7,7 @@ import { PartnersReadService } from './partners.read-service';
 export class PartnersController {
   constructor(private readService: PartnersReadService) {}
 
-  @Get('/profile/:id')
+  @Get('/:id/profile')
   @ApiParam({ name: 'id' })
   async getProfile(@Param('id') id: string) {
     const partner = await this.readService.getProfile(

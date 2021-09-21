@@ -8,28 +8,41 @@ import {
   ParseBoolPipe,
   ParseIntPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import { FollowInteraction } from './social-services/follow/follow.interaction';
+import {
+  FollowBody,
+  FollowInteraction,
+} from './social-services/follow/follow.interaction';
 import { FollowService } from './social-services/follow/follow.service';
-import { FriendRequestInteraction } from './social-services/friend-request/friend-request.interaction';
+import {
+  FriendRequestBody,
+  FriendRequestInteraction,
+} from './social-services/friend-request/friend-request.interaction';
 import { FriendRequestService } from './social-services/friend-request/friend-request.service';
 import { FriendInteraction } from './social-services/friend/friend.interaction';
 import { FriendService } from './social-services/friend/friend.service';
-import { LikeInteraction } from './social-services/like/like.interaction';
+import {
+  LikeBody,
+  LikeInteraction,
+} from './social-services/like/like.interaction';
 import { LikeService } from './social-services/like/like.service';
 import {
   ShareBody,
   ShareInteraction,
 } from './social-services/share/share.interaction';
 import { ShareService } from './social-services/share/share.service';
-import { ViewStoryInteraction } from './social-services/view-story/view-story.interaction';
+import {
+  ViewStoryBody,
+  ViewStoryInteraction,
+} from './social-services/view-story/view-story.interaction';
 import { ViewStoryService } from './social-services/view-story/view-story.service';
 
-@ApiTags('social-graph')
-@Controller('social-graph')
+@ApiTags('interactions')
+@Controller('interactions')
 export class SocialGraphController {
   constructor(
     private like: LikeService,
@@ -40,9 +53,9 @@ export class SocialGraphController {
     private share: ShareService,
   ) {}
 
-  @Post('/me/likes/:to')
-  async makeLike(@Param('to') to: string) {
-    const interaction = new LikeInteraction(new UniqueEntityID(to));
+  @Post('/add-to-favorites')
+  async makeLike(@Body() data: LikeBody) {
+    const interaction = new LikeInteraction(new UniqueEntityID(data.eventId));
     if (!(await this.like.isPosible(interaction)))
       throw new ConflictException(
         'Cant create like interaction with this params',
@@ -53,11 +66,11 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/me/shares/:to')
-  async makeShare(@Param('to') to: string, @Body() data: ShareBody) {
+  @Post('/share/')
+  async makeShare(@Body() data: ShareBody) {
     const interaction = new ShareInteraction(
-      new UniqueEntityID(to),
-      new UniqueEntityID(data.publicationId),
+      new UniqueEntityID(data.shareWith),
+      new UniqueEntityID(data.eventId),
     );
     if (!(await this.share.isPosible(interaction)))
       throw new ConflictException(
@@ -69,9 +82,11 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/me/follows/:to')
-  async makeFollow(@Param('to') to: string) {
-    const interaction = new FollowInteraction(new UniqueEntityID(to));
+  @Post('/follow-partner/')
+  async makeFollow(@Body() data: FollowBody) {
+    const interaction = new FollowInteraction(
+      new UniqueEntityID(data.partnerId),
+    );
     if (!(await this.follow.isPosible(interaction)))
       throw new ConflictException(
         'Cant create follow interaction with this params',
@@ -82,9 +97,11 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/me/friend-requests/:to')
-  async makeFriendRequest(@Param('to') to: string) {
-    const interaction = new FriendRequestInteraction(new UniqueEntityID(to));
+  @Post('/send-friend-request')
+  async makeFriendRequest(@Body() data: FriendRequestBody) {
+    const interaction = new FriendRequestInteraction(
+      new UniqueEntityID(data.userId),
+    );
     if (!(await this.friendRequest.isPosible(interaction)))
       throw new ConflictException(
         'Cant create friend-request interaction with this params',
@@ -95,9 +112,9 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/me/friends/:to')
-  async makeFriend(@Param('to') to: string) {
-    const interaction = new FriendInteraction(new UniqueEntityID(to));
+  @Post('/accept-friend-request')
+  async makeFriend(@Body() data: FriendRequestBody) {
+    const interaction = new FriendInteraction(new UniqueEntityID(data.userId));
     if (
       !(await this.friend.isPosible(
         interaction,
@@ -113,9 +130,11 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/me/view-stories/:to')
-  async makeViewStory(@Param('to') to: string) {
-    const interaction = new ViewStoryInteraction(new UniqueEntityID(to));
+  @Post('/view-story/')
+  async makeViewStory(@Body() data: ViewStoryBody) {
+    const interaction = new ViewStoryInteraction(
+      new UniqueEntityID(data.storyId),
+    );
     if (!(await this.viewStory.isPosible(interaction)))
       throw new ConflictException(
         'Cant create follow interaction with this params',
@@ -126,43 +145,60 @@ export class SocialGraphController {
     );
   }
 
-  @Delete('/me/likes/:to')
-  async undoLike(@Param('to') to: string) {
-    const interaction = new LikeInteraction(new UniqueEntityID(to));
+  @Post('/remove-from-favorites')
+  async undoLike(@Body() data: LikeBody) {
+    const interaction = new LikeInteraction(new UniqueEntityID(data.eventId));
     await this.like.drop(
       new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
       interaction,
     );
   }
 
-  @Delete('/me/follows/:to')
-  async undoFollow(@Param('to') to: string) {
-    const interaction = new FollowInteraction(new UniqueEntityID(to));
+  @Post('/unfollow-partner/')
+  async undoFollow(@Body() data: FollowBody) {
+    const interaction = new FollowInteraction(
+      new UniqueEntityID(data.partnerId),
+    );
     await this.follow.drop(
       new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
       interaction,
     );
   }
 
-  @Delete('/me/friend-requests/:to')
-  async undoFriendRequest(@Param('to') to: string) {
-    const interaction = new FriendRequestInteraction(new UniqueEntityID(to));
+  @Post('/cancel-friend-requests')
+  async undoFriendRequest(@Body() data: FriendRequestBody) {
+    const interaction = new FriendRequestInteraction(
+      new UniqueEntityID(data.userId),
+    );
     await this.friendRequest.drop(
       new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
       interaction,
     );
   }
 
-  @Delete('/me/friends/:to')
-  async undoFriend(@Param('to') to: string) {
-    const interaction = new FriendRequestInteraction(new UniqueEntityID(to));
+  @Post('/remove-from-friends')
+  async undoFriend(@Body() data: FriendRequestBody) {
+    const interaction = new FriendRequestInteraction(
+      new UniqueEntityID(data.userId),
+    );
     await this.friend.drop(
       new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
       interaction,
     );
   }
+}
 
-  @Get('/me/follows')
+@ApiTags('users')
+@Controller('users')
+export class UsersGraphController {
+  constructor(
+    private like: LikeService,
+    private follow: FollowService,
+    private friendRequest: FriendRequestService,
+    private friend: FriendService,
+  ) {}
+
+  @Get('/me/followees')
   @ApiQuery({ name: 'q', allowEmptyValue: true })
   @ApiQuery({ name: 'take', type: Number })
   @ApiQuery({ name: 'skip', type: Number })
@@ -196,7 +232,7 @@ export class SocialGraphController {
     );
   }
 
-  @Get('/me/likes')
+  @Get('/me/favorites')
   @ApiQuery({ name: 'take', type: Number })
   @ApiQuery({ name: 'skip', type: Number })
   async getLiked(
@@ -210,7 +246,7 @@ export class SocialGraphController {
     );
   }
 
-  @Get('/:eventId/liked-by')
+  @Get('/favorites/:eventId')
   @ApiQuery({ name: 'take', type: Number })
   @ApiQuery({ name: 'skip', type: Number })
   @ApiQuery({ name: 'only_friends', type: Boolean, allowEmptyValue: true })

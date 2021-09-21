@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsUUID } from 'class-validator';
 import { SocialGraphInteraction } from '../../common/interaction.interface';
 import { SocialGraphNode } from '../../common/social-graph-node.entity';
 import { InteractionType } from '../../enums/interaction-type.enum';
@@ -15,6 +15,9 @@ export class ShareInteraction extends SocialGraphInteraction {
 
 export class ShareBody {
   @ApiProperty()
-  @IsNotEmpty()
-  publicationId: string;
+  @IsUUID()
+  eventId: string;
+  @ApiProperty()
+  @IsUUID()
+  shareWith: string;
 }

@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
-import { SocialGraphController } from './social-graph.controller';
+import {
+  SocialGraphController,
+  UsersGraphController,
+} from './social-graph.controller';
 import { FollowService } from './social-services/follow/follow.service';
 import { FriendRequestService } from './social-services/friend-request/friend-request.service';
 import { FriendService } from './social-services/friend/friend.service';
@@ -16,6 +19,6 @@ import { ViewStoryService } from './social-services/view-story/view-story.servic
     FriendService,
     ShareService,
   ],
-  controllers: [SocialGraphController],
+  controllers: [SocialGraphController, UsersGraphController],
 })
 export class SocialGraphModule {}

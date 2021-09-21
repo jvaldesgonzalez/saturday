@@ -34,7 +34,7 @@ export class SearchEngineController {
     return this.hashtagService.search(new HashtagQuery(q), skip, limit);
   }
 
-  @Get('accounts')
+  @Get('profiles')
   @ApiQuery({ name: 'q' })
   @ApiQuery({ name: 'skip' })
   @ApiQuery({ name: 'take' })
@@ -52,9 +52,5 @@ export class SearchEngineController {
       limit,
       '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
     );
-  }
-  @Get('/test')
-  testQuery(@Query('q') q: string) {
-    return new AccountQuery(q).processedQuery;
   }
 }
