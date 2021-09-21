@@ -27,15 +27,17 @@ export class FollowService
   ): Promise<PaginatedFindResult<Followee>> {
     const items = await this.persistenceManager.query<Followee>(
       QuerySpecification.withStatement(
-        `MATCH (u:User)-[r:FOLLOW]->(p:Partner)<-[:FOLLOW]-(o:User)
+        `MATCH (u:User)-[r:FOLLOW]->(p:Partner)
 				WHERE u.id = $uId AND (p.username STARTS WITH $search OR p.businessName STARTS WITH $search)
+				OPTIONAL MATCH (p)<-[:FOLLOW]-(o:User)
+
 				RETURN distinct {
 					id:p.id,
 					username:p.username,
 					email:p.email,
 					avatar:p.avatar,
 					businessName:p.businessName,
-					amountOfFollowers: count(distinct o) + 1,
+					amountOfFollowers: count(distinct o),
 					followSince:r.createdAt
 					}
 					SKIP $skip

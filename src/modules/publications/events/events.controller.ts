@@ -31,7 +31,7 @@ export class EventsController {
   @ApiQuery({ name: 'skip', type: Number })
   @ApiQuery({ name: 'take', type: Number })
   async getEventsWithHashtag(
-    @Param('hashtag-word') hashtagWord: string,
+    @Param('hashtagword') hashtagWord: string,
     @Query('skip', ParseIntPipe) skip: number = 0,
     @Query('take', ParseIntPipe) limit: number = 10,
   ) {

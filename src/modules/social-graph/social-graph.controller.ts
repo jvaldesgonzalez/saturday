@@ -39,7 +39,7 @@ export class SocialGraphController {
     private share: ShareService,
   ) {}
 
-  @Post('/me/like/:to')
+  @Post('/me/likes/:to')
   async makeLike(@Param('to') to: string) {
     const interaction = new LikeInteraction(new UniqueEntityID(to));
     if (!(await this.like.isPosible(interaction)))
@@ -52,7 +52,7 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/me/share/:to')
+  @Post('/me/shares/:to')
   async makeShare(@Param('to') to: string, @Body() data: ShareBody) {
     const interaction = new ShareInteraction(
       new UniqueEntityID(to),
@@ -68,7 +68,7 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/me/follow/:to')
+  @Post('/me/follows/:to')
   async makeFollow(@Param('to') to: string) {
     const interaction = new FollowInteraction(new UniqueEntityID(to));
     if (!(await this.follow.isPosible(interaction)))
@@ -81,7 +81,7 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/me/friend-request/:to')
+  @Post('/me/friend-requests/:to')
   async makeFriendRequest(@Param('to') to: string) {
     const interaction = new FriendRequestInteraction(new UniqueEntityID(to));
     if (!(await this.friendRequest.isPosible(interaction)))
@@ -94,7 +94,7 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/me/friend/:to')
+  @Post('/me/friends/:to')
   async makeFriend(@Param('to') to: string) {
     const interaction = new FriendInteraction(new UniqueEntityID(to));
     if (
@@ -112,7 +112,7 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/me/view-story/:to')
+  @Post('/me/view-stories/:to')
   async makeViewStory(@Param('to') to: string) {
     const interaction = new ViewStoryInteraction(new UniqueEntityID(to));
     if (!(await this.viewStory.isPosible(interaction)))
@@ -125,7 +125,7 @@ export class SocialGraphController {
     );
   }
 
-  @Delete('/me/like/:to')
+  @Delete('/me/likes/:to')
   async undoLike(@Param('to') to: string) {
     const interaction = new LikeInteraction(new UniqueEntityID(to));
     await this.like.drop(
@@ -134,7 +134,7 @@ export class SocialGraphController {
     );
   }
 
-  @Delete('/me/follow/:to')
+  @Delete('/me/follows/:to')
   async undoFollow(@Param('to') to: string) {
     const interaction = new FollowInteraction(new UniqueEntityID(to));
     await this.follow.drop(
@@ -143,7 +143,7 @@ export class SocialGraphController {
     );
   }
 
-  @Delete('/me/friend-request/:to')
+  @Delete('/me/friend-requests/:to')
   async undoFriendRequest(@Param('to') to: string) {
     const interaction = new FriendRequestInteraction(new UniqueEntityID(to));
     await this.friendRequest.drop(
@@ -152,7 +152,7 @@ export class SocialGraphController {
     );
   }
 
-  @Delete('/me/friend/:to')
+  @Delete('/me/friends/:to')
   async undoFriend(@Param('to') to: string) {
     const interaction = new FriendRequestInteraction(new UniqueEntityID(to));
     await this.friend.drop(
@@ -161,7 +161,7 @@ export class SocialGraphController {
     );
   }
 
-  @Get('/me/follow')
+  @Get('/me/follows')
   @ApiQuery({ name: 'q', allowEmptyValue: true })
   @ApiQuery({ name: 'take', type: Number })
   @ApiQuery({ name: 'skip', type: Number })
@@ -178,7 +178,7 @@ export class SocialGraphController {
     );
   }
 
-  @Get('/me/friend-request')
+  @Get('/me/friend-requests')
   @ApiQuery({ name: 'q', allowEmptyValue: true })
   @ApiQuery({ name: 'take', type: Number })
   @ApiQuery({ name: 'skip', type: Number })
@@ -195,7 +195,7 @@ export class SocialGraphController {
     );
   }
 
-  @Get('/me/like')
+  @Get('/me/likes')
   @ApiQuery({ name: 'take', type: Number })
   @ApiQuery({ name: 'skip', type: Number })
   async getLiked(

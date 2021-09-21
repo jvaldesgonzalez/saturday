@@ -3,7 +3,7 @@ export class UserItem {
   fullname: string;
   username: string;
   id: string;
-  friendshipStatus: 'friends';
+  friendshipStatus: 'friend' | 'friend_request' | 'none';
 }
 
 export class PartnerItem {

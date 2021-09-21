@@ -1,6 +1,7 @@
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { SocialGraphInteraction } from './interaction.interface';
 import { SocialGraphNode } from './social-graph-node.entity';
+import { UserInteractor } from './user.interactor';
 
 export interface ISocialGraphService<
   TRead,
@@ -15,4 +16,8 @@ export interface ISocialGraphService<
     limit: number,
     searchTerm?: string,
   ): Promise<PaginatedFindResult<TRead>>;
+  getIngoings?(
+    interaction: T,
+    from?: SocialGraphNode,
+  ): PaginatedFindResult<UserInteractor>;
 }
