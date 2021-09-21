@@ -25,65 +25,24 @@ export class PublicationsReadService {
         `
 				MATCH (p:Publication)
 				CALL apoc.when(p:Event,'
-				MATCH (pl:Place)<-[:HAS_PLACE]-(item)<-[:PUBLISH_EVENT]-(p:Partner),
-				(item)-[:HAS_CATEGORY]->(cat:Category),
-				(item)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-				OPTIONAL MATCH (item)-[:HAS_TAG]-(tag:AttentionTag),
-				(item)<-[:COLLABORATOR]-(c:Partner)
-				OPTIONAL MATCH (u:User)-[:LIKE]->(item)
-				OPTIONAL MATCH (me:User)-[:FRIEND]-(o:User)-[:LIKE]->(item)
-				WHERE me.id = meId
-				OPTIONAL MATCH (o)-[:FRIEND]-(common:User)-[:FRIEND]-(me)
-				WITH {
-					id:o.id,
-					dateTimeInit:o.dateTimeInit,
-					dateTimeEnd:o.dateTimeEnd,
-					tickets:collect(t { .id ,.price, .name, .amount, .description})
-				} as occ, item, collect(distinct tag {.title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id, .avatar, .username}) as coll,u,o,count(distinct common) as common
-				OPTIONAL MATCH (me:User)-[r:LIKE]->(item)
-				where me.id = $meId
-				return {
-					type:"event",
-					id:item.id,
-					name:item.name,
-					occurrences:collect(occ),
-					info:item.description,
-					publisher:{
-						id:p.id,
-						avatar:p.avatar,
-						username:p.username
-					},
-					category:{
-						name:cat.name,
-						id:cat.id
-					},
-					place:{
-						name:pl.name,
-						address:pl.address,
-						longitude:apoc.number.parseFloat(pl.longitude),
-						latitude:apoc.number.parseFloat(pl.latitude)
-					},
-					collaborators: coll,
-					multimedia:item.multimedia,
-					attentionTags: tags,
-					amIInterestedd:r is not null,
-					friends:o,
-					totalUsersInterested:count(distinct u)
-				} as result','
-					MATCH (item)--(e:Event),
-					(pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
-					(e)-[:HAS_CATEGORY]->(cat:Category),
-					(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag),
-					(e)<-[:COLLABORATOR]-(c:Partner)
-					OPTIONAL MATCH (u:User)-[:LIKE]->(e)
+					MATCH (pl:Place)<-[:HAS_PLACE]-(item)<-[:PUBLISH_EVENT]-(p:Partner),
+					(item)-[:HAS_CATEGORY]->(cat:Category),
+					(item)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
+					OPTIONAL MATCH (item)-[:HAS_TAG]-(tag:AttentionTag)
+					OPTIONAL MATCH (item)<-[:COLLABORATOR]-(c:Partner)
+					MATCH (me:User)
+					WHERE me.id = $meId
+					OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
+					OPTIONAL MATCH (me)-[rlike:LIKE]-(item)
+					OPTIONAL MATCH (u:User)-[:LIKE]->(item)
 					WITH {
 						id:o.id,
 						dateTimeInit:o.dateTimeInit,
 						dateTimeEnd:o.dateTimeEnd,
 						tickets:collect(t { .id, .price, .name, .amount, .description})
-					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,item,u
-					WITH {
+					} as occ, item as e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
+					with distinct {
+						type:"event",
 						id:e.id,
 						name:e.name,
 						occurrences:collect(occ),
@@ -91,7 +50,9 @@ export class PublicationsReadService {
 						publisher:{
 							id:p.id,
 							avatar:p.avatar,
-							username:p.username
+							username:p.username,
+							businessName:p.businessName,
+							IFollowThis: rfollow IS NOT null
 						},
 						category:{
 							name:cat.name,
@@ -106,9 +67,67 @@ export class PublicationsReadService {
 						collaborators: coll,
 						multimedia:e.multimedia,
 						attentionTags: tags,
-						amIInterested:false,
-						totalUserInterested:count(distinct u)
-					} AS events,item
+						amIInterested: rlike IS NOT null,
+						totalUserInterested: usersInterested
+					} as eventInfo, me, e
+					call {
+						WITH e,me
+						OPTIONAL MATCH (me)-[:FRIEND]-(f:User)-[:LIKE]->(e)
+						RETURN f LIMIT 3
+          }
+					return apoc.map.merge(eventInfo, {friends:collect( distinct f{.username, .avatar})}) as result
+				','
+					MATCH (item)--(e:Event)
+					,(pl:Place)<-[:HAS_PLACE]-(e)<-[:PUBLISH_EVENT]-(p:Partner),
+					(e)-[:HAS_CATEGORY]->(cat:Category),
+					(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
+					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
+					OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
+					MATCH (me:User)
+					WHERE me.id = $meId
+					OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
+					OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
+					OPTIONAL MATCH (u:User)-[:LIKE]->(e)
+					WITH {
+						id:o.id,
+						dateTimeInit:o.dateTimeInit,
+						dateTimeEnd:o.dateTimeEnd,
+						tickets:collect(t { .id, .price, .name, .amount, .description})
+					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,item
+					with distinct {
+						id:e.id,
+						name:e.name,
+						occurrences:collect(occ),
+						info:e.description,
+						publisher:{
+							id:p.id,
+							avatar:p.avatar,
+							username:p.username,
+							businessName:p.businessName,
+							IFollowThis: rfollow IS NOT null
+						},
+						category:{
+							name:cat.name,
+							id:cat.id
+						},
+						place:{
+							name:pl.name,
+							address:pl.address,
+							longitude:apoc.number.parseFloat(pl.longitude),
+							latitude:apoc.number.parseFloat(pl.latitude)
+						},
+						collaborators: coll,
+						multimedia:e.multimedia,
+						attentionTags: tags,
+						amIInterested: rlike IS NOT null,
+						totalUserInterested: usersInterested
+					} as eventInfo, me, e,item
+					call {
+						WITH e,me
+						OPTIONAL MATCH (me)-[:FRIEND]-(f:User)-[:LIKE]->(e)
+						RETURN f LIMIT 3
+          }
+					WITH apoc.map.merge(eventInfo, {friends:collect( distinct f{.username, .avatar})}) as events,item
 					return {
      				type:"collection",
 						id:item.id,

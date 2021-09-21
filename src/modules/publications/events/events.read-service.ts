@@ -69,8 +69,11 @@ export class EventsReadService {
 					amIInterested: rlike IS NOT null,
 					totalUserInterested: usersInterested
 				} as eventInfo, me, e
-				OPTIONAL MATCH (me)-[:FRIEND]-(f:User)-[:LIKE]->(e)
-				WITH f, eventInfo LIMIT 3
+				CALL {
+					WITH e,me
+					OPTIONAL MATCH (me)-[:FRIEND]-(f:User)-[:LIKE]->(e)
+					RETURN f limit 3
+				}
 				return apoc.map.merge(eventInfo, {friends:collect( distinct f{.username, .avatar})})
 				`,
         )
@@ -103,6 +106,7 @@ export class EventsReadService {
     hashtagWord: string,
     skip: number,
     limit: number,
+    userId: string,
   ): Promise<PaginatedFindResult<EventDetails>> {
     const sanitizedWord = TextUtils.removeLeadingSharpCharacter(
       hashtagWord.trim(),
@@ -111,20 +115,28 @@ export class EventsReadService {
       this.persistenceManager.query<EventDetails>(
         QuerySpecification.withStatement(
           `
-					MATCH (e:Event)-[:CONTAIN_HASHTAG]->(h:Hashtag),
-					(pl:Place)<-[:HAS_PLACE]-(e)<-[:PUBLISH_EVENT]-(p:Partner),
+					MATCH (e:Event)-[:CONTAIN_HASHTAG]->(h:Hashtag)
+					WHERE h.word = $hashtagWord
+					MATCH (pl:Place)<-[:HAS_PLACE]-(e)<-[:PUBLISH_EVENT]-(p:Partner),
 					(e)-[:HAS_CATEGORY]->(cat:Category),
 					(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-					WHERE h.word = $hashtagWord
-					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag),
-					(e)<-[:COLLABORATOR]-(c:Partner)
+
+					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
+					OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
+
+					MATCH (me:User)
+					WHERE me.id = $meId
+					OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
+					OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
+					OPTIONAL MATCH (u:User)-[:LIKE]->(e)
+
 					WITH {
 						id:o.id,
 						dateTimeInit:o.dateTimeInit,
 						dateTimeEnd:o.dateTimeEnd,
 						tickets:collect(t { .id, .price, .name, .amount, .description})
-					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll
-					RETURN {
+					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
+					with distinct {
 						id:e.id,
 						name:e.name,
 						occurrences:collect(occ),
@@ -132,7 +144,9 @@ export class EventsReadService {
 						publisher:{
 							id:p.id,
 							avatar:p.avatar,
-							username:p.username
+							username:p.username,
+							businessName:p.businessName,
+							IFollowThis: rfollow IS NOT null
 						},
 						category:{
 							name:cat.name,
@@ -147,9 +161,16 @@ export class EventsReadService {
 						collaborators: coll,
 						multimedia:e.multimedia,
 						attentionTags: tags,
-						amIInterested:false,
-						totalUserInterested:34
-					} as result
+						amIInterested: rlike IS NOT null,
+						totalUserInterested: usersInterested
+					} as eventInfo, me, e
+					call {
+						WITH e,me
+						OPTIONAL MATCH (me)-[:FRIEND]-(f:User)-[:LIKE]->(e)
+						RETURN f LIMIT 3
+          }
+					WITH collect(f) as friends,f, eventInfo
+					return apoc.map.merge(eventInfo, {friends:collect( distinct f{.username, .avatar})}) as result
 					ORDER BY result.createdAt DESC
 					SKIP $skip
 					LIMIT $limit
@@ -159,6 +180,7 @@ export class EventsReadService {
             hashtagWord: sanitizedWord,
             skip: Integer.fromInt(skip),
             limit: Integer.fromInt(limit),
+            meId: userId,
           })
           .map((r) => {
             return {
@@ -186,7 +208,7 @@ export class EventsReadService {
           `
 					MATCH (e:Event)-[:CONTAIN_HASHTAG]->(h:Hashtag)
 					WHERE h.word = $hashtagWord
-					return count(distinct e)
+					return count(e)
 					`,
         ).bind({ hashtagWord: sanitizedWord }),
       ),

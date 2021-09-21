@@ -39,6 +39,7 @@ export class EventsController {
       hashtagWord,
       skip,
       limit,
+      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
     );
   }
 }
