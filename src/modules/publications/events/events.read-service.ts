@@ -124,7 +124,7 @@ export class EventsReadService {
 						dateTimeEnd:o.dateTimeEnd,
 						tickets:collect(t { .id, .price, .name, .amount, .description})
 					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll
-					return {
+					RETURN {
 						id:e.id,
 						name:e.name,
 						occurrences:collect(occ),
@@ -186,6 +186,7 @@ export class EventsReadService {
           `
 					MATCH (e:Event)-[:CONTAIN_HASHTAG]->(h:Hashtag)
 					WHERE h.word = $hashtagWord
+					return count(distinct e)
 					`,
         ).bind({ hashtagWord: sanitizedWord }),
       ),

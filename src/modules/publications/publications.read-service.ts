@@ -67,7 +67,7 @@ export class PublicationsReadService {
 					multimedia:item.multimedia,
 					attentionTags: tags,
 					amIInterestedd:r is not null,
-					friendsInterested:o,
+					friends:o,
 					totalUsersInterested:count(distinct u)
 				} as result','
 					MATCH (item)--(e:Event),
