@@ -14,6 +14,10 @@ export class PublicationsController {
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
   ) {
-    return await this.readService.getHome(limit, skip);
+    return await this.readService.getHome(
+      limit,
+      skip,
+      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
+    );
   }
 }

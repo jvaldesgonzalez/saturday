@@ -23,17 +23,17 @@ export class AccountSearchService implements ISearchService<AccountItem> {
     q: AccountQuery,
     skip: number,
     limit: number,
+    requesterId: string,
   ): Promise<ISearchResult<AccountItem>> {
-    const items = await this.persistenceManager.query<
-      ISearchResultItem<AccountItem>
-    >(
-      QuerySpecification.withStatement(
-        `
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<ISearchResultItem<AccountItem>>(
+        QuerySpecification.withStatement(
+          `
 				CALL db.index.fulltext.queryNodes('accounts','${q.processedQuery}') yield node,score
 				CALL apoc.when(node:User,
-				'return a{.fullname, .username, .id, .avatar, type:"user", friendshipStatus:"friend", privacy:"public"} as result',
-				'return a{.businessName, .username, .id, .avatar, type:"partner", followers:0} as result',
-				{a:node}) yield value
+				'optional match (a)-[r]-(u:User) where u.id = uId return a{.fullname, .username, .id, .avatar, type:"user", friendshipStatus:toLower(type(r)), privacy:"public"} as result',
+				'optional match (a)-[r:FOLLOW]-(u:User) where u.id = uId optional match (n:User)-[:FOLLOW]->(a) return a{.businessName, .username, .id, .avatar, type:"partner", followers:count(distinct n), IFollowThis: r is not null } as result',
+				{a:node,uId:$uId}) yield value
 				RETURN {
 					data: value.result,
 					score:score
@@ -41,15 +41,19 @@ export class AccountSearchService implements ISearchService<AccountItem> {
 				SKIP $skip
 				LIMIT $limit
 			`,
-      ).bind({ limit: Integer.fromInt(limit), skip: Integer.fromInt(skip) }),
-    );
-    console.log(items);
-    const total = await this.persistenceManager.getOne<number>(
-      QuerySpecification.withStatement(`
+        ).bind({
+          limit: Integer.fromInt(limit),
+          skip: Integer.fromInt(skip),
+          uId: requesterId,
+        }),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(`
 				CALL db.index.fulltext.queryNodes('accounts','${q.processedQuery}') yield node, score
 				RETURN count(node)
 				`),
-    );
+      ),
+    ]);
     return {
       items,
       total,

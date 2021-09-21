@@ -25,22 +25,29 @@ export class LikeService
     skip: number,
     limit: number,
   ): Promise<PaginatedFindResult<EventDetails>> {
-    const items = await this.persistenceManager.query<EventDetails>(
-      QuerySpecification.withStatement(
-        `
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<EventDetails>(
+        QuerySpecification.withStatement(
+          `
+					MATCH (me:User)
+					WHERE me.id = $meId
+
 					MATCH (pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
-					(u:User)-[like:LIKE]->(e),
+					(me)-[like:LIKE]->(e),
 					(e)-[:HAS_CATEGORY]->(cat:Category),
 					(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-					WHERE u.id = $uId
-					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag),
-					(e)<-[:COLLABORATOR]-(c:Partner)
+					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
+					OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
+
+					OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
+					OPTIONAL MATCH (u:User)-[:LIKE]->(e)
+
 					WITH {
 						id:o.id,
 						dateTimeInit:o.dateTimeInit,
 						dateTimeEnd:o.dateTimeEnd,
 						tickets:collect(t { .id, .price, .name, .amount, .description})
-					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,like
+					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rfollow,like.createdAt as likedAt
 					with {
 						id:e.id,
 						name:e.name,
@@ -49,7 +56,8 @@ export class LikeService
 						publisher:{
 							id:p.id,
 							avatar:p.avatar,
-							username:p.username
+							username:p.username,
+							IFollowThis: rfollow IS NOT null
 						},
 						category:{
 							name:cat.name,
@@ -65,43 +73,44 @@ export class LikeService
 						multimedia:e.multimedia,
 						attentionTags: tags,
 						amIInterested:true,
-						totalUserInterested:34
-					} as events,like
-					ORDER BY like.likedAt
+						totalUserInterested:usersInterested
+					} as events,likedAt
+					ORDER BY likedAt
 					SKIP $skip
 					LIMIT $limit
 					RETURN events
 				`,
-      )
-        .bind({
-          uId: from.toString(),
-          limit: Integer.fromInt(limit),
-          skip: Integer.fromInt(skip),
-        })
-        .map((r) => {
-          return {
-            ...r,
-            info: JSON.parse(r.info),
-            multimedia: JSON.parse(r.multimedia),
-            occurrences: r.occurrences.map((o) => {
-              return {
-                ...o,
-                dateTimeInit: parseDate(o.dateTimeInit),
-                dateTimeEnd: parseDate(o.dateTimeEnd),
-              };
-            }),
-          };
-        }),
-    );
-    const total = await this.persistenceManager.getOne<number>(
-      QuerySpecification.withStatement(
-        `
+        )
+          .bind({
+            meId: from.toString(),
+            limit: Integer.fromInt(limit),
+            skip: Integer.fromInt(skip),
+          })
+          .map((r) => {
+            return {
+              ...r,
+              info: JSON.parse(r.info),
+              multimedia: JSON.parse(r.multimedia),
+              occurrences: r.occurrences.map((o) => {
+                return {
+                  ...o,
+                  dateTimeInit: parseDate(o.dateTimeInit),
+                  dateTimeEnd: parseDate(o.dateTimeEnd),
+                };
+              }),
+            };
+          }),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(
+          `
 				MATCH (u:User)-[like:LIKE]->(e:Event)
 				WHERE u.id = $uId
 				return count(e)
 				`,
-      ).bind({ uId: '777cc88c-2e3f-4eb4-ac81-14c9323c541d' }),
-    );
+        ).bind({ uId: '777cc88c-2e3f-4eb4-ac81-14c9323c541d' }),
+      ),
+    ]);
     return {
       items,
       pageSize: items.length,

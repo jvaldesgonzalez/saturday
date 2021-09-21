@@ -16,7 +16,10 @@ export class EventsReadService {
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
 
-  async getEventDetails(eventId: string): Promise<EventDetails> {
+  async getEventDetails(
+    eventId: string,
+    userId: string,
+  ): Promise<EventDetails> {
     return (
       (await this.persistenceManager.maybeGetOne<EventDetails>(
         QuerySpecification.withStatement(
@@ -25,15 +28,20 @@ export class EventsReadService {
 				(e)-[:HAS_CATEGORY]->(cat:Category),
 				(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
 				WHERE e.id = $eId
-				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag),
-				(e)<-[:COLLABORATOR]-(c:Partner)
+				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
+				OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
+				MATCH (me:User)
+				WHERE me.id = $meId
+				OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
+				OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
+				OPTIONAL MATCH (u:User)-[:LIKE]->(e)
 				WITH {
 					id:o.id,
 					dateTimeInit:o.dateTimeInit,
 					dateTimeEnd:o.dateTimeEnd,
 					tickets:collect(t { .id, .price, .name, .amount, .description})
-				} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll
-				return {
+				} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
+				with distinct {
 					id:e.id,
 					name:e.name,
 					occurrences:collect(occ),
@@ -41,7 +49,9 @@ export class EventsReadService {
 					publisher:{
 						id:p.id,
 						avatar:p.avatar,
-						username:p.username
+						username:p.username,
+						businessName:p.businessName,
+						IFollowThis: rfollow IS NOT null
 					},
 					category:{
 						name:cat.name,
@@ -56,12 +66,15 @@ export class EventsReadService {
 					collaborators: coll,
 					multimedia:e.multimedia,
 					attentionTags: tags,
-					amIInterested:false,
-					totalUserInterested:34
-				}
+					amIInterested: rlike IS NOT null,
+					totalUserInterested: usersInterested
+				} as eventInfo, me, e
+				OPTIONAL MATCH (me)-[:FRIEND]-(f:User)-[:LIKE]->(e)
+				WITH f, eventInfo LIMIT 3
+				return apoc.map.merge(eventInfo, {friends:collect( distinct f{.username, .avatar})})
 				`,
         )
-          .bind({ eId: eventId })
+          .bind({ eId: eventId, meId: userId })
           .map((r) => {
             return {
               ...r,

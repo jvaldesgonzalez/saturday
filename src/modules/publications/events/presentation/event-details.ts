@@ -67,6 +67,13 @@ class OccurrenceDetails {
   tickets: TicketDetail[];
 }
 
+class FriendInterestedPreview {
+  @ApiResponseProperty()
+  username: string;
+  @ApiResponseProperty()
+  avatar: string;
+}
+
 export class EventDetails {
   @ApiResponseProperty({ type: PartnerDetails })
   publisher: PartnerDetails;
@@ -88,4 +95,10 @@ export class EventDetails {
   attentionTags: string[];
   @ApiResponseProperty({ type: OccurrenceDetails })
   occurrences: OccurrenceDetails[];
+  @ApiResponseProperty()
+  amIInterested: boolean;
+  @ApiResponseProperty()
+  totalUsersInterested: number;
+  @ApiResponseProperty({ type: [FriendInterestedPreview] })
+  friendsInterestedPreview: FriendInterestedPreview[];
 }

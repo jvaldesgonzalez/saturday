@@ -46,7 +46,12 @@ export class SearchEngineController {
     const query = new AccountQuery(q);
     if (query.processedQuery.length === 0)
       throw new BadRequestException('q must not be empty');
-    return this.accountsService.search(query, skip, limit);
+    return this.accountsService.search(
+      query,
+      skip,
+      limit,
+      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
+    );
   }
   @Get('/test')
   testQuery(@Query('q') q: string) {

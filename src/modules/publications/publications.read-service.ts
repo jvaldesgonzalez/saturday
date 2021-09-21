@@ -18,6 +18,7 @@ export class PublicationsReadService {
   async getHome(
     limit: number,
     skip: number,
+    userId: string,
   ): Promise<PaginatedFindResult<EventDetails>> {
     const items = await this.persistenceManager.query<EventDetails>(
       QuerySpecification.withStatement(
@@ -29,12 +30,18 @@ export class PublicationsReadService {
 				(item)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
 				OPTIONAL MATCH (item)-[:HAS_TAG]-(tag:AttentionTag),
 				(item)<-[:COLLABORATOR]-(c:Partner)
+				OPTIONAL MATCH (u:User)-[:LIKE]->(item)
+				OPTIONAL MATCH (me:User)-[:FRIEND]-(o:User)-[:LIKE]->(item)
+				WHERE me.id = meId
+				OPTIONAL MATCH (o)-[:FRIEND]-(common:User)-[:FRIEND]-(me)
 				WITH {
 					id:o.id,
 					dateTimeInit:o.dateTimeInit,
 					dateTimeEnd:o.dateTimeEnd,
 					tickets:collect(t { .id ,.price, .name, .amount, .description})
-				} as occ, item, collect(distinct tag {.title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id, .avatar, .username}) as coll
+				} as occ, item, collect(distinct tag {.title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id, .avatar, .username}) as coll,u,o,count(distinct common) as common
+				OPTIONAL MATCH (me:User)-[r:LIKE]->(item)
+				where me.id = $meId
 				return {
 					type:"event",
 					id:item.id,
@@ -59,8 +66,9 @@ export class PublicationsReadService {
 					collaborators: coll,
 					multimedia:item.multimedia,
 					attentionTags: tags,
-					amIInterested:false,
-					totalUsersInterested:123
+					amIInterestedd:r is not null,
+					friendsInterested:o,
+					totalUsersInterested:count(distinct u)
 				} as result','
 					MATCH (item)--(e:Event),
 					(pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
@@ -68,12 +76,13 @@ export class PublicationsReadService {
 					(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag),
 					(e)<-[:COLLABORATOR]-(c:Partner)
+					OPTIONAL MATCH (u:User)-[:LIKE]->(e)
 					WITH {
 						id:o.id,
 						dateTimeInit:o.dateTimeInit,
 						dateTimeEnd:o.dateTimeEnd,
 						tickets:collect(t { .id, .price, .name, .amount, .description})
-					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,item
+					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,item,u
 					WITH {
 						id:e.id,
 						name:e.name,
@@ -98,7 +107,7 @@ export class PublicationsReadService {
 						multimedia:e.multimedia,
 						attentionTags: tags,
 						amIInterested:false,
-						totalUserInterested:34
+						totalUserInterested:count(distinct u)
 					} AS events,item
 					return {
      				type:"collection",
@@ -107,14 +116,18 @@ export class PublicationsReadService {
 						description:item.description,
 						events:collect(events)
 					} as result
-				',{item:p}) YIELD value
+				',{item:p,meId:$meId}) YIELD value
 				return value.result as r
 				ORDER BY r.id
 				SKIP $skip
 				LIMIT $limit
 			`,
       )
-        .bind({ limit: Integer.fromInt(limit), skip: Integer.fromInt(skip) })
+        .bind({
+          limit: Integer.fromInt(limit),
+          skip: Integer.fromInt(skip),
+          meId: userId,
+        })
         .map((r) => {
           return r.type === 'event'
             ? {

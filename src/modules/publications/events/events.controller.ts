@@ -18,7 +18,10 @@ export class EventsController {
   @Get('/:id')
   @ApiOkResponse({ type: EventDetails })
   async getEventDetails(@Param('id') id: string) {
-    const event = await this.readService.getEventDetails(id);
+    const event = await this.readService.getEventDetails(
+      id,
+      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
+    );
     if (!event) throw new NotFoundException(`Event ${id} not found`);
     return event;
   }
