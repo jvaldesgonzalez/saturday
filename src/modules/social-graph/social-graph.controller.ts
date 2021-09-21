@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseIntPipe,
   Post,
   Query,
@@ -218,7 +219,7 @@ export class SocialGraphController {
   async getUsersInterested(
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
-    @Query('only_friends') onlyFriends = false,
+    @Query('only_friends', ParseBoolPipe) onlyFriends = false,
     @Query('q') searchTerm = '',
     @Param('eventId') eventId: string,
   ) {

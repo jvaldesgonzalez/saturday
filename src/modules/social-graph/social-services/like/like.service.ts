@@ -126,7 +126,7 @@ export class LikeService
     skip,
     limit,
     searchTerm,
-    onlyFriends = true,
+    onlyFriends = false,
   }: {
     interaction: LikeInteraction;
     from: UniqueEntityID;
@@ -135,20 +135,23 @@ export class LikeService
     searchTerm: string;
     onlyFriends: boolean;
   }): Promise<PaginatedFindResult<UserInteractor>> {
+    console.log({ onlyFriends });
     const [items, total] = await Promise.all([
       this.persistenceManager.query<UserInteractor>(
         QuerySpecification.withStatement(
           `MATCH (me:User)
 					WHERE me.id = $meId
 					MATCH (u:User)-[:LIKE]->(e:Event)
-					WHERE e.id = $eId ${onlyFriends ? 'AND (u)-[:FRIEND]-(me)' : ''}
-					AND ( u[toLower(username)] STARTS WITH toLower($search) OR u[toLower(fullname)] STARTS WITH toLower($search) )
+					WHERE e.id = $eId  AND u.id <> me.id ${
+            onlyFriends ? 'AND (u)-[:FRIEND]-(me)' : ''
+          }
+					AND ( toLower(u.username) STARTS WITH toLower($search) OR toLower(u.fullname) CONTAINS toLower($search) )
 					OPTIONAL MATCH (u)-[:FRIEND]-(common:User)-[:FRIEND]-(me)
 					OPTIONAL MATCH (u)-[r:FRIEND]-(me)
-					WITH u,count(common) as commonFriends
+					WITH u, count(common) as commonFriends,r
 					RETURN {
 						username:u.username,
-						friendshipStatus:type(r),
+						friendshipStatus:CASE WHEN r is null THEN "none" ELSE toLower(type(r)) END,
 						id:u.id,
 						fullname:u.fullname,
 						friendsInCommon:commonFriends
@@ -168,15 +171,19 @@ export class LikeService
       this.persistenceManager.getOne<number>(
         QuerySpecification.withStatement(
           `
+					MATCH (me:User) WHERE me.id = $meId
 					MATCH (u:User)-[:LIKE]->(e:Event)
-					WHERE e.id = $eId ${onlyFriends ? 'AND (u)-[:FRIEND]-(me)' : ''}
-					AND (
-						u[toLower(username) STARTS WITH toLower($search)
-						OR u[toLower(fullname)] STARTS WITH toLower($search)
-					)
+					WHERE e.id = $eId AND u.id <> me.id ${
+            onlyFriends ? 'AND (u)-[:FRIEND]-(me)' : ''
+          }
+					AND ( toLower(u.username) STARTS WITH toLower($search) OR toLower(u.fullname) CONTAINS toLower($search) )
 					RETURN count(u)
 					`,
-        ).bind({ search: searchTerm, eId: interaction.to.toString() }),
+        ).bind({
+          search: searchTerm,
+          eId: interaction.to.toString(),
+          meId: from.toString(),
+        }),
       ),
     ]);
     return {
