@@ -76,7 +76,7 @@ export class LikeService
 						amIInterested:true,
 						totalUsersInterested:usersInterested
 					} as events,likedAt
-					ORDER BY likedAt
+					ORDER BY likedAt DESC
 					SKIP $skip
 					LIMIT $limit
 					RETURN events
