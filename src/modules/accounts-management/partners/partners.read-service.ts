@@ -33,7 +33,7 @@ export class PartnersReadService {
 						avatar:p.avatar,
 						businessName:p.businessName,
 						aditionalBusinessData:p.aditionalBusinessData,
-						followers:followers,
+						amountOfFollowers:followers,
 						IFollowThis: r IS NOT null,
 						events:events
 				}
