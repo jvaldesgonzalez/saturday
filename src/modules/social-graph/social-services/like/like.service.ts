@@ -156,7 +156,7 @@ export class LikeService
 						fullname:u.fullname,
 						friendsInCommon:commonFriends,
 						avatar:u.avatar,
-						email:u.email,
+						email:u.email
 					} as result
 					ORDER BY result.friendsInCommon DESC
 					SKIP $skip

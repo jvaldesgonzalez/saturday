@@ -215,6 +215,23 @@ export class UsersGraphController {
     );
   }
 
+  @Get('/me/friends')
+  @ApiQuery({ name: 'q', allowEmptyValue: true })
+  @ApiQuery({ name: 'take', type: Number })
+  @ApiQuery({ name: 'skip', type: Number })
+  async getFriends(
+    @Query('q') q = '',
+    @Query('skip', ParseIntPipe) skip: number,
+    @Query('take', ParseIntPipe) limit: number,
+  ) {
+    return this.friend.getOutgoings(
+      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      skip,
+      limit,
+      q,
+    );
+  }
+
   @Get('/me/friend-requests')
   @ApiQuery({ name: 'q', allowEmptyValue: true })
   @ApiQuery({ name: 'take', type: Number })

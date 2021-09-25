@@ -105,4 +105,70 @@ export class PurchasesReadService {
       current: skip,
     };
   }
+
+  async getPurchaseDetail(purchaseId: string): Promise<MyPurchases> {
+    return await this.persistenceManager.maybeGetOne<MyPurchases>(
+      QuerySpecification.withStatement(
+        `
+				MATCH (u:User)--(p:Purchase)--(t:Ticket)--(o:EventOccurrence)--(e:Event)--(pl:Place),
+				(e)-[:PUBLISH_EVENT]-(c:Partner)
+				WHERE u.id = "8de83b51-04aa-42d8-861e-4289160694ef" AND p.id = $pId
+				OPTIONAL MATCH (p)-[:HAS_COUPON]->(coupon:Coupon)
+				RETURN {
+					ticket:{
+						name:t.name,
+						id:t.id,
+						description:t.description,
+						price:t.price
+					},
+					userId:u.id,
+					id:p.id,
+					transactionId:p.transactionId,
+					gateway:p.gateway,
+					dateTimePurchased:p.executedAt,
+					amountOfTickets:p.amountOfTickets,
+					couponApplied:{
+						code: coupon.code
+					},
+					event:{
+						publisher:{
+							name:c.businessName,
+							avatar:c.avatar,
+							id:c.id,
+							username:c.username
+						},
+						place:{
+							name:pl.name,
+							latitude:pl.latitude,
+							longitude:pl.longitude,
+							address:pl.address
+						},
+						dateTimeInit:o.dateTimeInit,
+						dateTimeEnd:o.dateTimeEnd,
+						multimedia:e.multimedia,
+						id:e.id,
+						name:e.name
+					}
+				} AS purchase`,
+      )
+        .bind({ pId: purchaseId })
+        .map((r) => {
+          return {
+            ...r,
+            dateTimePurchased: parseDate(r.dateTimePurchased),
+            event: {
+              ...r.event,
+              dateTimeInit: parseDate(r.event.dateTimeInit),
+              dateTimeEnd: parseDate(r.event.dateTimeEnd),
+              multimedia: JSON.parse(r.event.multimedia)[0],
+              place: {
+                ...r.event.place,
+                latitude: parseFloat(r.event.place.latitude),
+                longitude: parseFloat(r.event.place.longitude),
+              },
+            },
+          };
+        }),
+    );
+  }
 }
