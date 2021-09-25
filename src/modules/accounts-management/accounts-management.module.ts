@@ -9,6 +9,8 @@ import { FacebookProvider } from './auth/providers/facebook/facebook.provider';
 import { AuthProviders } from './auth/providers/providers.enum';
 import { UsersReadService } from './users/users.read-service';
 import { UsersController } from './users/users.controller';
+import { AccountsController } from './accounts-management.controller';
+import { AccountsManagementReadService } from './accounts-management.read-service';
 
 @Module({
   providers: [
@@ -16,6 +18,7 @@ import { UsersController } from './users/users.controller';
     ...UserUseCases,
     UsersReadService,
     ...AuthUseCases,
+    AccountsManagementReadService,
     {
       provide: UserProviders.IUserRepository,
       useClass: UserRepository,
@@ -25,6 +28,6 @@ import { UsersController } from './users/users.controller';
       useClass: FacebookProvider,
     },
   ],
-  controllers: [AuthController, UsersController],
+  controllers: [AuthController, UsersController, AccountsController],
 })
 export class AccountsManagementModule {}

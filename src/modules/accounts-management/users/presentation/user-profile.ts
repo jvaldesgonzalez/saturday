@@ -1,4 +1,5 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
+import { IsOptional } from 'class-validator';
 import { AccountProfile } from '../../common/presentation/account-profile';
 import { Gender } from '../domain/value-objects/gender.value';
 
@@ -17,4 +18,8 @@ export class UserProfile extends AccountProfile {
   friends: number;
   @ApiResponseProperty()
   following: number;
+
+  @ApiResponseProperty()
+  @IsOptional()
+  friendshipStatus: string;
 }

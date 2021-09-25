@@ -13,13 +13,13 @@ export class UsersReadService {
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
 
-  async getProfile(userId: string): Promise<UserProfile> {
+  async getMyProfile(meId: string): Promise<UserProfile> {
     return await this.persistenceManager.maybeGetOne<UserProfile>(
       QuerySpecification.withStatement(
         `
 			MATCH (l:Location)--(u:User)--(c:Category)
-			WHERE u.id = "777cc88c-2e3f-4eb4-ac81-14c9323c541d"
-			WITH u,l,collect(c.id) as c
+			WHERE u.id = $uId
+			WITH u,l,collect(distinct c.id) as c
 			OPTIONAL match (u)-[:FRIEND]-(friend:User)
 			OPTIONAL match (u)-[:FOLLOW]->(follow:Partner)
 			RETURN {
@@ -36,12 +36,46 @@ export class UsersReadService {
 					following:count(distinct follow)
 			}
 			`,
-      ).map((r) => {
-        return {
-          ...r,
-          birthday: parseDate(r.birthday),
-        };
-      }),
+      )
+        .bind({ uId: meId })
+        .map((r) => {
+          return {
+            ...r,
+            birthday: parseDate(r.birthday),
+          };
+        }),
+    );
+  }
+
+  async getProfile(meId: string, userId: string): Promise<UserProfile> {
+    return await this.persistenceManager.maybeGetOne<UserProfile>(
+      QuerySpecification.withStatement(
+        `
+			MATCH (l:Location)--(u:User)--(c:Category)
+			WHERE u.id = $uId
+			MATCH (me:User)
+			WHERE me.id = $meId
+			WITH u,l,collect(distinct c.id) as c,me
+			OPTIONAL match (u)-[:FRIEND]-(friend:User)
+			OPTIONAL match (u)-[:FOLLOW]->(follow:Partner)
+			OPTIONAL match (u)-[r]-(me)
+			RETURN {
+					id:u.id,
+					username:u.username,
+					avatar:u.avatar,
+					fullname:u.fullname,
+					gender:u.gender,
+					categoryPreferences:c,
+					friends:count(distinct friend),
+					following:count(distinct follow),
+					friendshipStatus: CASE WHEN r is null THEN 'none' ELSE toLower(type(r)) END
+			}
+			`,
+      )
+        .bind({ uId: userId, meId: meId })
+        .map((r) => {
+          return r;
+        }),
     );
   }
 }

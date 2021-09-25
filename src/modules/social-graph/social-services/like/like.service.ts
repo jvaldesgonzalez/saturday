@@ -147,7 +147,7 @@ export class LikeService
           }
 					AND ( toLower(u.username) STARTS WITH toLower($search) OR toLower(u.fullname) CONTAINS toLower($search) )
 					OPTIONAL MATCH (u)-[:FRIEND]-(common:User)-[:FRIEND]-(me)
-					OPTIONAL MATCH (u)-[r:FRIEND]-(me)
+					OPTIONAL MATCH (u)-[r]-(me)
 					WITH u, count(common) as commonFriends,r
 					RETURN {
 						username:u.username,
