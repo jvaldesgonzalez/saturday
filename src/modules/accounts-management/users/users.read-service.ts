@@ -71,7 +71,7 @@ export class UsersReadService {
 					avatar:u.avatar,
 					fullname:u.fullname,
 					gender:u.gender,
-					categoryPreferences:c,
+					location:l.name,
 					friends:count(distinct friend),
 					following:count(distinct follow),
 					description:u.description,
