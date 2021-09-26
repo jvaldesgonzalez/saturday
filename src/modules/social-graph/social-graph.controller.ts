@@ -306,6 +306,29 @@ export class UsersGraphController {
       new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
     );
   }
+
+  @Get('/:userId/friends')
+  @ApiQuery({ name: 'q', allowEmptyValue: true })
+  @ApiQuery({ name: 'take', type: Number })
+  @ApiQuery({ name: 'skip', type: Number })
+  @ApiParam({ name: 'userId', type: String })
+  @ApiQuery({ name: 'only_friends', type: Boolean, allowEmptyValue: true })
+  async getFriendsOfOther(
+    @Query('q') searchTerm = '',
+    @Query('skip', ParseIntPipe) skip: number,
+    @Query('take', ParseIntPipe) limit: number,
+    @Query('only_friends', ParseBoolPipe) onlyFriends = false,
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ) {
+    return this.friend.getIngoings({
+      from: new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      skip,
+      limit,
+      onlyFriends,
+      searchTerm,
+      interaction: new FriendInteraction(new UniqueEntityID(userId)),
+    });
+  }
 }
 
 @ApiTags('events')

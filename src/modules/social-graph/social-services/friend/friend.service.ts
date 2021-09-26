@@ -10,6 +10,7 @@ import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { SocialGraphNode } from '../../common/social-graph-node.entity';
 import { ISocialGraphService } from '../../common/social-graph.service.interface';
+import { UserInteractor } from '../../common/user.interactor';
 import { Friend, FriendInteraction } from './friend.interaction';
 
 @Injectable()
@@ -70,6 +71,81 @@ export class FriendService
       items,
       current: skip,
       pageSize: items.length,
+    };
+  }
+
+  async getIngoings({
+    interaction,
+    from,
+    skip,
+    limit,
+    searchTerm,
+    onlyFriends = false,
+  }: {
+    interaction: FriendInteraction;
+    from: UniqueEntityID;
+    skip: number;
+    limit: number;
+    searchTerm: string;
+    onlyFriends: boolean;
+  }): Promise<PaginatedFindResult<UserInteractor>> {
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<UserInteractor>(
+        QuerySpecification.withStatement(
+          `MATCH (me:User)
+					WHERE me.id = $meId
+					MATCH (u:User)-[:FRIEND]-(user:User)
+					WHERE user.id = $userId  AND u.id <> me.id ${
+            onlyFriends ? 'AND (u)-[:FRIEND]-(me)' : ''
+          }
+					AND ( toLower(u.username) STARTS WITH toLower($search) OR toLower(u.fullname) CONTAINS toLower($search) )
+					OPTIONAL MATCH (u)-[:FRIEND]-(common:User)-[:FRIEND]-(me)
+					OPTIONAL MATCH (u)-[r]-(me)
+					WITH u, count(common) as commonFriends,r
+					RETURN {
+						username:u.username,
+						friendshipStatus:CASE WHEN r is null THEN "none" ELSE toLower(type(r)) END,
+						id:u.id,
+						fullname:u.fullname,
+						friendsInCommon:commonFriends,
+						avatar:u.avatar,
+						email:u.email
+					} as result
+					ORDER BY result.friendsInCommon DESC
+					SKIP $skip
+					LIMIT $limit
+					`,
+        ).bind({
+          meId: from.toString(),
+          userId: interaction.to.toString(),
+          search: searchTerm,
+          skip: Integer.fromInt(skip),
+          limit: Integer.fromInt(limit),
+        }),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(
+          `
+					MATCH (me:User) WHERE me.id = $meId
+					MATCH (u:User)-[:FRIEND]->(user:User)
+					WHERE user.id = $userId AND u.id <> me.id ${
+            onlyFriends ? 'AND (u)-[:FRIEND]-(me)' : ''
+          }
+					AND ( toLower(u.username) STARTS WITH toLower($search) OR toLower(u.fullname) CONTAINS toLower($search) )
+					RETURN count(u)
+					`,
+        ).bind({
+          search: searchTerm,
+          userId: interaction.to.toString(),
+          meId: from.toString(),
+        }),
+      ),
+    ]);
+    return {
+      items,
+      total,
+      pageSize: items.length,
+      current: skip,
     };
   }
 
