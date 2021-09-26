@@ -4,6 +4,7 @@ import {
   NotFoundException,
   Param,
   ParseIntPipe,
+  ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -40,6 +41,30 @@ export class EventsController {
       skip,
       limit,
       '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
+    );
+  }
+}
+
+@ApiTags('partners')
+@Controller('partners')
+export class PartnerEventsController {
+  constructor(private readService: EventsReadService) {}
+
+  @Get('/:partnerId/events/')
+  @ApiParam({ name: 'partnerId', type: String })
+  @ApiQuery({ name: 'skip', type: Number })
+  @ApiQuery({ name: 'take', type: Number })
+  @ApiOkResponse({ type: EventDetails })
+  async getEventsByPartner(
+    @Param('partnerId', ParseUUIDPipe) partnerId: string,
+    @Query('skip', ParseIntPipe) skip: number = 0,
+    @Query('take', ParseIntPipe) limit: number = 10,
+  ) {
+    return await this.readService.getEventsByPartner(
+      partnerId,
+      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
+      skip,
+      limit,
     );
   }
 }

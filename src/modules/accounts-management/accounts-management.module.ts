@@ -11,6 +11,8 @@ import { UsersReadService } from './users/users.read-service';
 import { UsersController } from './users/users.controller';
 import { AccountsController } from './accounts-management.controller';
 import { AccountsManagementReadService } from './accounts-management.read-service';
+import { PartnersReadService } from './partners/partners.read-service';
+import { PartnersController } from './partners/partners.controller';
 
 @Module({
   providers: [
@@ -19,6 +21,7 @@ import { AccountsManagementReadService } from './accounts-management.read-servic
     UsersReadService,
     ...AuthUseCases,
     AccountsManagementReadService,
+    PartnersReadService,
     {
       provide: UserProviders.IUserRepository,
       useClass: UserRepository,
@@ -28,6 +31,11 @@ import { AccountsManagementReadService } from './accounts-management.read-servic
       useClass: FacebookProvider,
     },
   ],
-  controllers: [AuthController, UsersController, AccountsController],
+  controllers: [
+    AuthController,
+    UsersController,
+    AccountsController,
+    PartnersController,
+  ],
 })
 export class AccountsManagementModule {}

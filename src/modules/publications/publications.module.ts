@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { PartnersController } from '../accounts-management/partners/partners.controller';
-import { PartnersReadService } from '../accounts-management/partners/partners.read-service';
 import { CollectionsController } from './collections/collections.controller';
 import { CollectionsReadService } from './collections/collections.read-service';
-import { EventsController } from './events/events.controller';
+import {
+  EventsController,
+  PartnerEventsController,
+} from './events/events.controller';
 import { EventsReadService } from './events/events.read-service';
 import { PublicationsController } from './publications.controller';
 import { PublicationsReadService } from './publications.read-service';
@@ -13,13 +14,12 @@ import { PublicationsReadService } from './publications.read-service';
     EventsReadService,
     PublicationsReadService,
     CollectionsReadService,
-    PartnersReadService,
   ],
   controllers: [
     EventsController,
     PublicationsController,
     CollectionsController,
-    PartnersController,
+    PartnerEventsController,
   ],
 })
 export class PublicationsModule {}

@@ -102,6 +102,117 @@ export class EventsReadService {
     );
   }
 
+  async getEventsByPartner(
+    partnerId: string,
+    userId: string,
+    skip: number,
+    limit: number,
+  ): Promise<PaginatedFindResult<EventDetails>> {
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<EventDetails>(
+        QuerySpecification.withStatement(
+          `
+				MATCH (pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
+				(e)-[:HAS_CATEGORY]->(cat:Category),
+				(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
+				WHERE p.id = $pId
+				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
+				OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
+				MATCH (me:User)
+				WHERE me.id = $meId
+				OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
+				OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
+				OPTIONAL MATCH (u:User)-[:LIKE]->(e)
+				WITH {
+					id:o.id,
+					dateTimeInit:o.dateTimeInit,
+					dateTimeEnd:o.dateTimeEnd,
+					tickets:collect(t { .id, .price, .name, .amount, .description})
+				} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
+				with distinct {
+					id:e.id,
+					name:e.name,
+					occurrences:collect(occ),
+					info:e.description,
+					publisher:{
+						id:p.id,
+						avatar:p.avatar,
+						username:p.username,
+						businessName:p.businessName,
+						IFollowThis: rfollow IS NOT null
+					},
+					category:{
+						name:cat.name,
+						id:cat.id
+					},
+					place:{
+						name:pl.name,
+						address:pl.address,
+						longitude:apoc.number.parseFloat(pl.longitude),
+						latitude:apoc.number.parseFloat(pl.latitude)
+					},
+					collaborators: coll,
+					multimedia:e.multimedia,
+					attentionTags: tags,
+					amIInterested: rlike IS NOT null,
+					totalUsersInterested: usersInterested
+				} as eventInfo, me, e
+				CALL {
+					WITH e,me
+					OPTIONAL MATCH (me)-[:FRIEND]-(f:User)-[:LIKE]->(e)
+					RETURN f limit 3
+				}
+				WITH apoc.map.merge(eventInfo, {friends:collect( distinct f{.username, .avatar})}) as events 
+				RETURN events ORDER BY events.id
+				SKIP $skip
+				LIMIT $limit
+				`,
+        )
+          .bind({
+            pId: partnerId,
+            meId: userId,
+            skip: Integer.fromInt(skip),
+            limit: Integer.fromInt(limit),
+          })
+          .map((r) => {
+            return {
+              ...r,
+              info: JSON.parse(r.info),
+              multimedia: JSON.parse(r.multimedia),
+              occurrences: r.occurrences.map(
+                (o: {
+                  dateTimeInit: DateTime<number>;
+                  dateTimeEnd: DateTime<number>;
+                }) => {
+                  return {
+                    ...o,
+                    dateTimeInit: parseDate(o.dateTimeInit),
+                    dateTimeEnd: parseDate(o.dateTimeEnd),
+                  };
+                },
+              ),
+            };
+          })
+          .transform(EventDetails),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(
+          `
+					MATCH (e:Event)<-[:PUBLISH_EVENT]-(p:Partner)
+					WHERE p.id = $pId
+					RETURN count(e)
+					`,
+        ).bind({ pId: partnerId }),
+      ),
+    ]);
+
+    return {
+      items,
+      total,
+      pageSize: items.length,
+      current: skip,
+    };
+  }
   async getEventsWithHashtag(
     hashtagWord: string,
     skip: number,
