@@ -73,6 +73,69 @@ export class FollowService
     };
   }
 
+  async getOutgoingsFromRemoteNode(
+    from: UniqueEntityID,
+    skip: number,
+    limit: number,
+    searchTerm = '',
+    me: UniqueEntityID,
+    onlyFollowees = false,
+  ): Promise<PaginatedFindResult<Followee>> {
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<Followee>(
+        QuerySpecification.withStatement(
+          `MATCH (me:User)
+					WHERE me.id = $meId
+					MATCH (u:User)-[r:FOLLOW]->(p:Partner)
+					WHERE u.id = $uId AND (p.username STARTS WITH $search OR p.businessName STARTS WITH $search) ${
+            onlyFollowees ? 'AND (me)-[:FOLLOW]-(p)' : ''
+          }
+
+				OPTIONAL MATCH (p)<-[:FOLLOW]-(o:User)
+
+				RETURN distinct {
+					id:p.id,
+					username:p.username,
+					email:p.email,
+					avatar:p.avatar,
+					businessName:p.businessName,
+					amountOfFollowers: count(distinct o)
+					}
+					SKIP $skip
+					LIMIT $limit
+				`,
+        ).bind({
+          uId: from.toString(),
+          meId: me.toString(),
+          search: searchTerm,
+          skip: Integer.fromInt(skip),
+          limit: Integer.fromInt(limit),
+        }),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(
+          `MATCH (me:User) WHERE me.id = $meId
+					MATCH (u:User)-[:FOLLOW]->(p:Partner)
+					WHERE u.id = $uId AND (p.username STARTS WITH $search OR p.businessName STARTS WITH $search) ${
+            onlyFollowees ? 'AND (me)-[:FOLLOW]-(p)' : ''
+          }
+					RETURN count(p)
+				`,
+        ).bind({
+          uId: from.toString(),
+          meId: me.toString(),
+          search: searchTerm,
+        }),
+      ),
+    ]);
+    return {
+      items,
+      total,
+      pageSize: items.length,
+      current: skip,
+    };
+  }
+
   async getIngoings({
     interaction,
     from,
