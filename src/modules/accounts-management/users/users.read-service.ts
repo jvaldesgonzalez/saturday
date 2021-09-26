@@ -33,7 +33,9 @@ export class UsersReadService {
 					location:l.id,
 					categoryPreferences:c,
 					friends:count(distinct friend),
-					following:count(distinct follow)
+					following:count(distinct follow),
+					description:u.description,
+					privacyStatus:u.privacyStatus
 			}
 			`,
       )
@@ -47,6 +49,8 @@ export class UsersReadService {
     );
   }
 
+  //FIXME: review privacy things, when im blocked the user is private for me, etc
+  //see startNode(relation) for edge direction
   async getProfile(meId: string, userId: string): Promise<UserProfile> {
     return await this.persistenceManager.maybeGetOne<UserProfile>(
       QuerySpecification.withStatement(
@@ -58,7 +62,9 @@ export class UsersReadService {
 			WITH u,l,collect(distinct c.id) as c,me
 			OPTIONAL match (u)-[:FRIEND]-(friend:User)
 			OPTIONAL match (u)-[:FOLLOW]->(follow:Partner)
-			OPTIONAL match (u)-[r]-(me)
+			OPTIONAL match (u)-[rfriend:FRIEND|FRIEND_REQUEST]-(me)
+			OPTIONAL match (u)<-[rblock:BLOCK]-(me)
+			OPTIONAL match (u)-[:FRIEND]-(common:User)-[:FRIEND]-(me)
 			RETURN {
 					id:u.id,
 					username:u.username,
@@ -68,7 +74,16 @@ export class UsersReadService {
 					categoryPreferences:c,
 					friends:count(distinct friend),
 					following:count(distinct follow),
-					friendshipStatus: CASE WHEN r is null THEN 'none' ELSE toLower(type(r)) END
+					description:u.description,
+					IBlockedThis:rblock is not null,
+					friendsInCommon:count(distinct common),
+					friendshipStatus: CASE WHEN rfriend is null THEN 'none' ELSE toLower(type(rfriend)) END,
+					isPrivate: CASE
+												WHEN u.privacyStatus = "private" THEN true
+												WHEN u.privacyStatus = "public" THEN false
+												WHEN (u)-[:FRIEND]-(me) THEN false
+												ELSE true
+										END
 			}
 			`,
       )
