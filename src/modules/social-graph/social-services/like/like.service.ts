@@ -109,7 +109,112 @@ export class LikeService
 				WHERE u.id = $uId
 				return count(e)
 				`,
-        ).bind({ uId: '777cc88c-2e3f-4eb4-ac81-14c9323c541d' }),
+        ).bind({ uId: from.toString() }),
+      ),
+    ]);
+    return {
+      items,
+      pageSize: items.length,
+      current: skip,
+      total,
+    };
+  }
+
+  async getOutgoinsFromRemoteNode(
+    from: UniqueEntityID,
+    skip: number,
+    limit: number,
+    me: UniqueEntityID,
+  ): Promise<PaginatedFindResult<EventDetails>> {
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<EventDetails>(
+        QuerySpecification.withStatement(
+          `
+					MATCH (me:User)
+					WHERE me.id = $meId
+
+					MATCH (from:User)
+					WHERE from.id = $fromId
+
+					MATCH (pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
+					(from)-[:LIKE]->(e),
+					(e)-[:HAS_CATEGORY]->(cat:Category),
+					(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
+					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
+					OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
+
+					OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
+					OPTIONAL MATCH (me)-[rlike:LIKE]->(e)
+					OPTIONAL MATCH (u:User)-[:LIKE]->(e)
+
+					WITH {
+						id:o.id,
+						dateTimeInit:o.dateTimeInit,
+						dateTimeEnd:o.dateTimeEnd,
+						tickets:collect(t { .id, .price, .name, .amount, .description})
+					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rfollow,rlike, rlike.createdAt as likedAt
+					with {
+						id:e.id,
+						name:e.name,
+						occurrences:collect(occ),
+						info:e.description,
+						publisher:{
+							id:p.id,
+							avatar:p.avatar,
+							username:p.username,
+							IFollowThis: rfollow IS NOT null
+						},
+						category:{
+							name:cat.name,
+							id:cat.id
+						},
+						place:{
+							name:pl.name,
+							address:pl.address,
+							longitude:apoc.number.parseFloat(pl.longitude),
+							latitude:apoc.number.parseFloat(pl.latitude)
+						},
+						collaborators: coll,
+						multimedia:e.multimedia,
+						attentionTags: tags,
+						amIInterested:rlike IS NOT null,
+						totalUsersInterested:usersInterested
+					} as events,likedAt
+					ORDER BY likedAt DESC
+					SKIP $skip
+					LIMIT $limit
+					RETURN events
+				`,
+        )
+          .bind({
+            fromId: from.toString(),
+            meId: me.toString(),
+            limit: Integer.fromInt(limit),
+            skip: Integer.fromInt(skip),
+          })
+          .map((r) => {
+            return {
+              ...r,
+              info: JSON.parse(r.info),
+              multimedia: JSON.parse(r.multimedia),
+              occurrences: r.occurrences.map((o) => {
+                return {
+                  ...o,
+                  dateTimeInit: parseDate(o.dateTimeInit),
+                  dateTimeEnd: parseDate(o.dateTimeEnd),
+                };
+              }),
+            };
+          }),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(
+          `
+				MATCH (u:User)-[like:LIKE]->(e:Event)
+				WHERE u.id = $uId
+				return count(e)
+				`,
+        ).bind({ uId: from.toString() }),
       ),
     ]);
     return {

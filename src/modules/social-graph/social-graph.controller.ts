@@ -14,6 +14,8 @@ import {
 } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import { BlockInteraction } from './social-services/block/block.interaction';
+import { BlockService } from './social-services/block/block.service';
 import {
   FollowBody,
   FollowInteraction,
@@ -52,6 +54,7 @@ export class SocialGraphController {
     private friend: FriendService,
     private viewStory: ViewStoryService,
     private share: ShareService,
+    private block: BlockService,
   ) {}
 
   @Post('/add-to-favorites')
@@ -146,6 +149,19 @@ export class SocialGraphController {
     );
   }
 
+  @Post('/block')
+  async blockUser(@Body() data: FriendRequestBody) {
+    const interaction = new BlockInteraction(new UniqueEntityID(data.userId));
+    if (!(await this.block.isPosible(interaction)))
+      throw new ConflictException(
+        'Cant create block interaction with this params',
+      );
+    await this.block.save(
+      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      interaction,
+    );
+  }
+
   @Post('/remove-from-favorites')
   async undoLike(@Body() data: LikeBody) {
     const interaction = new LikeInteraction(new UniqueEntityID(data.eventId));
@@ -183,6 +199,15 @@ export class SocialGraphController {
       new UniqueEntityID(data.userId),
     );
     await this.friend.drop(
+      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      interaction,
+    );
+  }
+
+  @Post('/unblock')
+  async unblockUser(@Body() data: FriendRequestBody) {
+    const interaction = new BlockInteraction(new UniqueEntityID(data.userId));
+    await this.block.drop(
       new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
       interaction,
     );
@@ -264,8 +289,32 @@ export class UsersGraphController {
     );
   }
 
+  //TODO: add is_private filter
+  @Get('/:userId/favorites')
+  @ApiQuery({ name: 'take', type: Number })
+  @ApiQuery({ name: 'skip', type: Number })
+  @ApiParam({ name: 'userId', type: String })
+  async getLikedByOther(
+    @Query('skip', ParseIntPipe) skip: number,
+    @Query('take', ParseIntPipe) limit: number,
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ) {
+    return this.like.getOutgoinsFromRemoteNode(
+      new UniqueEntityID(userId),
+      skip,
+      limit,
+      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+    );
+  }
+}
+
+@ApiTags('events')
+@Controller('events')
+export class EventsGraphController {
+  constructor(private like: LikeService) {}
+
   //Users who like an event
-  @Get('/favorites/:eventId')
+  @Get('/:eventId/interested-users')
   @ApiQuery({ name: 'take', type: Number })
   @ApiQuery({ name: 'skip', type: Number })
   @ApiQuery({ name: 'only_friends', type: Boolean, allowEmptyValue: true })

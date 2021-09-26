@@ -4,4 +4,5 @@ export enum InteractionType {
   Friend = 'friend',
   Follow = 'follow',
   ViewStory = 'view-story',
+  Block = 'block',
 }
