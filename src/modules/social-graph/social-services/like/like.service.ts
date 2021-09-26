@@ -135,7 +135,6 @@ export class LikeService
     searchTerm: string;
     onlyFriends: boolean;
   }): Promise<PaginatedFindResult<UserInteractor>> {
-    console.log({ onlyFriends });
     const [items, total] = await Promise.all([
       this.persistenceManager.query<UserInteractor>(
         QuerySpecification.withStatement(

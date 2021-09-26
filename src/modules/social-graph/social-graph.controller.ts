@@ -7,6 +7,7 @@ import {
   Param,
   ParseBoolPipe,
   ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Put,
   Query,
@@ -263,6 +264,7 @@ export class UsersGraphController {
     );
   }
 
+  //Users who like an event
   @Get('/favorites/:eventId')
   @ApiQuery({ name: 'take', type: Number })
   @ApiQuery({ name: 'skip', type: Number })
@@ -283,6 +285,34 @@ export class UsersGraphController {
       onlyFriends,
       searchTerm,
       interaction: new LikeInteraction(new UniqueEntityID(eventId)),
+    });
+  }
+}
+
+@ApiTags('partners')
+@Controller('partners')
+export class PartnersGraphController {
+  constructor(private follow: FollowService) {}
+
+  @Get('/:partnerId/followers')
+  @ApiQuery({ name: 'q', allowEmptyValue: true })
+  @ApiQuery({ name: 'take', type: Number })
+  @ApiQuery({ name: 'only_friends', type: Boolean, allowEmptyValue: true })
+  @ApiQuery({ name: 'skip', type: Number })
+  async getFolloweesOfUser(
+    @Query('q') searchTerm = '',
+    @Query('skip', ParseIntPipe) skip: number,
+    @Query('take', ParseIntPipe) limit: number,
+    @Query('only_friends', ParseBoolPipe) onlyFriends = false,
+    @Param('partnerId', ParseUUIDPipe) partnerId: string,
+  ) {
+    return this.follow.getIngoings({
+      from: new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      skip,
+      limit,
+      onlyFriends,
+      searchTerm,
+      interaction: new FollowInteraction(new UniqueEntityID(partnerId)),
     });
   }
 }
