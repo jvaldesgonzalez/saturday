@@ -24,9 +24,17 @@ export class PartnersReadService {
 				OPTIONAL MATCH (u:User)-[:FOLLOW]->(p)
 				OPTIONAL MATCH (p)-[:PUBLISH_EVENT]->(e:Event)
 				WITH count(distinct u) as followers, p, count(e) as events
-				OPTIONAL MATCH (p)-[r:FOLLOW]-(me)
+				MATCH (me:User)
 				WHERE me.id = $meId
+
+				OPTIONAL MATCH (p)-[r:FOLLOW]-(me)
 				OPTIONAL MATCH (p)-[:HAS_PLACE]-(place:Place)
+				OPTIONAL MATCH (me)-[:FRIEND]-(friend:User)-[:FOLLOW]->(p)
+				CALL {
+					with me,p
+					optional match (me)-[:FRIEND]-(f:User)-[:FOLLOW]->(p)
+					return f limit 3
+				}
 				RETURN distinct {
 						id:p.id,
 						username:p.username,
@@ -37,12 +45,15 @@ export class PartnersReadService {
 						amountOfFollowers:followers,
 						IFollowThis: r IS NOT null,
 						events:events,
+						totalFriendsWhoFollowThis: count(distinct friend),
+						friends:collect(distinct f{.username, .avatar}),
 						place:place {.name, .address, .latitude, .longitude}
 				}
 				`,
       )
         .bind({ pId: partnerId, meId: userRequesterId })
         .map((r) => {
+          console.log(r);
           r.aditionalBusinessData = JSON.parse(r.aditionalBusinessData);
           if (r.place === null || r.place === undefined) {
             delete r.place;

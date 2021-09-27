@@ -37,4 +37,6 @@ export class PartnerProfile extends AccountProfile {
   totalFriendsWhoFollowThis: number;
   @ApiResponseProperty()
   IFollowThis: boolean;
+  @ApiResponseProperty({ type: [FriendFollowersPreview] })
+  friends: [FriendFollowersPreview];
 }

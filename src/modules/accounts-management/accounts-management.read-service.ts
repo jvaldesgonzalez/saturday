@@ -61,6 +61,12 @@ export class AccountsManagementReadService {
 					WHERE me.id = $meId
 					OPTIONAL MATCH (item)-[r:FOLLOW]-(me)
 					OPTIONAL MATCH (item)-[:HAS_PLACE]-(place:Place)
+					OPTIONAL MATCH (me)-[:FRIEND]-(friend:User)-[:FOLLOW]->(item)
+					CALL {
+						with me,item
+						optional match (me)-[:FRIEND]-(f:User)-[:FOLLOW]->(item)
+						return f limit 3
+					}
 					RETURN distinct {
 							type:"partner",
 							id:item.id,
@@ -72,6 +78,8 @@ export class AccountsManagementReadService {
 							followers:followers,
 							IFollowThis: r IS NOT null,
 							events:events,
+							totalFriendsWhoFollowThis: count(distinct friend),
+							friends:collect(distinct f{.username, .avatar}),
 							place:place {.name, .address, .latitude, .longitude}
 					} as result
 				',{item:acc,meId:$meId}) YIELD value
