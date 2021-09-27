@@ -80,6 +80,7 @@ export class AccountsManagementReadService {
 							events:events,
 							totalFriendsWhoFollowThis: count(distinct friend),
 							friends:collect(distinct f{.username, .avatar}),
+							contactInfo:item.contactInfo,
 							place:place {.name, .address, .latitude, .longitude}
 					} as result
 				',{item:acc,meId:$meId}) YIELD value
@@ -90,6 +91,7 @@ export class AccountsManagementReadService {
         .map((r) => {
           if (r.type === 'user') return r;
           r.aditionalBusinessData = JSON.parse(r.aditionalBusinessData);
+          r.contactInfo = JSON.parse(r.contactInfo);
           if (r.place === null || r.place === undefined) {
             delete r.place;
             return r;

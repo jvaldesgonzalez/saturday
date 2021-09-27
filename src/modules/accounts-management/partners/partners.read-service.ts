@@ -47,14 +47,15 @@ export class PartnersReadService {
 						events:events,
 						totalFriendsWhoFollowThis: count(distinct friend),
 						friends:collect(distinct f{.username, .avatar}),
+						contactInfo:p.contactInfo,
 						place:place {.name, .address, .latitude, .longitude}
 				}
 				`,
       )
         .bind({ pId: partnerId, meId: userRequesterId })
         .map((r) => {
-          console.log(r);
           r.aditionalBusinessData = JSON.parse(r.aditionalBusinessData);
+          r.contactInfo = JSON.parse(r.contactInfo);
           if (r.place === null || r.place === undefined) {
             delete r.place;
             return r;
