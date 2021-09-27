@@ -80,6 +80,7 @@ export class AccountsManagementReadService {
       )
         .bind({ meId: meId, username: username })
         .map((r) => {
+          if (r.type === 'user') return r;
           r.aditionalBusinessData = JSON.parse(r.aditionalBusinessData);
           if (r.place === null || r.place === undefined) {
             delete r.place;
