@@ -50,7 +50,7 @@ export class EventsController {
 export class PartnerEventsController {
   constructor(private readService: EventsReadService) {}
 
-  @Get('/:partnerId/events/')
+  @Get('/:partnerId/publications/')
   @ApiParam({ name: 'partnerId', type: String })
   @ApiQuery({ name: 'skip', type: Number })
   @ApiQuery({ name: 'take', type: Number })
