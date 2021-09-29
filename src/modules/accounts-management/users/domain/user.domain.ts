@@ -1,4 +1,3 @@
-import { AppError } from 'src/shared/core/errors/AppError';
 import { Fail, Ok, Result } from 'src/shared/core/Result';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import {

@@ -60,8 +60,8 @@ export class PartnersReadService {
             delete r.place;
             return r;
           }
-          r.place.latitude = parseFloat(r.place.latitude);
-          r.place.longitude = parseFloat(r.place.longitude);
+          r.place.latitude = r.place.latitude;
+          r.place.longitude = r.place.longitude;
           return r;
         }),
     );

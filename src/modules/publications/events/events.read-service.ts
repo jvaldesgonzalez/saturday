@@ -60,8 +60,8 @@ export class EventsReadService {
 					place:{
 						name:pl.name,
 						address:pl.address,
-						longitude:apoc.number.parseFloat(pl.longitude),
-						latitude:apoc.number.parseFloat(pl.latitude)
+						longitude:(pl.longitude),
+						latitude:(pl.latitude)
 					},
 					collaborators: coll,
 					multimedia:e.multimedia,
@@ -148,8 +148,8 @@ export class EventsReadService {
 					place:{
 						name:pl.name,
 						address:pl.address,
-						longitude:apoc.number.parseFloat(pl.longitude),
-						latitude:apoc.number.parseFloat(pl.latitude)
+						longitude:(pl.longitude),
+						latitude:(pl.latitude)
 					},
 					collaborators: coll,
 					multimedia:e.multimedia,
@@ -266,8 +266,8 @@ export class EventsReadService {
 						place:{
 							name:pl.name,
 							address:pl.address,
-							longitude:apoc.number.parseFloat(pl.longitude),
-							latitude:apoc.number.parseFloat(pl.latitude)
+							longitude:(pl.longitude),
+							latitude:(pl.latitude)
 						},
 						collaborators: coll,
 						multimedia:e.multimedia,

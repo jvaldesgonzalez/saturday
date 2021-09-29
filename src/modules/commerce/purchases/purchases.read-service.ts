@@ -80,8 +80,8 @@ export class PurchasesReadService {
                 multimedia: JSON.parse(r.event.multimedia)[0],
                 place: {
                   ...r.event.place,
-                  latitude: parseFloat(r.event.place.latitude),
-                  longitude: parseFloat(r.event.place.longitude),
+                  latitude: r.event.place.latitude,
+                  longitude: r.event.place.longitude,
                 },
               },
             };
@@ -163,8 +163,8 @@ export class PurchasesReadService {
               multimedia: JSON.parse(r.event.multimedia)[0],
               place: {
                 ...r.event.place,
-                latitude: parseFloat(r.event.place.latitude),
-                longitude: parseFloat(r.event.place.longitude),
+                latitude: r.event.place.latitude,
+                longitude: r.event.place.longitude,
               },
             },
           };

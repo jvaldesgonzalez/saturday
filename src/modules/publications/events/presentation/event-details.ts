@@ -6,9 +6,9 @@ class PlaceDetails {
   @ApiResponseProperty()
   address: string;
   @ApiResponseProperty()
-  longitude: string;
+  longitude: number;
   @ApiResponseProperty()
-  latitude: string;
+  latitude: number;
   @ApiResponseProperty()
   hostRef?: string;
 }
