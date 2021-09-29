@@ -9,6 +9,7 @@ import { SearchEngineModule } from './modules/search-engine/search-service.modul
 import { SocialGraphModule } from './modules/social-graph/social-graph.module';
 import { RecommenderModule } from './modules/recommender/recommender.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { GeolocationModule } from './modules/geolocation/geolocation.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     SocialGraphModule,
     RecommenderModule,
     NotificationsModule,
+    GeolocationModule,
   ],
 })
 export class AppModule {}
