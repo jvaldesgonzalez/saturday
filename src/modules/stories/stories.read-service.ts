@@ -50,8 +50,8 @@ export class StoriesReadService {
     );
 
     items.sort((_a, b) => {
-      if (b.stories.some((story) => story.viewed)) return +1;
-      return -1;
+      if (b.stories.some((story) => story.viewed)) return -1;
+      return +1;
     });
 
     return {

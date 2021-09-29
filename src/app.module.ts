@@ -8,6 +8,7 @@ import { CommerceModule } from './modules/commerce/commerce.module';
 import { SearchEngineModule } from './modules/search-engine/search-service.module';
 import { SocialGraphModule } from './modules/social-graph/social-graph.module';
 import { RecommenderModule } from './modules/recommender/recommender.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RecommenderModule } from './modules/recommender/recommender.module';
     SearchEngineModule,
     SocialGraphModule,
     RecommenderModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}
