@@ -29,7 +29,8 @@ export class HashtagSearchService implements ISearchService<HashtagItem> {
     >(
       QuerySpecification.withStatement(
         `
-				CALL db.index.fulltext.queryNodes('hashtags','${q.processedQuery}') yield node, score
+				CALL db.index.fulltext.queryNodes('search_engine','${q.processedQuery}') yield node, score
+				WHERE node:Hashtag
 				RETURN {
     			data: {
 						word:node.word,
@@ -45,7 +46,8 @@ export class HashtagSearchService implements ISearchService<HashtagItem> {
     );
     const total = await this.persistenceManager.getOne<number>(
       QuerySpecification.withStatement(`
-				CALL db.index.fulltext.queryNodes('hashtags','${q.processedQuery}') yield node, score
+				CALL db.index.fulltext.queryNodes('search_engine','${q.processedQuery}') yield node, score
+				WHERE node:Hashtag
 				RETURN count(node)
 				`),
     );

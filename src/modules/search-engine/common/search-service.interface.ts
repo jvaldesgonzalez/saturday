@@ -7,5 +7,6 @@ export interface ISearchService<TItem> {
     skip: number,
     limit: number,
     requesterId?: string,
+    ...more: any
   ): Promise<ISearchResult<TItem>>;
 }

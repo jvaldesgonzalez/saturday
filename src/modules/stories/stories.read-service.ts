@@ -20,6 +20,7 @@ export class StoriesReadService {
         `
 				MATCH (n:Partner)--(s:Story)
 				WITH n,s
+				ORDER BY s.createdAt DESC
 				OPTIONAL MATCH (u:User {username:"yansarorodriguezpaez"})--(s)
 				WITH collect(apoc.map.merge(s {.type, .url, .id, .createdAt, .attachedText},{viewed:u.username})) as stories, n
 				RETURN {
@@ -29,7 +30,7 @@ export class StoriesReadService {
 						avatar:n.avatar
 					},
 					stories:stories
-			}
+			} as result
 			`,
       )
         .map((r) => {
@@ -49,10 +50,7 @@ export class StoriesReadService {
         .transform(Stories),
     );
 
-    items.sort((_a, b) => {
-      if (b.stories.some((story) => story.viewed)) return -1;
-      return +1;
-    });
+    items.sort((_a, b) => (b.stories.every((story) => story.viewed) ? -1 : +1));
 
     return {
       items,

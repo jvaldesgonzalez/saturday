@@ -1,0 +1,89 @@
+import {
+  InjectPersistenceManager,
+  PersistenceManager,
+  QuerySpecification,
+} from '@liberation-data/drivine';
+import { Injectable } from '@nestjs/common';
+import { Integer, DateTime } from 'neo4j-driver-core';
+import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  ISearchResult,
+  ISearchResultItem,
+} from '../../common/search-result.interface';
+import { ISearchService } from '../../common/search-service.interface';
+import { EventItem } from '../../search-results/event.search-result';
+import { EventQuery } from './events.query';
+
+@Injectable()
+export class EventSearchService implements ISearchService<EventItem> {
+  constructor(
+    @InjectPersistenceManager() private persistenceManager: PersistenceManager,
+  ) {}
+
+  async search(
+    q: EventQuery,
+    skip: number,
+    limit: number,
+    requesterId: string,
+    dateInterval?: { from: Date; to: Date },
+    categories?: string[],
+  ): Promise<ISearchResult<EventItem>> {
+    const items = await this.persistenceManager.query<
+      ISearchResultItem<EventItem>
+    >(
+      QuerySpecification.withStatement(
+        `
+				CALL db.index.fulltext.queryNodes('search_engine','${
+          q.processedQuery
+        }') yield node, score
+				WHERE node:Event
+				MATCH (place:Place)--(node)-[:PUBLISH_EVENT]-(publisher:Partner),
+				(c:Category)--(node)--(o:EventOccurrence)
+				WHERE o.dateTimeInit >= $fromDate AND o.dateTimeEnd <= $toDate ${
+          categories.some((i) => i) ? 'AND c.id IN $categories' : ''
+        }
+				RETURN {
+    			data: {
+						publisher: publisher{.id, .avatar, .username},
+						type:"event",
+						name:node.name,
+						multimedia: node.multimedia,
+						place: place {.name, .address},
+						dateTimeInit:collect(o.dateTimeInit)[0],
+						dateTimeEnd:collect(o.dateTimeEnd)[0]
+					},
+    			score:score
+				}
+				SKIP $skip
+				LIMIT $limit
+			`,
+      )
+        .bind({
+          limit: Integer.fromInt(limit),
+          skip: Integer.fromInt(skip),
+          categories,
+          fromDate: DateTime.fromStandardDate(dateInterval.from),
+          toDate: DateTime.fromStandardDate(dateInterval.to),
+        })
+        .map((r) => {
+          r.data.multimedia = JSON.parse(r.data.multimedia);
+          r.data.dateTimeEnd = parseDate(r.data.dateTimeInit);
+          r.data.dateTimeInit = parseDate(r.data.dateTimeEnd);
+          return r;
+        }),
+    );
+    const total = await this.persistenceManager.getOne<number>(
+      QuerySpecification.withStatement(`
+				CALL db.index.fulltext.queryNodes('search_engine','${q.processedQuery}') yield node, score
+				WHERE node:Event
+				RETURN count(node)
+				`),
+    );
+    return {
+      items,
+      total,
+      pageSize: items.length,
+      current: skip,
+    };
+  }
+}

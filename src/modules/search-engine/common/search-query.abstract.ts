@@ -1,8 +1,14 @@
-export abstract class Query {
+export class Query {
   protected raw: string;
   constructor(raw: string) {
     this.raw = raw;
   }
 
-  abstract get processedQuery(): string;
+  get processedQuery(): string {
+    return this.raw;
+  }
+}
+
+export function GetCombinedProcessed(...queries: Query[]): Query {
+  return new Query(queries.map((q) => q.processedQuery).join(' OR '));
 }

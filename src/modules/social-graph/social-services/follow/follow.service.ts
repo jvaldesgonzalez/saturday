@@ -162,11 +162,15 @@ export class FollowService
           }
 					AND ( toLower(u.username) STARTS WITH toLower($search) OR toLower(u.fullname) CONTAINS toLower($search) )
 					OPTIONAL MATCH (u)-[:FRIEND]-(common:User)-[:FRIEND]-(me)
-					OPTIONAL MATCH (u)-[r]-(me)
-					WITH u, count(common) as commonFriends,r
+					OPTIONAL MATCH (u)-[rfriend:FRIEND|FRIEND_REQUEST]-(me)
+					WITH u, count(common) as commonFriends,rfriend,me
 					RETURN {
 						username:u.username,
-						friendshipStatus:CASE WHEN r is null THEN "none" ELSE toLower(type(r)) END,
+						friendshipStatus: CASE
+														WHEN rfriend is null THEN 'none' 
+														WHEN toLower(type(rfriend)) = 'friend' THEN 'friend' 
+														WHEN startNode(rfriend)=me THEN 'requested'
+														ELSE 'friend_request' END,
 						id:u.id,
 						fullname:u.fullname,
 						friendsInCommon:commonFriends,

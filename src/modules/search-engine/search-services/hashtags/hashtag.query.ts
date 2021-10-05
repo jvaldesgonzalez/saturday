@@ -14,7 +14,7 @@ export class HashtagQuery extends Query {
   }
 
   private fuzzyOrPrefix(s: string): string {
-    return `word: ${s}~ OR ${s}*`;
+    return `word: ${s}~ OR word: ${s}*`;
   }
 
   private removeSharpCharacter(s: string) {

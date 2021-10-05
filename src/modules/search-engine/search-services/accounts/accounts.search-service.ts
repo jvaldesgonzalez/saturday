@@ -29,12 +29,17 @@ export class AccountSearchService implements ISearchService<AccountItem> {
       this.persistenceManager.query<ISearchResultItem<AccountItem>>(
         QuerySpecification.withStatement(
           `
-				CALL db.index.fulltext.queryNodes('accounts','${q.processedQuery}') yield node,score
+				CALL db.index.fulltext.queryNodes('search_engine','${q.processedQuery}') yield node,score
+				WHERE node:Account
 				CALL apoc.when(node:User,
-				'optional match (a)-[r]-(u:User) 
+				'optional match (a)-[rfriend:FRIEND|FRIEND_REQUEST]-(u:User) 
 				where u.id = uId 
 				return a{.fullname, .username, .id, .avatar, type:"user",
-					friendshipStatus: toLower(type(r)),
+					friendshipStatus:CASE
+														WHEN rfriend is null THEN "none" 
+														WHEN toLower(type(rfriend)) = "friend" THEN "friend" 
+														WHEN startNode(rfriend)=u THEN "requested"
+														ELSE "friend_request" END,
 					privacy:"public"
 				} as result',
 				'optional match (a)-[r:FOLLOW]-(u:User) 
@@ -63,7 +68,8 @@ export class AccountSearchService implements ISearchService<AccountItem> {
       ),
       this.persistenceManager.getOne<number>(
         QuerySpecification.withStatement(`
-				CALL db.index.fulltext.queryNodes('accounts','${q.processedQuery}') yield node, score
+				CALL db.index.fulltext.queryNodes('search_engine','${q.processedQuery}') yield node, score
+				WHERE node:Account
 				RETURN count(node)
 				`),
       ),

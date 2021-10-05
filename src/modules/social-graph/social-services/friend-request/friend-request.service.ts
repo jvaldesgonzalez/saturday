@@ -82,7 +82,8 @@ export class FriendRequestService
       QuerySpecification.withStatement(
         `MATCH (u:User),(f:User)
 				WHERE u.id = $uId AND f.id = $fId
-				MERGE (u)-[:FRIEND_REQUEST]->(f)`,
+				MERGE (u)-[r:FRIEND_REQUEST]->(f)
+				SET r.createdAt = datetime()`,
       ).bind({ uId: from.toString(), fId: interaction.to.toString() }),
     );
   }

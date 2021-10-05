@@ -77,7 +77,11 @@ export class UsersReadService {
 					description:u.description,
 					IBlockedThis:rblock is not null,
 					friendsInCommon:count(distinct common),
-					friendshipStatus: CASE WHEN rfriend is null THEN 'none' ELSE toLower(type(rfriend)) END,
+					friendshipStatus: CASE
+														WHEN rfriend is null THEN 'none' 
+														WHEN toLower(type(rfriend)) = 'friend' THEN 'friend' 
+														WHEN startNode(rfriend)=me THEN 'requested'
+														ELSE 'friend_request' END,
 					isPrivate: CASE
 												WHEN u.privacyStatus = "private" THEN true
 												WHEN u.privacyStatus = "public" THEN false
