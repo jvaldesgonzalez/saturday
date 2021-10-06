@@ -12,7 +12,6 @@ import {
   ISearchResultItem,
 } from '../../common/search-result.interface';
 import { ISearchService } from '../../common/search-service.interface';
-import { AccountItem } from '../../search-results/account.search-result';
 import { GeneralSearchItem } from '../../search-results/general.search-result';
 
 @Injectable()
