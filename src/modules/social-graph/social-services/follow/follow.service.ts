@@ -223,7 +223,8 @@ export class FollowService
       QuerySpecification.withStatement(
         `MATCH (u:User),(p:Partner)
 				WHERE u.id = $uId AND p.id = $pId
-				MERGE (u)-[:FOLLOW createdAt: datetime()]->(p)`,
+				MERGE (u)-[r:FOLLOW]->(p)
+				SET r.createdAt = datetime()`,
       ).bind({ uId: from.toString(), pId: interaction.to.toString() }),
     );
   }

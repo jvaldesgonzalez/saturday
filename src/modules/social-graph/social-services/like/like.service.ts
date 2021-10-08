@@ -312,7 +312,8 @@ export class LikeService
       QuerySpecification.withStatement(
         `MATCH (u:User),(e:Event)
 				WHERE u.id = $uId AND e.id = $eId
-				MERGE (u)-[:LIKE {likedAt: datetime()}]->(e)`,
+				MERGE (u)-[r:LIKE]->(e)
+				SET r.createdAt = datetime()`,
       ).bind({ uId: from.toString(), eId: interaction.to.toString() }),
     );
   }

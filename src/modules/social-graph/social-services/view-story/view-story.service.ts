@@ -24,7 +24,8 @@ export class ViewStoryService
       QuerySpecification.withStatement(
         `MATCH (u:User),(s:Story)
 				WHERE u.id = $uId AND s.id = $sId
-				MERGE (u)-[:VIEW]->(s)`,
+				MERGE (u)-[r:VIEW]->(s)
+				SET r.createdAt = datetime()`,
       ).bind({ uId: from.toString(), sId: interaction.to.toString() }),
     );
   }
