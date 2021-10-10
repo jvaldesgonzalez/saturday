@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { Integer } from 'neo4j-driver-core';
 import { EventDetails } from 'src/modules/publications/events/presentation/event-details';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
+import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { SimilarAccount } from './entities/account.entity';
 
 @Injectable()
@@ -120,7 +121,10 @@ export class SimilarityReadService {
 						multimedia:e.multimedia,
 						attentionTags: tags,
 						amIInterested: rlike IS NOT null,
-						totalUsersInterested: usersInterested
+						totalUsersInterested: usersInterested,
+						dateTimeInit:e.dateTimeInit,
+						dateTimeEnd:e.dateTimeEnd,
+						basePrice:e.basePrice
 					} as eventInfo, me, e
 					CALL {
 						WITH e,me
@@ -139,6 +143,8 @@ export class SimilarityReadService {
           .map((r) => {
             return {
               ...r,
+              dateTimeInit: parseDate(r.dateTimeInit),
+              dateTimeEnd: parseDate(r.dateTimeEnd),
               info: JSON.parse(r.info),
               multimedia: JSON.parse(r.multimedia),
             };
