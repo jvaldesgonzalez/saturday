@@ -56,15 +56,17 @@ export class GeneralSearchService implements ISearchService<GeneralSearchItem> {
 							} as result',
 						node:Event,
 							'MATCH (place:Place)--(a)-[:PUBLISH_EVENT]-(publisher:Partner),
-							(c:Category)--(a)--(o:EventOccurrence)
+							(c:Category)--(a)
 							RETURN {
+									id:a.id,
 									publisher: publisher{.id, .avatar, .username},
 									type:"event",
 									name:a.name,
 									multimedia: a.multimedia,
 									place: place {.name, .address},
-									dateTimeInit:collect(o.dateTimeInit)[0],
-									dateTimeEnd:collect(o.dateTimeEnd)[0]
+									dateTimeInit:a.dateTimeInit,
+									dateTimeEnd:a.dateTimeEnd,
+									basePrice:a.basePrice
 							} as result'
 					],
 					'return null as result',

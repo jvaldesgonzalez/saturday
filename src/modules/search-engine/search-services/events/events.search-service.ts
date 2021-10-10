@@ -38,19 +38,21 @@ export class EventSearchService implements ISearchService<EventItem> {
         }') yield node, score
 				WHERE node:Event
 				MATCH (place:Place)--(node)-[:PUBLISH_EVENT]-(publisher:Partner),
-				(c:Category)--(node)--(o:EventOccurrence)
-				WHERE o.dateTimeInit >= $fromDate AND o.dateTimeEnd <= $toDate ${
+				(c:Category)--(node)
+				WHERE node.dateTimeInit >= $fromDate AND node.dateTimeEnd <= $toDate ${
           categories.some((i) => i) ? 'AND c.id IN $categories' : ''
         }
 				RETURN {
     			data: {
+						id: node.id,
 						publisher: publisher{.id, .avatar, .username},
 						type:"event",
 						name:node.name,
 						multimedia: node.multimedia,
 						place: place {.name, .address},
-						dateTimeInit:collect(o.dateTimeInit)[0],
-						dateTimeEnd:collect(o.dateTimeEnd)[0]
+						dateTimeInit:node.dateTimeInit,
+						dateTimeEnd:node.dateTimeEnd,
+						basePrice:node.basePrice
 					},
     			score:score
 				}
@@ -67,8 +69,8 @@ export class EventSearchService implements ISearchService<EventItem> {
         })
         .map((r) => {
           r.data.multimedia = JSON.parse(r.data.multimedia);
-          r.data.dateTimeEnd = parseDate(r.data.dateTimeInit);
-          r.data.dateTimeInit = parseDate(r.data.dateTimeEnd);
+          r.data.dateTimeEnd = parseDate(r.data.dateTimeEnd);
+          r.data.dateTimeInit = parseDate(r.data.dateTimeInit);
           return r;
         }),
     );

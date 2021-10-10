@@ -68,7 +68,10 @@ export class PublicationsReadService {
 						multimedia:e.multimedia,
 						attentionTags: tags,
 						amIInterested: rlike IS NOT null,
-						totalUsersInterested: usersInterested
+						totalUsersInterested: usersInterested,
+						dateTimeInit:e.dateTimeInit,
+						dateTimeEnd:e.dateTimeEnd,
+						basePrice:e.basePrice
 					} as eventInfo, me, e
 					call {
 						WITH e,me
@@ -153,6 +156,8 @@ export class PublicationsReadService {
                 ...r,
                 info: JSON.parse(r.info),
                 multimedia: JSON.parse(r.multimedia),
+                dateTimeInit: parseDate(r.dateTimeInit),
+                dateTimeEnd: parseDate(r.dateTimeEnd),
                 occurrences: r.occurrences.map((o) => {
                   return {
                     ...o,
