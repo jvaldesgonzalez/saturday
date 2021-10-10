@@ -8,6 +8,7 @@ import { Integer } from 'neo4j-driver-core';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import { SocialGraphNode } from '../../common/social-graph-node.entity';
 import { ISocialGraphService } from '../../common/social-graph.service.interface';
 import {
   FriendRequestInteraction,
@@ -102,16 +103,19 @@ export class FriendRequestService
     );
   }
 
-  async isPosible(interaction: FriendRequestInteraction): Promise<boolean> {
+  async isPosible(
+    interaction: FriendRequestInteraction,
+    from: SocialGraphNode,
+  ): Promise<boolean> {
     return await this.persistenceManager.getOne<boolean>(
       QuerySpecification.withStatement(
         `
-				OPTIONAL MATCH (n:User)
-				WHERE n.id = $fId
-				CALL apoc.when(n is null,'return false as result','return true as result',{}) yield value
+				OPTIONAL MATCH (n:User)-[:FRIEND_REQUEST]-(sender:User)
+				WHERE n.id = $fId AND sender.id = $senderId
+				CALL apoc.when(n is not null,'return false as result','return true as result',{}) yield value
 				RETURN value.result
 			`,
-      ).bind({ fId: interaction.to.toString() }),
+      ).bind({ fId: interaction.to.toString(), senderId: from.toString() }),
     );
   }
 }

@@ -2,14 +2,12 @@ import {
   Body,
   ConflictException,
   Controller,
-  Delete,
   Get,
   Param,
   ParseBoolPipe,
   ParseIntPipe,
   ParseUUIDPipe,
   Post,
-  Put,
   Query,
 } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -106,7 +104,12 @@ export class SocialGraphController {
     const interaction = new FriendRequestInteraction(
       new UniqueEntityID(data.userId),
     );
-    if (!(await this.friendRequest.isPosible(interaction)))
+    if (
+      !(await this.friendRequest.isPosible(
+        interaction,
+        new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      ))
+    )
       throw new ConflictException(
         'Cant create friend-request interaction with this params',
       );
