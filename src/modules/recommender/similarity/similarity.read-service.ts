@@ -27,7 +27,7 @@ export class SimilarityReadService {
         QuerySpecification.withStatement(
           `
 				MATCH (u:User)-[simm:SIMILAR]-(acc:Account)
-				WHERE u.id = $accountId AND NOT (u)-[:FRIEND]-(acc) AND NOT (u)-[:FOLLOW]-(acc)
+				WHERE u.id = $accountId AND NOT (u)-[:FRIEND]-(acc) AND NOT (u)-[:FOLLOW]-(acc) AND NOT (u)-[:FRIEND_REQUEST]->(acc)
 				WITH acc as account, (4*simm.friendsMetric + 5*simm.eventsMetric + 1*simm.categoriesMetric + 2*simm.followeesMetric)/12 as metric,u
 				WHERE metric > $threshold
 				WITH account,metric,u
@@ -36,9 +36,25 @@ export class SimilarityReadService {
 				LIMIT $limit
 				call apoc.when(account:User,'
 					optional match (item)-[:FRIEND]-(common:User)-[:FRIEND]-(user)
-					return item {.username, .avatar, .id, friendsInCommon: count(distinct common), type:"user"} as result','
+					optional match (user)-[rfriend:FRIEND|FRIEND_REQUEST]-(item)
+					return item {
+						.username, 
+						.avatar, 
+						.id, 
+						friendsInCommon: count(distinct common), 
+						friendshipStatus: CASE
+															WHEN rfriend is null THEN "none" 
+															WHEN toLower(type(rfriend)) = "friend" THEN "friend" 
+															WHEN startNode(rfriend)=user THEN "requested"
+															ELSE "friend_request" END,
+						type:"user"} as result','
 					optional match (user:User)-[:FOLLOW]->(item)
-					return item {.username, .avatar, .id, followers:count(distinct user), type:"partner"} as result',
+					return item {
+						.username,
+						.avatar,
+						.id, 
+						followers:count(distinct user), 
+						type:"partner"} as result',
 					{item:account,user:u}) yield value
 				return value.result
 				`,
@@ -53,7 +69,7 @@ export class SimilarityReadService {
         QuerySpecification.withStatement(
           `
 					MATCH (u:User)-[simm:SIMILAR]-(acc:Account)
-					WHERE u.id = $accountId AND NOT (u)-[:FRIEND]-(acc) AND NOT (u)-[:FOLLOW]-(acc)
+					WHERE u.id = $accountId AND NOT (u)-[:FRIEND]-(acc) AND NOT (u)-[:FOLLOW]-(acc) AND NOT (u)-[:FRIEND_REQUEST]->(acc)
 					WITH acc as account, (4*simm.friendsMetric + 5*simm.eventsMetric + 1*simm.categoriesMetric + 2*simm.followeesMetric)/12 as metric,u
 					WHERE metric > $threshold
 					RETURN count(account)
