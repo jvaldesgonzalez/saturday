@@ -5,4 +5,5 @@ export enum InteractionType {
   Follow = 'follow',
   ViewStory = 'view-story',
   Block = 'block',
+  Share = 'share',
 }

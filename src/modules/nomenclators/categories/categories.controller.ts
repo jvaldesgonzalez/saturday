@@ -6,7 +6,6 @@ import {
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CategoryEntity } from './infrastructure/entities/category.entity';
-import * as _ from 'faker';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -27,7 +26,7 @@ export class CategoriesController {
       return {
         id: c.id,
         name: c.name,
-        imageUrl: _.image.nightlife(),
+        imageUrl: c.imageUrl,
       };
     });
   }

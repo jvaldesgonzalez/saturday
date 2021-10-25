@@ -2,10 +2,10 @@ import { InteractionType } from '../enums/interaction-type.enum';
 import { SocialGraphNode } from './social-graph-node.entity';
 
 export abstract class SocialGraphInteraction {
-  to: SocialGraphNode;
+  to: SocialGraphNode | SocialGraphNode[];
   interactionType: InteractionType;
 
-  constructor(to: SocialGraphNode, type: InteractionType) {
+  constructor(to: SocialGraphNode | SocialGraphNode[], type: InteractionType) {
     this.to = to;
     this.interactionType = type;
   }

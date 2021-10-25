@@ -30,7 +30,7 @@ export class CollectionsReadService {
 					id:o.id,
 					dateTimeInit:o.dateTimeInit,
 					dateTimeEnd:o.dateTimeEnd,
-					tickets:collect(t { .id, .price, .name, .amount, .description})
+					tickets:collect(distinct t { .id, .price, .name, .amount, .description})
 				} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,col
 				WITH {
 					id:e.id,

@@ -4,5 +4,6 @@ export class CategoryEntity extends PersistentEntity {
   name: string;
   description: string;
   active: boolean;
+  imageUrl: string;
   parentCategory?: string;
 }

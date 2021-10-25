@@ -47,7 +47,7 @@ export class LikeService
 						id:o.id,
 						dateTimeInit:o.dateTimeInit,
 						dateTimeEnd:o.dateTimeEnd,
-						tickets:collect(t { .id, .price, .name, .amount, .description})
+						distinct tickets:collect(distinct t { .id, .price, .name, .amount, .description})
 					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rfollow,like.createdAt as likedAt
 					with {
 						id:e.id,
@@ -151,7 +151,7 @@ export class LikeService
 						id:o.id,
 						dateTimeInit:o.dateTimeInit,
 						dateTimeEnd:o.dateTimeEnd,
-						tickets:collect(t { .id, .price, .name, .amount, .description})
+						tickets:collect(distinct t { .id, .price, .name, .amount, .description})
 					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rfollow,rlike, rlike.createdAt as likedAt
 					with {
 						id:e.id,

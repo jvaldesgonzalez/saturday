@@ -163,7 +163,7 @@ export class FriendService
 				WHERE u.id = $uId AND f.id = $fId
 				DELETE req
 				MERGE (u)-[r:FRIEND]->(f)
-				SET t.createdAt = datetime()`,
+				SET r.createdAt = datetime()`,
       ).bind({ uId: from.toString(), fId: interaction.to.toString() }),
     );
   }

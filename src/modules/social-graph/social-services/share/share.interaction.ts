@@ -8,7 +8,7 @@ export class ShareInteraction extends SocialGraphInteraction {
   publication: SocialGraphNode;
 
   constructor(to: SocialGraphNode, publication: SocialGraphNode) {
-    super(to, InteractionType.Follow);
+    super(to, InteractionType.Share);
     this.publication = publication;
   }
 }
