@@ -10,6 +10,7 @@ import { SocialGraphModule } from './modules/social-graph/social-graph.module';
 import { RecommenderModule } from './modules/recommender/recommender.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { GeolocationModule } from './modules/geolocation/geolocation.module';
+import { StaticsModule } from './modules/statics/statics.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { GeolocationModule } from './modules/geolocation/geolocation.module';
     RecommenderModule,
     NotificationsModule,
     GeolocationModule,
+    StaticsModule,
   ],
 })
 export class AppModule {}

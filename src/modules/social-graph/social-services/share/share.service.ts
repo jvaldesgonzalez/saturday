@@ -24,12 +24,14 @@ export class ShareService
         `MATCH (u:User)
 				MATCH (t:User)
 				MATCH (e:Event)
-				WHERE u.id = $uId AND t.id = $tId AND e.id = $eId
-				CREATE (u)-[:FORWARD]->(f:ForwardedEvent)-[:FORWARDED_TO]->(t)
+				WHERE u.id = $uId AND t.id IN $recipients AND e.id = $eId
+				CREATE (u)-[:FORWARD]->(f:ForwardedEvent)
+				WITH f,e,t
+				CREATE (f)-[:FORWARDED_TO]->(t)
 				CREATE (f)-[:EVENT_FORWARDED]->(e)`,
       ).bind({
         uId: from.toString(),
-        tId: interaction.to.toString(),
+        recipients: interaction.to.map((node) => node.toString()),
         eId: interaction.publication.toString(),
       }),
     );

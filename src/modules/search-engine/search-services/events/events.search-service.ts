@@ -26,7 +26,7 @@ export class EventSearchService implements ISearchService<EventItem> {
     limit: number,
     requesterId: string,
     dateInterval?: { from: Date; to: Date },
-    categories?: string[],
+    categories: string[] = [],
   ): Promise<ISearchResult<EventItem>> {
     const items = await this.persistenceManager.query<
       ISearchResultItem<EventItem>

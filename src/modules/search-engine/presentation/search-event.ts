@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsUUID } from 'class-validator';
+import { IsDate, IsOptional, IsUUID } from 'class-validator';
 
 export class DateInterval {
   @ApiProperty({ default: '2020-10-04T03:42:50.819Z' })
@@ -19,7 +19,8 @@ export class FilterEventsBody {
   @Type(() => DateInterval)
   dateInterval: DateInterval;
 
+  @IsOptional()
   @IsUUID(4, { each: true })
-  @ApiProperty({ type: [String] })
+  @ApiPropertyOptional({ type: [String] })
   categories: string[];
 }

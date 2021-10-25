@@ -71,7 +71,7 @@ export class SocialGraphController {
   @Post('/share/')
   async makeShare(@Body() data: ShareBody) {
     const interaction = new ShareInteraction(
-      new UniqueEntityID(data.shareWith),
+      data.shareWith.map((uuid) => new UniqueEntityID(uuid)),
       new UniqueEntityID(data.eventId),
     );
     if (!(await this.share.isPosible(interaction)))
@@ -185,8 +185,19 @@ export class SocialGraphController {
     );
   }
 
-  @Post('/cancel-friend-requests')
+  @Post('/cancel-friend-request')
   async undoFriendRequest(@Body() data: FriendRequestBody) {
+    const interaction = new FriendRequestInteraction(
+      new UniqueEntityID(data.userId),
+    );
+    await this.friendRequest.drop(
+      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      interaction,
+    );
+  }
+
+  @Post('/decline-friend-request')
+  async declineFriendRequest(@Body() data: FriendRequestBody) {
     const interaction = new FriendRequestInteraction(
       new UniqueEntityID(data.userId),
     );

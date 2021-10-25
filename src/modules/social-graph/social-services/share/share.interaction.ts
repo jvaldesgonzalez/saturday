@@ -6,8 +6,9 @@ import { InteractionType } from '../../enums/interaction-type.enum';
 
 export class ShareInteraction extends SocialGraphInteraction {
   publication: SocialGraphNode;
+  to: SocialGraphNode[];
 
-  constructor(to: SocialGraphNode, publication: SocialGraphNode) {
+  constructor(to: SocialGraphNode[], publication: SocialGraphNode) {
     super(to, InteractionType.Share);
     this.publication = publication;
   }
@@ -18,6 +19,6 @@ export class ShareBody {
   @IsUUID()
   eventId: string;
   @ApiProperty()
-  @IsUUID()
-  shareWith: string;
+  @IsUUID(4, { each: true })
+  shareWith: string[];
 }
