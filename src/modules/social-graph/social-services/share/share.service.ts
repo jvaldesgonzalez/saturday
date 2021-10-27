@@ -15,6 +15,7 @@ export class ShareService
   constructor(
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
+
   async save(
     from: UniqueEntityID,
     interaction: ShareInteraction,
@@ -42,17 +43,16 @@ export class ShareService
     from: UniqueEntityID,
     event: UniqueEntityID,
   ): Promise<void> {
-    console.log('saving for all friends');
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(
         `MATCH (u:User)-[:FRIEND]-(friends:User)
-				WHERE u.id = $uId 
-				CREATE (u)-[:FORWARD]->(f:ForwardedEvent)
-				WITH u,f,friends
-				MATCH (e:Event)
-				WHERE e.id = $eId
-				CREATE (f)-[:FORWARDED_TO]->(friends)
-				CREATE (f)-[:EVENT_FORWARDED]->(e)`,
+					WHERE u.id = $uId
+					CREATE (u)-[:FORWARD]->(f:ForwardedEvent)
+					WITH u,f,friends
+					MATCH (e:Event)
+					WHERE e.id = $eId
+					CREATE (f)-[:FORWARDED_TO]->(friends)
+					CREATE (f)-[:EVENT_FORWARDED]->(e)`,
       ).bind({
         uId: from.toString(),
         eId: event.toString(),

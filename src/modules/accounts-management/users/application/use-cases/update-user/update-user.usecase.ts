@@ -50,6 +50,21 @@ export class UpdateUser
     if (request.gender) {
       this.changes.addChange(userOrNone.changeGender(request.gender));
     }
+    if (request.privacyStatus) {
+      this.changes.addChange(userOrNone.changePrivacy(request.privacyStatus));
+    }
+    if (request.locationId) {
+      this.changes.addChange(
+        userOrNone.changeLocation(new UniqueEntityID(request.locationId)),
+      );
+    }
+    if (request.categoryPreferences) {
+      this.changes.addChange(
+        userOrNone.changeCategories(
+          request.categoryPreferences.map((i) => new UniqueEntityID(i)),
+        ),
+      );
+    }
     if (request.avatar) {
       this.changes.addChange(userOrNone.changeAvatar(request.avatar));
     }

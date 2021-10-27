@@ -1,3 +1,4 @@
+import { PrivacyStatus } from '../../domain/value-objects/privacy-status.value';
 import { CreateUserDto } from './create-user.dto';
 
 export type UpdateUserDto = Partial<
@@ -11,4 +12,4 @@ export type UpdateUserDto = Partial<
     | 'email'
     | 'appVersion'
   >
-> & { id: string };
+> & { id: string; privacyStatus: PrivacyStatus };

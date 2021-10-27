@@ -68,7 +68,7 @@ export class FriendRequestService
 					AND ( toLower(o.username) STARTS WITH toLower($search) OR toLower(o.fullname) CONTAINS toLower($search) )
 					RETURN count(o)
 				`,
-        ).bind({ uId: from.toString() }),
+        ).bind({ uId: from.toString(), search: searchTerm }),
       ),
     ]);
     return {
