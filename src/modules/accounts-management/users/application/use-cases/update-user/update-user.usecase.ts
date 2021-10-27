@@ -13,8 +13,7 @@ import { UpdateUserErrors } from './update-user.errors';
 type Response = Either<
   | AppError.UnexpectedError
   | AppError.ValidationError
-  | UpdateUserErrors.UserNotFound
-  | Result<unknown>,
+  | UpdateUserErrors.UserNotFound,
   Result<void>
 >;
 
@@ -28,12 +27,14 @@ export class UpdateUser
     @Inject(UserProviders.IUserRepository) private repo: IUserRepository,
   ) {
     this.changes = new Changes();
+    this.logger = new Logger('UpdateUserUseCase');
   }
   async execute(request: UpdateUserDto): Promise<Response> {
     this.logger.log('Excecuting...');
 
     const userId = new UniqueEntityID(request.id);
     const userOrNone = await this.repo.findById(userId);
+    console.log(userOrNone);
 
     if (!userOrNone) return left(new UpdateUserErrors.UserNotFound(userId));
 
@@ -53,7 +54,8 @@ export class UpdateUser
       this.changes.addChange(userOrNone.changeAvatar(request.avatar));
     }
     const combinedResult = this.changes.getChangeResult();
-    if (combinedResult.isFailure) return left(combinedResult);
+    if (combinedResult.isFailure)
+      return left(new AppError.ValidationError(combinedResult.error as string));
     await this.repo.save(userOrNone);
     return right(Ok());
   }

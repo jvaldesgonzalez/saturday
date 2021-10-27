@@ -27,6 +27,8 @@ export class EventSearchService implements ISearchService<EventItem> {
     requesterId: string,
     dateInterval?: { from: Date; to: Date },
     categories: string[] = [],
+    priceInterval?: { from: number; to: number },
+    locationId?: string,
   ): Promise<ISearchResult<EventItem>> {
     const items = await this.persistenceManager.query<
       ISearchResultItem<EventItem>
@@ -37,11 +39,20 @@ export class EventSearchService implements ISearchService<EventItem> {
           q.processedQuery
         }') yield node, score
 				WHERE node:Event
-				MATCH (place:Place)--(node)-[:PUBLISH_EVENT]-(publisher:Partner),
+				MATCH (l:Location)--(place:Place)--(node)-[:PUBLISH_EVENT]-(publisher:Partner),
 				(c:Category)--(node)
-				WHERE node.dateTimeInit >= $fromDate AND node.dateTimeEnd <= $toDate ${
-          categories.some((i) => i) ? 'AND c.id IN $categories' : ''
-        }
+				WHERE node.dateTimeEnd >= datetime()
+				${
+          dateInterval
+            ? 'AND node.dateTimeInit >= $fromDate AND node.dateTimeEnd <= $toDate'
+            : ''
+        } ${categories.some((i) => i) ? 'AND c.id IN $categories' : ''}
+        ${locationId ? 'AND l.id = $locationId' : ''}
+				${
+          priceInterval
+            ? 'AND node.basePrice >= $fromPrice AND node.topPrice <= $toPrice'
+            : ''
+        } 
 				RETURN {
     			data: {
 						id: node.id,
@@ -64,8 +75,15 @@ export class EventSearchService implements ISearchService<EventItem> {
           limit: Integer.fromInt(limit),
           skip: Integer.fromInt(skip),
           categories,
-          fromDate: DateTime.fromStandardDate(dateInterval.from),
-          toDate: DateTime.fromStandardDate(dateInterval.to),
+          fromDate: dateInterval
+            ? DateTime.fromStandardDate(dateInterval.from)
+            : null,
+          toDate: dateInterval
+            ? DateTime.fromStandardDate(dateInterval.to)
+            : null,
+          fromPrice: priceInterval ? priceInterval.from : null,
+          toPrice: priceInterval ? priceInterval.to : null,
+          locationId: locationId,
         })
         .map((r) => {
           r.data.multimedia = JSON.parse(r.data.multimedia);

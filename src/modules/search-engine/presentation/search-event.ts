@@ -14,8 +14,19 @@ export class DateInterval {
   to: Date;
 }
 
+export class PriceInterval {
+  @ApiProperty()
+  @IsDate()
+  from: number;
+
+  @ApiProperty()
+  @IsDate()
+  to: number;
+}
+
 export class FilterEventsBody {
-  @ApiProperty({ type: DateInterval })
+  @ApiPropertyOptional({ type: DateInterval })
+  @IsOptional()
   @Type(() => DateInterval)
   dateInterval: DateInterval;
 
@@ -23,4 +34,14 @@ export class FilterEventsBody {
   @IsUUID(4, { each: true })
   @ApiPropertyOptional({ type: [String] })
   categories: string[];
+
+  @ApiPropertyOptional({ type: PriceInterval })
+  @IsOptional()
+  @Type(() => PriceInterval)
+  priceInterval: PriceInterval;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID(4)
+  locationId: string;
 }

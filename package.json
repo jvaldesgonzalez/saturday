@@ -63,6 +63,7 @@
     "@types/faker": "^5.5.8",
     "@types/helmet": "^4.0.0",
     "@types/jest": "^27.0.1",
+    "@types/minio": "^7.0.11",
     "@types/morgan": "^1.9.3",
     "@types/node": "^16.9.1",
     "@types/supertest": "^2.0.10",

@@ -33,7 +33,7 @@ export class UserRepository
     const persistence = await this.persistenceManager.maybeGetOne<UserEntity>(
       QuerySpecification.withStatement(
         `MATCH (l:Location)<-[:IN_LOCATION]-(u:User)-[:PREFER_CATEGORY]->(c:Category)
-				WHERE u.authProviderId = $theId
+				WHERE u.id = $theId
 				return {
 					fullname:u.fullname,
 					birthday:u.birthday,
@@ -111,7 +111,7 @@ export class UserRepository
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(
         `MERGE (u:User {id:$uId})
-			SET u += $data`,
+				SET u += $data`,
       ).bind({
         uId: persistent.id,
         data,
@@ -132,7 +132,7 @@ export class UserRepository
           `MATCH (u:User),(c:Category)
 					WHERE u.id = $uId
 					AND c.id = $cId
-					CREATE (u)-[:PREFER_CATEGORY]->(c)`,
+					MERGE (u)-[:PREFER_CATEGORY]->(c)`,
         ).bind({ uId: userId.toString(), cId: catId.toString() }),
       );
     }
@@ -147,7 +147,7 @@ export class UserRepository
         `MATCH (u:User),(l:Location)
 					WHERE u.id = $uId
 					AND l.id = $lId
-					CREATE (u)-[:IN_LOCATION]->(l)`,
+					MERGE (u)-[:IN_LOCATION]->(l)`,
       ).bind({ uId: userId.toString(), lId: locationId.toString() }),
     );
   }

@@ -19,7 +19,7 @@ export class GeolocationReadService {
     location: MapLocation,
     radius: number,
     dateInterval: { from: Date; to: Date },
-    categories: string[],
+    categories: string[] = [],
   ): Promise<PlaceWithEvent[]> {
     console.log(dateInterval);
     return await this.persistenceManager.query<PlaceWithEvent>(

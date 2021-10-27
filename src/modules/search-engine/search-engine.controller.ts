@@ -73,8 +73,7 @@ export class SearchEngineController {
     @Body() data: FilterEventsBody,
   ) {
     const query = new EventQuery(q);
-    if (query.processedQuery.length === 0)
-      throw new BadRequestException('q must not be empty');
+    if (q.length === 0) throw new BadRequestException('q must not be empty');
     return this.eventsService.search(
       query,
       skip,
@@ -82,6 +81,8 @@ export class SearchEngineController {
       null,
       data.dateInterval,
       data.categories,
+      data.priceInterval,
+      data.locationId,
     );
   }
 
