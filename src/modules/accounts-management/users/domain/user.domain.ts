@@ -9,6 +9,7 @@ import { AuthProvider } from './value-objects/auth-provider.value';
 import { CategoryId } from './value-objects/category-id.value';
 import { Gender } from './value-objects/gender.value';
 import { LocationId } from './value-objects/location-id.value';
+import { PrivacyStatus } from './value-objects/privacy-status.value';
 
 type UserProps = {
   fullname: string;
@@ -29,9 +30,13 @@ type UserProps = {
   //that has the providerUid in database
   authProviderId: AuthProviderId;
   authProvider: AuthProvider;
+  privacyStatus: PrivacyStatus;
 } & CommonAccountProps;
 
-type NewUserProps = Omit<UserProps, 'createdAt' | 'updatedAt'>;
+type NewUserProps = Omit<
+  UserProps,
+  'createdAt' | 'updatedAt' | 'privacyStatus'
+>;
 
 export class User extends CommonAccount<UserProps> {
   get fullname(): string {
@@ -64,6 +69,10 @@ export class User extends CommonAccount<UserProps> {
 
   get authProvider(): AuthProvider {
     return this.props.authProvider;
+  }
+
+  get privacyStatus(): PrivacyStatus {
+    return this.props.privacyStatus;
   }
 
   changeFullname(newFullname: string): Result<void> {
@@ -104,12 +113,19 @@ export class User extends CommonAccount<UserProps> {
     return Ok();
   }
 
+  changePrivacy(newStatus: PrivacyStatus): Result<void> {
+    this.props.privacyStatus = newStatus;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
+
   public static new(props: NewUserProps): Result<User> {
     return User.create(
       {
         ...props,
         createdAt: new Date(),
         updatedAt: new Date(),
+        privacyStatus: PrivacyStatus.Public,
       },
       new UniqueEntityID(),
     );

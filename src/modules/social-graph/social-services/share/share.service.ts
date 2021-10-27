@@ -37,6 +37,28 @@ export class ShareService
     );
   }
 
+  async saveForFriends(
+    from: UniqueEntityID,
+    interaction: ShareInteraction,
+  ): Promise<void> {
+    await this.persistenceManager.execute(
+      QuerySpecification.withStatement(
+        `MATCH (u:User)
+				CREATE (u)-[:FORWARD]->(f:ForwardedEvent)
+				WITH u,f
+				MATCH (t:User)
+				MATCH (e:Event)
+				WHERE u.id = $uId AND t.id IN $recipients AND e.id = $eId
+				CREATE (f)-[:FORWARDED_TO]->(t)
+				CREATE (f)-[:EVENT_FORWARDED]->(e)`,
+      ).bind({
+        uId: from.toString(),
+        recipients: interaction.to.map((node) => node.toString()),
+        eId: interaction.publication.toString(),
+      }),
+    );
+  }
+
   async drop(
     from: UniqueEntityID,
     interaction: ShareInteraction,

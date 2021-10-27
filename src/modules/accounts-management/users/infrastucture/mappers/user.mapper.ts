@@ -23,6 +23,7 @@ export namespace UserMappers {
       locationId: domain.locationId.toString(),
       authProviderId: domain.authProviderId.toString(),
       authProvider: domain.authProvider,
+      privacyStatus: domain.privacyStatus,
     };
   }
 
@@ -44,6 +45,7 @@ export namespace UserMappers {
         gender: p.gender as Gender,
         authProvider: p.authProvider as AuthProvider,
         authProviderId,
+        privacyStatus: p.privacyStatus,
       },
       new UniqueEntityID(p.id),
     ).getValue();

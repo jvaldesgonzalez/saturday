@@ -30,7 +30,8 @@ export class FriendService
       this.persistenceManager.query<any>(
         QuerySpecification.withStatement(
           `MATCH (u:User)-[r:FRIEND]-(requester:User)
-					WHERE u.id = $uId AND (requester.username STARTS WITH $search OR requester.fullname STARTS WITH $search)
+					WHERE u.id = $uId
+					AND ( toLower(requester.username) STARTS WITH toLower($search) OR toLower(requester.fullname) CONTAINS toLower($search) )
 					WITH u,requester,r
 					OPTIONAL MATCH (requester)-[:FRIEND]-(common:User)-[:FRIEND]-(u)
 					RETURN distinct {
@@ -61,9 +62,10 @@ export class FriendService
         QuerySpecification.withStatement(
           `MATCH (u:User)-[:FRIEND]-(o:User)
       		WHERE u.id = $uId
-      		return count(o)
+					AND ( toLower(o.username) STARTS WITH toLower($search) OR toLower(o.fullname) CONTAINS toLower($search) )
+					return count(o)
       `,
-        ).bind({ uId: from.toString() }),
+        ).bind({ uId: from.toString(), search: searchTerm }),
       ),
     ]);
     return {

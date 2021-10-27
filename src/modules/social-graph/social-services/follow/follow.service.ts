@@ -30,17 +30,18 @@ export class FollowService
       this.persistenceManager.query<Followee>(
         QuerySpecification.withStatement(
           `MATCH (u:User)-[r:FOLLOW]->(p:Partner)
-				WHERE u.id = $uId AND (p.username STARTS WITH $search OR p.businessName STARTS WITH $search)
+					WHERE u.id = $uId 
+					AND ( toLower(u.username) STARTS WITH toLower($search) OR toLower(u.businessName) CONTAINS toLower($search) )
 				OPTIONAL MATCH (p)<-[:FOLLOW]-(o:User)
 
 				RETURN distinct {
-					id:p.id,
-					username:p.username,
-					email:p.email,
-					avatar:p.avatar,
-					businessName:p.businessName,
-					amountOfFollowers: count(distinct o),
-					followSince:r.createdAt
+						id:p.id,
+						username:p.username,
+						email:p.email,
+						avatar:p.avatar,
+						businessName:p.businessName,
+						amountOfFollowers: count(distinct o),
+						followSince:r.createdAt
 					}
 					SKIP $skip
 					LIMIT $limit
@@ -60,7 +61,8 @@ export class FollowService
         QuerySpecification.withStatement(
           `MATCH (u:User)-[:FOLLOW]->(p:Partner)
 					WHERE u.id = $uId
-				return count(p)
+					AND ( toLower(u.username) STARTS WITH toLower($search) OR toLower(u.businessName) CONTAINS toLower($search) )
+					return count(p)
 				`,
         ).bind({ uId: from.toString() }),
       ),
@@ -87,9 +89,9 @@ export class FollowService
           `MATCH (me:User)
 					WHERE me.id = $meId
 					MATCH (u:User)-[r:FOLLOW]->(p:Partner)
-					WHERE u.id = $uId AND (p.username STARTS WITH $search OR p.businessName STARTS WITH $search) ${
-            onlyFollowees ? 'AND (me)-[:FOLLOW]-(p)' : ''
-          }
+					WHERE u.id = $uId 
+					AND ( toLower(p.username) STARTS WITH toLower($search) OR toLower(p.businessName) CONTAINS toLower($search) )
+					${onlyFollowees ? 'AND (me)-[:FOLLOW]-(p)' : ''}
 
 				OPTIONAL MATCH (p)<-[:FOLLOW]-(o:User)
 
@@ -116,9 +118,9 @@ export class FollowService
         QuerySpecification.withStatement(
           `MATCH (me:User) WHERE me.id = $meId
 					MATCH (u:User)-[:FOLLOW]->(p:Partner)
-					WHERE u.id = $uId AND (p.username STARTS WITH $search OR p.businessName STARTS WITH $search) ${
-            onlyFollowees ? 'AND (me)-[:FOLLOW]-(p)' : ''
-          }
+					WHERE u.id = $uId
+					AND ( toLower(p.username) STARTS WITH toLower($search) OR toLower(p.businessName) CONTAINS toLower($search) )
+					${onlyFollowees ? 'AND (me)-[:FOLLOW]-(p)' : ''}
 					RETURN count(p)
 				`,
         ).bind({
