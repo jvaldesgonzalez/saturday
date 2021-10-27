@@ -70,6 +70,13 @@ export class SocialGraphController {
 
   @Post('/share/')
   async makeShare(@Body() data: ShareBody) {
+    if (data.shareWith.length == 0) {
+      await this.share.saveForFriends(
+        new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+        new UniqueEntityID(data.eventId),
+      );
+      return;
+    }
     const interaction = new ShareInteraction(
       data.shareWith.map((uuid) => new UniqueEntityID(uuid)),
       new UniqueEntityID(data.eventId),

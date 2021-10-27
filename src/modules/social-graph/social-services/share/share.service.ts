@@ -22,11 +22,12 @@ export class ShareService
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(
         `MATCH (u:User)
+				WHERE u.id = $uId 
+				CREATE (u)-[:FORWARD]->(f:ForwardedEvent)
+				WITH f,e
 				MATCH (t:User)
 				MATCH (e:Event)
-				WHERE u.id = $uId AND t.id IN $recipients AND e.id = $eId
-				CREATE (u)-[:FORWARD]->(f:ForwardedEvent)
-				WITH f,e,t
+				WHERE t.id IN $recipients AND e.id = $eId
 				CREATE (f)-[:FORWARDED_TO]->(t)
 				CREATE (f)-[:EVENT_FORWARDED]->(e)`,
       ).bind({
@@ -39,22 +40,22 @@ export class ShareService
 
   async saveForFriends(
     from: UniqueEntityID,
-    interaction: ShareInteraction,
+    event: UniqueEntityID,
   ): Promise<void> {
+    console.log('saving for all friends');
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(
-        `MATCH (u:User)
+        `MATCH (u:User)-[:FRIEND]-(friends:User)
+				WHERE u.id = $uId 
 				CREATE (u)-[:FORWARD]->(f:ForwardedEvent)
-				WITH u,f
-				MATCH (t:User)
+				WITH u,f,friends
 				MATCH (e:Event)
-				WHERE u.id = $uId AND t.id IN $recipients AND e.id = $eId
-				CREATE (f)-[:FORWARDED_TO]->(t)
+				WHERE e.id = $eId
+				CREATE (f)-[:FORWARDED_TO]->(friends)
 				CREATE (f)-[:EVENT_FORWARDED]->(e)`,
       ).bind({
         uId: from.toString(),
-        recipients: interaction.to.map((node) => node.toString()),
-        eId: interaction.publication.toString(),
+        eId: event.toString(),
       }),
     );
   }
