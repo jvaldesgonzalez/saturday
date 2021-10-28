@@ -9,6 +9,7 @@ import { EventDetails } from 'src/modules/publications/events/presentation/event
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import { ISocialGraphService } from '../../common/social-graph.service.interface';
 import { UserInteractor } from '../../common/user.interactor';
 import { LikeInteraction } from './like.interaction';
@@ -90,8 +91,8 @@ export class LikeService
           .map((r) => {
             return {
               ...r,
-              info: JSON.parse(r.info),
-              multimedia: JSON.parse(r.multimedia),
+              info: TextUtils.escapeAndParse(r.info),
+              multimedia: TextUtils.escapeAndParse(r.multimedia),
               occurrences: r.occurrences.map((o) => {
                 return {
                   ...o,
@@ -195,8 +196,8 @@ export class LikeService
           .map((r) => {
             return {
               ...r,
-              info: JSON.parse(r.info),
-              multimedia: JSON.parse(r.multimedia),
+              info: TextUtils.escapeAndParse(r.info),
+              multimedia: TextUtils.escapeAndParse(r.multimedia),
               occurrences: r.occurrences.map((o) => {
                 return {
                   ...o,

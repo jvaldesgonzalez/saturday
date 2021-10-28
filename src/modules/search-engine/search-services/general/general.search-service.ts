@@ -6,6 +6,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Integer } from 'neo4j-driver-core';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import { Query } from '../../common/search-query.abstract';
 import {
   ISearchResult,
@@ -89,7 +90,7 @@ export class GeneralSearchService implements ISearchService<GeneralSearchItem> {
               case 'user':
                 r.data.friendshipStatus = r.data.friendshipStatus && 'none';
               case 'event':
-                r.data.multimedia = JSON.parse(r.data.multimedia);
+                r.data.multimedia = TextUtils.escapeAndParse(r.data.multimedia);
                 r.data.dateTimeInit = parseDate(r.data.dateTimeInit);
                 r.data.dateTimeEnd = parseDate(r.data.dateTimeEnd);
             }

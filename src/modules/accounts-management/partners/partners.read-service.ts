@@ -4,6 +4,7 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import { PartnerProfile } from './presentation/partner-profile';
 
 @Injectable()
@@ -54,8 +55,10 @@ export class PartnersReadService {
       )
         .bind({ pId: partnerId, meId: userRequesterId })
         .map((r) => {
-          r.aditionalBusinessData = JSON.parse(r.aditionalBusinessData);
-          r.contactInfo = JSON.parse(r.contactInfo);
+          r.aditionalBusinessData = TextUtils.escapeAndParse(
+            r.aditionalBusinessData,
+          );
+          r.contactInfo = TextUtils.escapeAndParse(r.contactInfo);
           if (r.place === null || r.place === undefined) {
             delete r.place;
             return r;

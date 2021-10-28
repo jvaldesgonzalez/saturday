@@ -8,6 +8,7 @@ import { Integer } from 'neo4j-driver-core';
 import { EventDetails } from 'src/modules/publications/events/presentation/event-details';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import { SimilarAccount } from './entities/account.entity';
 
 @Injectable()
@@ -161,8 +162,8 @@ export class SimilarityReadService {
               ...r,
               dateTimeInit: parseDate(r.dateTimeInit),
               dateTimeEnd: parseDate(r.dateTimeEnd),
-              info: JSON.parse(r.info),
-              multimedia: JSON.parse(r.multimedia),
+              info: TextUtils.escapeAndParse(r.info),
+              multimedia: TextUtils.escapeAndParse(r.multimedia),
             };
           }),
       ),

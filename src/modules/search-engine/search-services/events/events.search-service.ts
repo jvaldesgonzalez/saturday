@@ -6,6 +6,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Integer, DateTime } from 'neo4j-driver-core';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import {
   ISearchResult,
   ISearchResultItem,
@@ -86,7 +87,7 @@ export class EventSearchService implements ISearchService<EventItem> {
           locationId: locationId,
         })
         .map((r) => {
-          r.data.multimedia = JSON.parse(r.data.multimedia);
+          r.data.multimedia = TextUtils.escapeAndParse(r.data.multimedia);
           r.data.dateTimeEnd = parseDate(r.data.dateTimeEnd);
           r.data.dateTimeInit = parseDate(r.data.dateTimeInit);
           return r;

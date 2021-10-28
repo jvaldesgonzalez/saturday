@@ -3,6 +3,7 @@ import {
   PersistenceManager,
   QuerySpecification,
 } from '@liberation-data/drivine';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import { PartnerProfile } from './partners/presentation/partner-profile';
 import { UserProfile } from './users/presentation/user-profile';
 
@@ -94,8 +95,11 @@ export class AccountsManagementReadService {
         .bind({ meId: meId, username: username })
         .map((r) => {
           if (r.type === 'user') return r;
-          r.aditionalBusinessData = JSON.parse(r.aditionalBusinessData);
-          r.contactInfo = JSON.parse(r.contactInfo);
+          console.log(r.aditionalBusinessData);
+          r.aditionalBusinessData = TextUtils.escapeAndParse(
+            r.aditionalBusinessData,
+          );
+          r.contactInfo = TextUtils.escapeAndParse(r.contactInfo);
           if (r.place === null || r.place === undefined) {
             delete r.place;
             return r;

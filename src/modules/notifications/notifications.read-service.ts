@@ -6,6 +6,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import { NotificationResponse } from './presentation/notification';
 
 @Injectable()
@@ -35,8 +36,8 @@ export class NotificationsReadService {
           return {
             ...r,
             createdAt: parseDate(r.createdAt),
-            eventData: JSON.parse(r.eventData || null),
-            userData: JSON.parse(r.userData || null),
+            eventData: TextUtils.escapeAndParse(r.eventData || null),
+            userData: TextUtils.escapeAndParse(r.userData || null),
           };
         }),
     );

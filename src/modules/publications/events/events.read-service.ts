@@ -84,8 +84,8 @@ export class EventsReadService {
           .map((r) => {
             return {
               ...r,
-              info: JSON.parse(r.info),
-              multimedia: JSON.parse(r.multimedia),
+              info: TextUtils.escapeAndParse(r.info),
+              multimedia: TextUtils.escapeAndParse(r.multimedia),
               dateTimeInit: parseDate(r.dateTimeInit),
               dateTimeEnd: parseDate(r.dateTimeEnd),
               occurrences: r.occurrences.map(
@@ -185,8 +185,8 @@ export class EventsReadService {
           .map((r) => {
             return {
               ...r,
-              info: JSON.parse(r.info),
-              multimedia: JSON.parse(r.multimedia),
+              info: TextUtils.escapeAndParse(r.info),
+              multimedia: TextUtils.escapeAndParse(r.multimedia),
               dateTimeInit: parseDate(r.dateTimeInit),
               dateTimeEnd: parseDate(r.dateTimeEnd),
               occurrences: r.occurrences.map(
@@ -309,8 +309,8 @@ export class EventsReadService {
           .map((r) => {
             return {
               ...r,
-              info: JSON.parse(r.info),
-              multimedia: JSON.parse(r.multimedia),
+              info: TextUtils.escapeAndParse(r.info),
+              multimedia: TextUtils.escapeAndParse(r.multimedia),
               dateTimeInit: parseDate(r.dateTimeInit),
               dateTimeEnd: parseDate(r.dateTimeEnd),
               occurrences: r.occurrences.map(

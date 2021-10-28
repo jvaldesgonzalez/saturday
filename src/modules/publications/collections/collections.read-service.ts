@@ -5,6 +5,7 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import { EventDetails } from '../events/presentation/event-details';
 import { CollectionDetails } from './presentation/collection-details';
 
@@ -73,8 +74,8 @@ export class CollectionsReadService {
               events: r.events.map((e) => {
                 return {
                   ...e,
-                  info: JSON.parse(e.info),
-                  multimedia: JSON.parse(e.multimedia),
+                  info: TextUtils.escapeAndParse(e.info),
+                  multimedia: TextUtils.escapeAndParse(e.multimedia),
                   occurrences: e.occurrences.map((o) => {
                     return {
                       ...o,

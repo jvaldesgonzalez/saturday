@@ -7,7 +7,7 @@ export type CommonAccountProps = {
   firebasePushId: string;
   appVersion: number;
   isActive: boolean;
-  avatar: string;
+  avatar?: string;
   createdAt: Date;
   updatedAt: Date;
   refreshToken: string;
@@ -72,6 +72,11 @@ export class CommonAccount<
   changeAvatar(newAvatar: string): Result<void> {
     this.props.firebasePushId = newAvatar;
     this.props.updatedAt = new Date();
+    return Ok();
+  }
+
+  removeAvatar(): Result<void> {
+    this.props.avatar = null;
     return Ok();
   }
 }

@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { DateTime } from 'neo4j-driver-core';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { MapLocation } from 'src/shared/typedefs/map-location';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import { PlaceWithEvent } from './entities/place-with-event.entity';
 
 @Injectable()
@@ -63,7 +64,7 @@ export class GeolocationReadService {
             events: r.events.map((e) => {
               return {
                 ...e,
-                multimedia: JSON.parse(e.multimedia),
+                multimedia: TextUtils.escapeAndParse(e.multimedia),
                 dateTimeInit: parseDate(e.dateTimeInit),
                 dateTimeEnd: parseDate(e.dateTimeEnd),
               };

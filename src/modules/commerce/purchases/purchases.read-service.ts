@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { Integer } from 'neo4j-driver-core';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import { MyPurchases } from './presentation/my-purchases';
 
 @Injectable()
@@ -77,7 +78,7 @@ export class PurchasesReadService {
                 ...r.event,
                 dateTimeInit: parseDate(r.event.dateTimeInit),
                 dateTimeEnd: parseDate(r.event.dateTimeEnd),
-                multimedia: JSON.parse(r.event.multimedia)[0],
+                multimedia: TextUtils.escapeAndParse(r.event.multimedia)[0],
                 place: {
                   ...r.event.place,
                   latitude: r.event.place.latitude,
@@ -160,7 +161,7 @@ export class PurchasesReadService {
               ...r.event,
               dateTimeInit: parseDate(r.event.dateTimeInit),
               dateTimeEnd: parseDate(r.event.dateTimeEnd),
-              multimedia: JSON.parse(r.event.multimedia)[0],
+              multimedia: TextUtils.escapeAndParse(r.event.multimedia)[0],
               place: {
                 ...r.event.place,
                 latitude: r.event.place.latitude,

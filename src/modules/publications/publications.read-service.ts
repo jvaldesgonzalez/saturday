@@ -8,6 +8,7 @@ import { Integer } from 'neo4j-driver-core';
 import { EventDetails } from './events/presentation/event-details';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import { TextUtils } from 'src/shared/utils/text.utils';
 
 @Injectable()
 export class PublicationsReadService {
@@ -154,8 +155,8 @@ export class PublicationsReadService {
           return r.type === 'event'
             ? {
                 ...r,
-                info: JSON.parse(r.info),
-                multimedia: JSON.parse(r.multimedia),
+                info: TextUtils.escapeAndParse(r.info),
+                multimedia: TextUtils.escapeAndParse(r.multimedia),
                 dateTimeInit: parseDate(r.dateTimeInit),
                 dateTimeEnd: parseDate(r.dateTimeEnd),
                 occurrences: r.occurrences.map((o) => {
@@ -171,8 +172,8 @@ export class PublicationsReadService {
                 events: r.events.map((e) => {
                   return {
                     ...e,
-                    info: JSON.parse(e.info),
-                    multimedia: JSON.parse(e.multimedia),
+                    info: TextUtils.escapeAndParse(e.info),
+                    multimedia: TextUtils.escapeAndParse(e.multimedia),
                     occurrences: e.occurrences.map((o) => {
                       return {
                         ...o,
