@@ -48,7 +48,7 @@ export class UpdateUser
       const usernameIsTaken = await this.repo.usernameIsTaken(request.username);
       if (usernameIsTaken)
         return left(new UpdateUserErrors.UsernameExistsError(request.username));
-      this.changes.addChange(userOrNone.changeEmail(request.username));
+      this.changes.addChange(userOrNone.changeUsername(request.username));
     }
     if (request.fullname) {
       this.changes.addChange(userOrNone.changeFullname(request.fullname));

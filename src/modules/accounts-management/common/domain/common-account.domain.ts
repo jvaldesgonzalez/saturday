@@ -57,6 +57,11 @@ export class CommonAccount<
     this.props.updatedAt = new Date();
     return Ok();
   }
+  changeUsername(newUsername: string): Result<void> {
+    this.props.username = newUsername;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
 
   changeFirebasePushId(newPushId: string): Result<void> {
     this.props.firebasePushId = newPushId;
