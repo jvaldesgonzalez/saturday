@@ -71,6 +71,18 @@ export class UserRepository
       ? true
       : false;
   }
+
+  async usernameIsTaken(theUsername: string): Promise<boolean> {
+    return (await this.persistenceManager.maybeGetOne<UserEntity>(
+      QuerySpecification.withStatement(
+        `MATCH (u:User)
+			WHERE u.username = $username
+				RETURN u.id`,
+      ).bind({ username: theUsername }),
+    ))
+      ? true
+      : false;
+  }
   async findByAuthProviderId(theId: UniqueEntityID): Promise<User> {
     const persistence = await this.persistenceManager.maybeGetOne<UserEntity>(
       QuerySpecification.withStatement(
@@ -117,8 +129,25 @@ export class UserRepository
         data,
       }),
     );
-    await this.addCategories(theUser._id, theUser.categoryPreferences);
-    await this.addLocation(theUser._id, theUser.locationId);
+    await this.cleanCategoriesAndLocation(theUser._id);
+    await Promise.all([
+      this.addCategories(theUser._id, theUser.categoryPreferences),
+      this.addLocation(theUser._id, theUser.locationId),
+    ]);
+  }
+
+  private async cleanCategoriesAndLocation(userId: IIdentifier): Promise<void> {
+    this._logger.log('Cleaning');
+    return await this.persistenceManager.execute(
+      QuerySpecification.withStatement(
+        `
+				MATCH (u:User)-[rel]-(item)
+				WHERE u.id = $userId
+				AND (item:Location OR item:Category)
+				DELETE rel
+				`,
+      ).bind({ userId: userId.toString() }),
+    );
   }
 
   private async addCategories(

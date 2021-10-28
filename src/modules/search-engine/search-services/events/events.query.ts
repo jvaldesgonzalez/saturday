@@ -12,7 +12,7 @@ export class EventQuery extends Query {
   private makeNameQuery() {
     const termsFuzzy = this.raw
       .split(' ')
-      .map((t) => (t.length > 3 ? `${t}~` : t))
+      .map((t) => (t.length > 3 ? `${t}~ OR ${t}*` : `${t}*`))
       .filter((i) => i);
     return `name: ${termsFuzzy.join(' OR ')}`;
   }

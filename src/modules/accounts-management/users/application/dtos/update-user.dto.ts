@@ -7,9 +7,7 @@ export type UpdateUserDto = Partial<
     | 'authProviderId'
     | 'authProvider'
     | 'refreshToken'
-    | 'username'
     | 'firebasePushId'
-    | 'email'
     | 'appVersion'
   >
 > & { id: string; privacyStatus: PrivacyStatus };

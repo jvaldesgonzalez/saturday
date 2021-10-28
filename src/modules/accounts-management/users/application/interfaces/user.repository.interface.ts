@@ -7,4 +7,5 @@ export interface IUserRepository extends IRepository<User> {
   emailIsTaken(theEmail: string): Promise<boolean>;
   findByAuthProviderId(theId: AuthProviderId): Promise<User>;
   findById(theId: UniqueEntityID): Promise<User>;
+  usernameIsTaken(theUserame: string): Promise<boolean>;
 }
