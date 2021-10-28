@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { StaticsService } from './statics.service';
 
@@ -14,9 +14,9 @@ export class StaticsController {
     );
   }
 
-  @Get('/signed-urls/events/:id')
-  @ApiQuery({ name: 'id' })
-  async getEventSignedUrl(@Param('id', ParseUUIDPipe) id: string) {
+  @Get('/signed-urls/events/')
+  @ApiQuery({ name: 'name' })
+  async getEventSignedUrl(@Query('name') id: string) {
     return await this.service.getSignedUrl(`event-${id}`);
   }
 }

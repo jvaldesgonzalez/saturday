@@ -25,7 +25,7 @@ export class ShareService
         `MATCH (u:User)
 				WHERE u.id = $uId 
 				CREATE (u)-[:FORWARD]->(f:ForwardedEvent)
-				WITH f,e
+				WITH f,u
 				MATCH (t:User)
 				MATCH (e:Event)
 				WHERE t.id IN $recipients AND e.id = $eId
