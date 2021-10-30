@@ -89,10 +89,12 @@ export class GeneralSearchService implements ISearchService<GeneralSearchItem> {
             switch (r.data.type) {
               case 'user':
                 r.data.friendshipStatus = r.data.friendshipStatus && 'none';
+                break;
               case 'event':
                 r.data.multimedia = TextUtils.escapeAndParse(r.data.multimedia);
                 r.data.dateTimeInit = parseDate(r.data.dateTimeInit);
                 r.data.dateTimeEnd = parseDate(r.data.dateTimeEnd);
+                break;
             }
             return r;
           }),
