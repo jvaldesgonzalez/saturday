@@ -23,7 +23,7 @@ export class StaticsService implements IStaticsService {
       putUrl: url,
       readUrl: `http://${minioConfig.endPoint}:${minioConfig.port}/saturday.static/${objectName}`,
       expTime: 24 * 60 * 60,
-      fileName: 'profile-777cc88c-2e3f-4eb4-ac81-14c9323c541d',
+      fileName: objectName,
     };
   }
 }

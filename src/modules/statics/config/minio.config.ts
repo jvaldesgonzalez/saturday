@@ -5,5 +5,5 @@ export const minioConfig: MinioOptions = {
   port: 9000,
   useSSL: false,
   accessKey: 'minio',
-  secretKey: 'minio123',
+  secretKey: 'hJG5myodnc9cc4!N',
 };
