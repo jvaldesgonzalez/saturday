@@ -70,7 +70,7 @@ export class CommonAccount<
   }
 
   changeAvatar(newAvatar: string): Result<void> {
-    this.props.firebasePushId = newAvatar;
+    this.props.avatar = newAvatar;
     this.props.updatedAt = new Date();
     return Ok();
   }
