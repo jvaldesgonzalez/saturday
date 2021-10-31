@@ -38,13 +38,13 @@ export class UpdateUser
 
     if (!userOrNone) return left(new UpdateUserErrors.UserNotFound(userId));
 
-    if (request.email != userOrNone.email) {
+    if (request.email && request.email != userOrNone.email) {
       const emailIsTaken = await this.repo.emailIsTaken(request.email);
       if (emailIsTaken)
         return left(new UpdateUserErrors.EmailExistsError(request.email));
       this.changes.addChange(userOrNone.changeEmail(request.email));
     }
-    if (request.username != userOrNone.username) {
+    if (request.username && request.username != userOrNone.username) {
       const usernameIsTaken = await this.repo.usernameIsTaken(request.username);
       if (usernameIsTaken)
         return left(new UpdateUserErrors.UsernameExistsError(request.username));

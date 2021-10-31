@@ -51,6 +51,7 @@ export class UserRepository
 					refreshToken:u.refreshToken,
 					createdAt:u.createdAt,
 					updatedAt:u.updatedAt,
+					privacyStatus:u.privacyStatus,
 					id:u.id
 				}`,
       )
