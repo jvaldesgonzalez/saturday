@@ -3,6 +3,7 @@ import { MinioService } from 'nestjs-minio-client';
 import { minioConfig, staticsBucketConfig } from './config/minio.config';
 import { PresignedUrlResult } from './interfaces/presigned-url.result';
 import { IStaticsService } from './interfaces/statics.service.interface';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class StaticsService implements IStaticsService {
@@ -14,16 +15,20 @@ export class StaticsService implements IStaticsService {
   async getSignedUrl(objectName: string): Promise<PresignedUrlResult> {
     this.logger.log(`Generating url for object ${objectName}`);
 
+    const objectWithSlug = `${objectName}-${crypto
+      .randomBytes(20)
+      .toString('hex')}`;
+
     const url = await this.minioService.client.presignedPutObject(
-      'saturday.static',
-      objectName,
+      staticsBucketConfig.name,
+      objectWithSlug,
       24 * 60 * 60,
     );
     return {
       putUrl: url,
-      readUrl: `http://${minioConfig.endPoint}:${minioConfig.port}/${staticsBucketConfig.name}/${objectName}`,
+      readUrl: `http://${minioConfig.endPoint}:${minioConfig.port}/${staticsBucketConfig.name}/${objectWithSlug}`,
       expTime: staticsBucketConfig.ttl,
-      fileName: objectName,
+      fileName: objectWithSlug,
     };
   }
 }
