@@ -64,7 +64,7 @@ export class FollowService
 					AND ( toLower(u.username) STARTS WITH toLower($search) OR toLower(u.businessName) CONTAINS toLower($search) )
 					return count(p)
 				`,
-        ).bind({ uId: from.toString() }),
+        ).bind({ uId: from.toString(), search: searchTerm }),
       ),
     ]);
     return {
