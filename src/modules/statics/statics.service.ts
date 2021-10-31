@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MinioService } from 'nestjs-minio-client';
-import { minioConfig } from './config/minio.config';
+import { minioConfig, staticsBucketConfig } from './config/minio.config';
 import { PresignedUrlResult } from './interfaces/presigned-url.result';
 import { IStaticsService } from './interfaces/statics.service.interface';
 
@@ -21,8 +21,8 @@ export class StaticsService implements IStaticsService {
     );
     return {
       putUrl: url,
-      readUrl: `http://${minioConfig.endPoint}:${minioConfig.port}/saturday.static/${objectName}`,
-      expTime: 24 * 60 * 60,
+      readUrl: `http://${minioConfig.endPoint}:${minioConfig.port}/${staticsBucketConfig.name}/${objectName}`,
+      expTime: staticsBucketConfig.ttl,
       fileName: objectName,
     };
   }

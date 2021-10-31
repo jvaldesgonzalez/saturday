@@ -7,3 +7,8 @@ export const minioConfig: MinioOptions = {
   accessKey: 'minio',
   secretKey: 'hJG5myodnc9cc4!N',
 };
+
+export const staticsBucketConfig = {
+  name: 'saturday.static',
+  ttl: 24 * 60 * 60, //1d
+};
