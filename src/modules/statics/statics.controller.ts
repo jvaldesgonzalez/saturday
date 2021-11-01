@@ -1,5 +1,6 @@
 import { Controller, Get, Query, Res } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 import { Theme } from './enums/themes.enum';
 import { StaticsService } from './statics.service';
 
@@ -16,7 +17,8 @@ export class StaticsController {
   }
 
   @Get('/default-profile-image')
-  async getDefaultImage(@Query('theme') theme: Theme, @Res() res) {
+  @ApiQuery({ name: 'theme', enum: Theme })
+  async getDefaultImage(@Query('theme') theme: Theme, @Res() res: Response) {
     const url = await this.service.getDefaultProfileImageUrl(theme);
     res.redirect(url);
   }

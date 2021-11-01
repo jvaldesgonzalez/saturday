@@ -11,12 +11,10 @@ import { RecommenderModule } from './modules/recommender/recommender.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { GeolocationModule } from './modules/geolocation/geolocation.module';
 import { StaticsModule } from './modules/statics/statics.module';
-import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
     DataAccessModule,
-    HttpModule,
     AccountsManagementModule,
     PublicationsModule,
     NomenclatorsModule,
