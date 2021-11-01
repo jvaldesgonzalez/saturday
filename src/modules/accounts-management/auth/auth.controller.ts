@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   InternalServerErrorException,
+  NotFoundException,
   Post,
   UnauthorizedException,
   UseGuards,
@@ -14,11 +15,14 @@ import { AuthProvider } from '../users/domain/value-objects/auth-provider.value'
 import { CheckUserStatusErrors } from './application/use-cases/check-user-status/check-user-status.errors';
 import { CheckUserStatusFacebook } from './application/use-cases/check-user-status/check-user-status.facebook.usecase';
 import { LoginUser } from './application/use-cases/login/login.usecase';
+import { RefreshTokenErrors } from './application/use-cases/refresh-token/refresh-token.errors';
+import { RefreshToken } from './application/use-cases/refresh-token/refresh-token.usecase';
 import { RegisterUser } from './application/use-cases/register-user/register-user.usecase';
 import { SkipAuth } from './decorators/skip-auth.decorator';
 import { JwtAuthGuard } from './guards/auth.guard';
 import { CheckUserStatusFbRequest } from './presentation/check-user-status';
 import { LoginUserRequest } from './presentation/login-user';
+import { RefreshTokenBody } from './presentation/refresh-token.';
 import { RegisterUserRequest } from './presentation/register-user';
 
 @ApiBearerAuth()
@@ -29,6 +33,7 @@ export class AuthController {
     private checkUserStatusFbUC: CheckUserStatusFacebook,
     private registerUserUC: RegisterUser,
     private loginUserUC: LoginUser,
+    private refreshUC: RefreshToken,
   ) {}
 
   @SkipAuth()
@@ -91,8 +96,20 @@ export class AuthController {
     }
   }
 
-  @Get('test')
-  testing() {
-    return 'hello';
+  @SkipAuth()
+  @Post('issue-token')
+  async issueNewToken(@Body() data: RefreshTokenBody) {
+    const result = await this.refreshUC.execute(data);
+    if (result.isLeft()) {
+      const error = result.value;
+      switch (error.constructor) {
+        case RefreshTokenErrors.UserNotFoundInDatabase:
+          throw new NotFoundException(error.getValue().message);
+        default:
+          throw new InternalServerErrorException(error.errorValue().message);
+      }
+    } else if (result.isRight()) {
+      return result.value.getValue();
+    }
   }
 }

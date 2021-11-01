@@ -4,7 +4,9 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
+import { JwtPayload } from 'jsonwebtoken';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
+import { JWTClaim, RefreshToken } from '../../auth/login-payload.type';
 import { ICommonAccountRepository } from '../application/interfaces/common-account.repository.interface';
 import { CommonAccount } from '../domain/common-account.domain';
 import { CommonAccountEntity } from './entities/common-account.entity';

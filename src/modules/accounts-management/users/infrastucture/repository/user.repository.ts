@@ -4,6 +4,10 @@ import {
   QuerySpecification,
   Transactional,
 } from '@liberation-data/drivine';
+import {
+  JWTClaim,
+  RefreshToken,
+} from 'src/modules/accounts-management/auth/login-payload.type';
 import { IIdentifier } from 'src/shared/domain/Identifier';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
@@ -59,6 +63,17 @@ export class UserRepository
         .transform(UserEntity),
     );
     return persistence ? UserMappers.fromPersistence(persistence) : null;
+  }
+
+  async getPayloadByRefreshToken(token: RefreshToken): Promise<JWTClaim> {
+    return await this.persistenceManager.maybeGetOne<JWTClaim>(
+      QuerySpecification.withStatement(
+        `MATCH (u:User)
+				WHERE u.refreshToken = $token
+				RETURN u{.id, .email, .username}
+			`,
+      ).bind({ token }),
+    );
   }
 
   async emailIsTaken(theEmail: string): Promise<boolean> {
