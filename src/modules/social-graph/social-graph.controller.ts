@@ -12,6 +12,8 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import { CurrentUser } from '../accounts-management/auth/decorators/current-user.decorator';
+import { JWTClaim } from '../accounts-management/auth/login-payload.type';
 import { BlockInteraction } from './social-services/block/block.interaction';
 import { BlockService } from './social-services/block/block.service';
 import {
@@ -57,23 +59,20 @@ export class SocialGraphController {
   ) {}
 
   @Post('/add-to-favorites')
-  async makeLike(@Body() data: LikeBody) {
+  async makeLike(@Body() data: LikeBody, @CurrentUser() payload: JWTClaim) {
     const interaction = new LikeInteraction(new UniqueEntityID(data.eventId));
     if (!(await this.like.isPosible(interaction)))
       throw new ConflictException(
         'Cant create like interaction with this params',
       );
-    await this.like.save(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.like.save(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/share/')
-  async makeShare(@Body() data: ShareBody) {
+  async makeShare(@Body() data: ShareBody, @CurrentUser() payload: JWTClaim) {
     if (data.shareWith.length == 0) {
       await this.share.saveForFriends(
-        new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+        new UniqueEntityID(payload.id),
         new UniqueEntityID(data.eventId),
       );
       return;
@@ -86,14 +85,11 @@ export class SocialGraphController {
       throw new ConflictException(
         'Cant create like interaction with this params',
       );
-    await this.share.save(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.share.save(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/follow-partner/')
-  async makeFollow(@Body() data: FollowBody) {
+  async makeFollow(@Body() data: FollowBody, @CurrentUser() payload: JWTClaim) {
     const interaction = new FollowInteraction(
       new UniqueEntityID(data.partnerId),
     );
@@ -101,52 +97,52 @@ export class SocialGraphController {
       throw new ConflictException(
         'Cant create follow interaction with this params',
       );
-    await this.follow.save(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.follow.save(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/send-friend-request')
-  async makeFriendRequest(@Body() data: FriendRequestBody) {
+  async makeFriendRequest(
+    @Body() data: FriendRequestBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
     const interaction = new FriendRequestInteraction(
       new UniqueEntityID(data.userId),
     );
     if (
       !(await this.friendRequest.isPosible(
         interaction,
-        new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+        new UniqueEntityID(payload.id),
       ))
     )
       throw new ConflictException(
         'Cant create friend-request interaction with this params',
       );
-    await this.friendRequest.save(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.friendRequest.save(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/accept-friend-request')
-  async makeFriend(@Body() data: FriendRequestBody) {
+  async makeFriend(
+    @Body() data: FriendRequestBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
     const interaction = new FriendInteraction(new UniqueEntityID(data.userId));
     if (
       !(await this.friend.isPosible(
         interaction,
-        new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+        new UniqueEntityID(payload.id),
       ))
     )
       throw new ConflictException(
         'Cant create like interaction with this params',
       );
-    await this.friend.save(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.friend.save(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/view-story/')
-  async makeViewStory(@Body() data: ViewStoryBody) {
+  async makeViewStory(
+    @Body() data: ViewStoryBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
     const interaction = new ViewStoryInteraction(
       new UniqueEntityID(data.storyId),
     );
@@ -154,85 +150,76 @@ export class SocialGraphController {
       throw new ConflictException(
         'Cant create follow interaction with this params',
       );
-    await this.viewStory.save(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.viewStory.save(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/block')
-  async blockUser(@Body() data: FriendRequestBody) {
+  async blockUser(
+    @Body() data: FriendRequestBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
     const interaction = new BlockInteraction(new UniqueEntityID(data.userId));
     if (!(await this.block.isPosible(interaction)))
       throw new ConflictException(
         'Cant create block interaction with this params',
       );
-    await this.block.save(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.block.save(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/remove-from-favorites')
-  async undoLike(@Body() data: LikeBody) {
+  async undoLike(@Body() data: LikeBody, @CurrentUser() payload: JWTClaim) {
     const interaction = new LikeInteraction(new UniqueEntityID(data.eventId));
-    await this.like.drop(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.like.drop(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/unfollow-partner/')
-  async undoFollow(@Body() data: FollowBody) {
+  async undoFollow(@Body() data: FollowBody, @CurrentUser() payload: JWTClaim) {
     const interaction = new FollowInteraction(
       new UniqueEntityID(data.partnerId),
     );
-    await this.follow.drop(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.follow.drop(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/cancel-friend-request')
-  async undoFriendRequest(@Body() data: FriendRequestBody) {
+  async undoFriendRequest(
+    @Body() data: FriendRequestBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
     const interaction = new FriendRequestInteraction(
       new UniqueEntityID(data.userId),
     );
-    await this.friendRequest.drop(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.friendRequest.drop(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/decline-friend-request')
-  async declineFriendRequest(@Body() data: FriendRequestBody) {
+  async declineFriendRequest(
+    @Body() data: FriendRequestBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
     const interaction = new FriendRequestInteraction(
       new UniqueEntityID(data.userId),
     );
-    await this.friendRequest.drop(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.friendRequest.drop(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/remove-from-friends')
-  async undoFriend(@Body() data: FriendRequestBody) {
+  async undoFriend(
+    @Body() data: FriendRequestBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
     const interaction = new FriendRequestInteraction(
       new UniqueEntityID(data.userId),
     );
-    await this.friend.drop(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.friend.drop(new UniqueEntityID(payload.id), interaction);
   }
 
   @Post('/unblock')
-  async unblockUser(@Body() data: FriendRequestBody) {
+  async unblockUser(
+    @Body() data: FriendRequestBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
     const interaction = new BlockInteraction(new UniqueEntityID(data.userId));
-    await this.block.drop(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      interaction,
-    );
+    await this.block.drop(new UniqueEntityID(payload.id), interaction);
   }
 }
 
@@ -255,9 +242,10 @@ export class UsersGraphController {
     @Query('q') q = '',
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
+    @CurrentUser() payload: JWTClaim,
   ) {
     return this.follow.getOutgoings(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      new UniqueEntityID(payload.id),
       skip,
       limit,
       q,
@@ -272,9 +260,10 @@ export class UsersGraphController {
     @Query('q') q = '',
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
+    @CurrentUser() payload: JWTClaim,
   ) {
     return this.friend.getOutgoings(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      new UniqueEntityID(payload.id),
       skip,
       limit,
       q,
@@ -289,9 +278,10 @@ export class UsersGraphController {
     @Query('q') q = '',
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
+    @CurrentUser() payload: JWTClaim,
   ) {
     return this.friendRequest.getOutgoings(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      new UniqueEntityID(payload.id),
       skip,
       limit,
       q,
@@ -304,12 +294,9 @@ export class UsersGraphController {
   async getLiked(
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
+    @CurrentUser() payload: JWTClaim,
   ) {
-    return this.like.getOutgoings(
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
-      skip,
-      limit,
-    );
+    return this.like.getOutgoings(new UniqueEntityID(payload.id), skip, limit);
   }
 
   //TODO: add is_private filter
@@ -321,12 +308,13 @@ export class UsersGraphController {
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
     @Param('userId', ParseUUIDPipe) userId: string,
+    @CurrentUser() payload: JWTClaim,
   ) {
     return this.like.getOutgoinsFromRemoteNode(
       new UniqueEntityID(userId),
       skip,
       limit,
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      new UniqueEntityID(payload.id),
     );
   }
 
@@ -342,13 +330,14 @@ export class UsersGraphController {
     @Query('take', ParseIntPipe) limit: number,
     @Query('only_followees', ParseBoolPipe) onlyFollowees = false,
     @Param('userId', ParseUUIDPipe) userId: string,
+    @CurrentUser() payload: JWTClaim,
   ) {
     return this.follow.getOutgoingsFromRemoteNode(
       new UniqueEntityID(userId),
       skip,
       limit,
       searchTerm,
-      new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      new UniqueEntityID(payload.id),
       onlyFollowees,
     );
   }
@@ -365,9 +354,10 @@ export class UsersGraphController {
     @Query('take', ParseIntPipe) limit: number,
     @Query('only_friends', ParseBoolPipe) onlyFriends = false,
     @Param('userId', ParseUUIDPipe) userId: string,
+    @CurrentUser() payload: JWTClaim,
   ) {
     return this.friend.getIngoings({
-      from: new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      from: new UniqueEntityID(payload.id),
       skip,
       limit,
       onlyFriends,
@@ -396,9 +386,10 @@ export class EventsGraphController {
     @Query('only_friends', ParseBoolPipe) onlyFriends = false,
     @Query('q') searchTerm = '',
     @Param('eventId') eventId: string,
+    @CurrentUser() payload: JWTClaim,
   ) {
     return this.like.getIngoings({
-      from: new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      from: new UniqueEntityID(payload.id),
       skip,
       limit,
       onlyFriends,
@@ -425,9 +416,10 @@ export class PartnersGraphController {
     @Query('take', ParseIntPipe) limit: number,
     @Query('only_friends', ParseBoolPipe) onlyFriends = false,
     @Param('partnerId', ParseUUIDPipe) partnerId: string,
+    @CurrentUser() payload: JWTClaim,
   ) {
     return this.follow.getIngoings({
-      from: new UniqueEntityID('777cc88c-2e3f-4eb4-ac81-14c9323c541d'),
+      from: new UniqueEntityID(payload.id),
       skip,
       limit,
       onlyFriends,

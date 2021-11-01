@@ -1,4 +1,9 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotImplementedException,
+  Param,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CollectionsReadService } from './collections.read-service';
 
@@ -11,6 +16,7 @@ export class CollectionsController {
   @Get(':id')
   @ApiParam({ name: 'id' })
   async getColllectionDetails(@Param('id') id: string) {
-    return await this.readService.getCollectionDetails(id);
+    throw new NotImplementedException();
+    // return await this.readService.getCollectionDetails(id);
   }
 }

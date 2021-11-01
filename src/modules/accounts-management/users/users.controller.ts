@@ -9,6 +9,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { JWTClaim } from '../auth/login-payload.type';
 import { UpdateUserErrors } from './application/use-cases/update-user/update-user.errors';
 import { UpdateUser } from './application/use-cases/update-user/update-user.usecase';
 import { UpdateUserBody } from './presentation/update-user';
@@ -24,25 +26,26 @@ export class UsersController {
   ) {}
 
   @Get('/me/profile')
-  async getProfile() {
-    return await this.readService.getMyProfile(
-      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
-    );
+  async getProfile(@CurrentUser() payload: JWTClaim) {
+    return await this.readService.getMyProfile(payload.id);
   }
 
   @Get('/:userId/profile')
-  async getUserProfile(@Param('userId', ParseUUIDPipe) userId: string) {
-    return await this.readService.getProfile(
-      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
-      userId,
-    );
+  async getUserProfile(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @CurrentUser() payload: JWTClaim,
+  ) {
+    return await this.readService.getProfile(payload.id, userId);
   }
 
   @Put('/me/profile')
-  async updateUserProfile(@Body() data: UpdateUserBody) {
+  async updateUserProfile(
+    @Body() data: UpdateUserBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
     const result = await this.updateProfile.execute({
       ...data,
-      id: '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
+      id: payload.id,
     });
     if (result.isLeft()) {
       const error = result.value;

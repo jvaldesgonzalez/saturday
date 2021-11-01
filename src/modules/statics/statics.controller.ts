@@ -1,7 +1,9 @@
 import { Controller, Get, Query, Res } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { CurrentUser } from '../accounts-management/auth/decorators/current-user.decorator';
 import { SkipAuth } from '../accounts-management/auth/decorators/skip-auth.decorator';
+import { JWTClaim } from '../accounts-management/auth/login-payload.type';
 import { Theme } from './enums/themes.enum';
 import { StaticsService } from './statics.service';
 
@@ -12,10 +14,8 @@ export class StaticsController {
   constructor(private service: StaticsService) {}
 
   @Get('/signed-urls/profiles/me')
-  async getProfileSignedUrl() {
-    return await this.service.getSignedUrl(
-      `profile-777cc88c-2e3f-4eb4-ac81-14c9323c541d`,
-    );
+  async getProfileSignedUrl(@CurrentUser() payload: JWTClaim) {
+    return await this.service.getSignedUrl(`profile-${payload.username}`);
   }
 
   @SkipAuth()

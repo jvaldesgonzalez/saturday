@@ -1,6 +1,8 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AccountsManagementReadService } from './accounts-management.read-service';
+import { CurrentUser } from './auth/decorators/current-user.decorator';
+import { JWTClaim } from './auth/login-payload.type';
 
 @ApiBearerAuth()
 @ApiTags('accounts')
@@ -9,12 +11,12 @@ export class AccountsController {
   constructor(private readService: AccountsManagementReadService) {}
 
   @Get('/with-username/:username')
-  async getAccountByUsername(@Param('username') username: string) {
+  async getAccountByUsername(
+    @Param('username') username: string,
+    @CurrentUser() payload: JWTClaim,
+  ) {
     username = username[0] === '@' ? username.slice(1) : username;
 
-    return await this.readService.getAccountByUsername(
-      username,
-      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
-    );
+    return await this.readService.getAccountByUsername(username, payload.id);
   }
 }

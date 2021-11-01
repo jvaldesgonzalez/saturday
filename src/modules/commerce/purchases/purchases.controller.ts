@@ -13,6 +13,8 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { CurrentUser } from 'src/modules/accounts-management/auth/decorators/current-user.decorator';
+import { JWTClaim } from 'src/modules/accounts-management/auth/login-payload.type';
 import { MyPurchases } from './presentation/my-purchases';
 import { PurchasesReadService } from './purchases.read-service';
 
@@ -29,14 +31,18 @@ export class PurchasesController {
   async getMyPurchases(
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
+    @CurrentUser() payload: JWTClaim,
   ) {
-    return await this.readService.getMyPurchases('blabla', skip, limit);
+    return await this.readService.getMyPurchases(payload.id, skip, limit);
   }
 
   @Get('/:id')
   @ApiOkResponse({ type: MyPurchases })
-  async getPurchaseById(@Param('id', ParseUUIDPipe) id: string) {
-    const purchase = await this.readService.getPurchaseDetail(id);
+  async getPurchaseById(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() payload: JWTClaim,
+  ) {
+    const purchase = await this.readService.getPurchaseDetail(payload.id, id);
     if (!purchase)
       throw new NotFoundException('purchase not found on this user');
     return purchase;

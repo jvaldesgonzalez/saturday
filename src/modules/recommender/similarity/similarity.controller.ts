@@ -7,6 +7,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from 'src/modules/accounts-management/auth/decorators/current-user.decorator';
+import { JWTClaim } from 'src/modules/accounts-management/auth/login-payload.type';
 import { SimilarityReadService } from './similarity.read-service';
 
 @ApiBearerAuth()
@@ -21,12 +23,9 @@ export class SimilarityController {
   async getSimilarAccounts(
     @Query('skip', ParseIntPipe) skip = 0,
     @Query('take', ParseIntPipe) limit = 8,
+    @CurrentUser() payload: JWTClaim,
   ) {
-    return await this.readService.getSimilarAccounts(
-      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
-      skip,
-      limit,
-    );
+    return await this.readService.getSimilarAccounts(payload.id, skip, limit);
   }
 
   @ApiQuery({ name: 'skip', type: Number })
@@ -36,12 +35,13 @@ export class SimilarityController {
     @Query('skip', ParseIntPipe) skip = 0,
     @Query('take', ParseIntPipe) limit = 8,
     @Param('eventId', ParseUUIDPipe) eventId: string,
+    @CurrentUser() payload: JWTClaim,
   ) {
     return await this.readService.getSimilarEvents(
       eventId,
       skip,
       limit,
-      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
+      payload.id,
     );
   }
 }

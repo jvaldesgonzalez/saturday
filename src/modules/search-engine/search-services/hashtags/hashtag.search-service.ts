@@ -23,6 +23,7 @@ export class HashtagSearchService implements ISearchService<HashtagItem> {
     q: HashtagQuery,
     skip: number,
     limit: number,
+    _requesterId?: string,
   ): Promise<ISearchResult<HashtagItem>> {
     const items = await this.persistenceManager.query<
       ISearchResultItem<HashtagItem>

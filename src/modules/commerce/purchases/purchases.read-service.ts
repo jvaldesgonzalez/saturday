@@ -26,7 +26,7 @@ export class PurchasesReadService {
           `
 				MATCH (u:User)--(p:Purchase)--(t:Ticket)--(o:EventOccurrence)--(e:Event)--(pl:Place),
 				(e)-[:PUBLISH_EVENT]-(c:Partner)
-				WHERE u.id = "8de83b51-04aa-42d8-861e-4289160694ef"
+				WHERE u.id = $uId
 				RETURN DISTINCT {
 					ticket:{
 						name:t.name,
@@ -90,7 +90,7 @@ export class PurchasesReadService {
         QuerySpecification.withStatement(
           `
 				MATCH (u:User)--(p:Purchase)
-				WHERE u.id = "8de83b51-04aa-42d8-861e-4289160694ef"
+				WHERE u.id = $uId
 				return count(p)
 				`,
         ).bind({ uId: userId }),
@@ -104,13 +104,16 @@ export class PurchasesReadService {
     };
   }
 
-  async getPurchaseDetail(purchaseId: string): Promise<MyPurchases> {
+  async getPurchaseDetail(
+    issuerId: string,
+    purchaseId: string,
+  ): Promise<MyPurchases> {
     return await this.persistenceManager.maybeGetOne<MyPurchases>(
       QuerySpecification.withStatement(
         `
 				MATCH (u:User)--(p:Purchase)--(t:Ticket)--(o:EventOccurrence)--(e:Event)--(pl:Place),
 				(e)-[:PUBLISH_EVENT]-(c:Partner)
-				WHERE u.id = "8de83b51-04aa-42d8-861e-4289160694ef" AND p.id = $pId
+				WHERE u.id = $uId AND p.id = $pId
 				OPTIONAL MATCH (p)-[:HAS_COUPON]->(coupon:Coupon)
 				RETURN {
 					ticket:{
@@ -149,7 +152,7 @@ export class PurchasesReadService {
 					}
 				} AS purchase`,
       )
-        .bind({ pId: purchaseId })
+        .bind({ pId: purchaseId, uId: issuerId })
         .map((r) => {
           return {
             ...r,

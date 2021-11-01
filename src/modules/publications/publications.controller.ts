@@ -1,5 +1,7 @@
 import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '../accounts-management/auth/decorators/current-user.decorator';
+import { JWTClaim } from '../accounts-management/auth/login-payload.type';
 import { PublicationsReadService } from './publications.read-service';
 
 @ApiBearerAuth()
@@ -14,11 +16,8 @@ export class PublicationsController {
   async getHome(
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
+    @CurrentUser() payload: JWTClaim,
   ) {
-    return await this.readService.getHome(
-      limit,
-      skip,
-      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
-    );
+    return await this.readService.getHome(limit, skip, payload.id);
   }
 }

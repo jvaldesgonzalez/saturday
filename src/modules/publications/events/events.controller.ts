@@ -14,6 +14,8 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { CurrentUser } from 'src/modules/accounts-management/auth/decorators/current-user.decorator';
+import { JWTClaim } from 'src/modules/accounts-management/auth/login-payload.type';
 import { EventsReadService } from './events.read-service';
 import { EventDetails } from './presentation/event-details';
 
@@ -25,11 +27,11 @@ export class EventsController {
 
   @Get('/:id')
   @ApiOkResponse({ type: EventDetails })
-  async getEventDetails(@Param('id') id: string) {
-    const event = await this.readService.getEventDetails(
-      id,
-      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
-    );
+  async getEventDetails(
+    @Param('id') id: string,
+    @CurrentUser() payload: JWTClaim,
+  ) {
+    const event = await this.readService.getEventDetails(id, payload.id);
     if (!event) throw new NotFoundException(`Event ${id} not found`);
     return event;
   }
@@ -42,12 +44,13 @@ export class EventsController {
     @Param('hashtagword') hashtagWord: string,
     @Query('skip', ParseIntPipe) skip: number = 0,
     @Query('take', ParseIntPipe) limit: number = 10,
+    @CurrentUser() payload: JWTClaim,
   ) {
     return await this.readService.getEventsWithHashtag(
       hashtagWord,
       skip,
       limit,
-      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
+      payload.id,
     );
   }
 }
@@ -66,10 +69,11 @@ export class PartnerEventsController {
     @Param('partnerId', ParseUUIDPipe) partnerId: string,
     @Query('skip', ParseIntPipe) skip: number = 0,
     @Query('take', ParseIntPipe) limit: number = 10,
+    @CurrentUser() payload: JWTClaim,
   ) {
     return await this.readService.getEventsByPartner(
       partnerId,
-      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
+      payload.id,
       skip,
       limit,
     );

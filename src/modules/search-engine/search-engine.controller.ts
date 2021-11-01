@@ -7,6 +7,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '../accounts-management/auth/decorators/current-user.decorator';
+import { JWTClaim } from '../accounts-management/auth/login-payload.type';
 import { GetCombinedProcessed } from './common/search-query.abstract';
 import { FilterEventsBody } from './presentation/search-event';
 import { AccountQuery } from './search-services/accounts/account.query';
@@ -36,11 +38,17 @@ export class SearchEngineController {
     @Query('q') q: string,
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
+    @CurrentUser() payload: JWTClaim,
   ) {
     const query = new HashtagQuery(q);
     if (query.processedQuery.length === 0)
       throw new BadRequestException('q must not be empty');
-    return this.hashtagService.search(new HashtagQuery(q), skip, limit);
+    return this.hashtagService.search(
+      new HashtagQuery(q),
+      skip,
+      limit,
+      payload.id,
+    );
   }
 
   @Get('profiles')
@@ -51,16 +59,12 @@ export class SearchEngineController {
     @Query('q') q: string,
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
+    @CurrentUser() payload: JWTClaim,
   ) {
     const query = new AccountQuery(q);
     if (query.processedQuery.length === 0)
       throw new BadRequestException('q must not be empty');
-    return this.accountsService.search(
-      query,
-      skip,
-      limit,
-      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
-    );
+    return this.accountsService.search(query, skip, limit, payload.id);
   }
 
   @Get('events')
@@ -72,6 +76,7 @@ export class SearchEngineController {
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
     @Body() data: FilterEventsBody,
+    @CurrentUser() payload: JWTClaim,
   ) {
     const query = new EventQuery(q);
     if (q.length === 0) throw new BadRequestException('q must not be empty');
@@ -79,7 +84,7 @@ export class SearchEngineController {
       query,
       skip,
       limit,
-      null,
+      payload.id,
       data.dateInterval,
       data.categories,
       data.priceInterval,
@@ -95,6 +100,7 @@ export class SearchEngineController {
     @Query('q') q: string,
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
+    @CurrentUser() payload: JWTClaim,
   ) {
     const query = GetCombinedProcessed(
       new EventQuery(q),
@@ -103,11 +109,6 @@ export class SearchEngineController {
     );
     if (query.processedQuery.length === 0)
       throw new BadRequestException('q must not be empty');
-    return await this.generalService.search(
-      query,
-      skip,
-      limit,
-      '777cc88c-2e3f-4eb4-ac81-14c9323c541d',
-    );
+    return await this.generalService.search(query, skip, limit, payload.id);
   }
 }
