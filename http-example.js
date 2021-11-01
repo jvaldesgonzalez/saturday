@@ -1,5 +1,4 @@
 const axios = require('axios').default;
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 const qs = require('qs');
 
 const instance = axios.create();

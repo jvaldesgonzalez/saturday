@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Req, Res } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { StaticsService } from './statics.service';
 
@@ -12,6 +12,14 @@ export class StaticsController {
     return await this.service.getSignedUrl(
       `profile-777cc88c-2e3f-4eb4-ac81-14c9323c541d`,
     );
+  }
+
+  @Get('/default-profile-image')
+  async getDefaultImage(@Req() req, @Res() res) {
+    const url = await this.service.getDefaultProfileImageUrl(
+      req.headers['theme'],
+    );
+    res.redirect(url);
   }
 
   @Get('/signed-urls/events/')
