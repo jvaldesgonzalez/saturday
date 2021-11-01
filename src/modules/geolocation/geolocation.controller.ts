@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { GeolocationReadService } from './geolocation.read-service';
 import { GetNearEventsBody } from './presentation/get-near-events';
 
+@ApiBearerAuth()
 @ApiTags('geolocation')
 @Controller('geolocation')
 export class GeolocationController {

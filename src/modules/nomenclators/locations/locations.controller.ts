@@ -4,10 +4,12 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import * as _ from 'faker';
+import { SkipAuth } from 'src/modules/accounts-management/auth/decorators/skip-auth.decorator';
 import { LocationEntity } from './infrastructure/entities/location.entity';
 
+@ApiBearerAuth()
 @ApiTags('locations')
 @Controller('locations')
 export class LocationsController {
@@ -15,6 +17,7 @@ export class LocationsController {
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
 
+  @SkipAuth()
   @Get('')
   async getAll() {
     const locs = await this.persistenceManager.query<LocationEntity>(

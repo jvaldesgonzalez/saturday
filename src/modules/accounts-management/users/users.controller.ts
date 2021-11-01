@@ -8,12 +8,13 @@ import {
   ParseUUIDPipe,
   Put,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UpdateUserErrors } from './application/use-cases/update-user/update-user.errors';
 import { UpdateUser } from './application/use-cases/update-user/update-user.usecase';
 import { UpdateUserBody } from './presentation/update-user';
 import { UsersReadService } from './users.read-service';
 
+@ApiBearerAuth()
 @ApiTags('users')
 @Controller('users')
 export class UsersController {

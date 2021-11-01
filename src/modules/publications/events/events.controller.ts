@@ -7,10 +7,17 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { EventsReadService } from './events.read-service';
 import { EventDetails } from './presentation/event-details';
 
+@ApiBearerAuth()
 @ApiTags('events')
 @Controller('events')
 export class EventsController {

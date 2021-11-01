@@ -47,7 +47,7 @@ export class RegisterUser implements IUseCase<RegisterUserDto, Response> {
     const userOrError = await this.createUser.execute({
       ...request,
       refreshToken: JWTUtils.signRefresh(),
-      username: 'fsldkfjJk:w',
+      username: request.email.split('@')[0],
     });
     if (userOrError.isLeft()) return left(userOrError.value);
     else if (userOrError.isRight()) {

@@ -15,6 +15,10 @@ async function bootstrap(): Promise<void> {
   app.use(helmet());
   app.enableCors();
 
+  // app.enableVersioning({
+  //   type: VersioningType.URI,
+  // });
+
   const config = new DocumentBuilder()
     .setTitle('Saturday Backend')
     .setDescription('Saturday apps API description')

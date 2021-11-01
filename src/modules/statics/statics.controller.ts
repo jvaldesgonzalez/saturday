@@ -1,9 +1,11 @@
 import { Controller, Get, Query, Res } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { SkipAuth } from '../accounts-management/auth/decorators/skip-auth.decorator';
 import { Theme } from './enums/themes.enum';
 import { StaticsService } from './statics.service';
 
+@ApiBearerAuth()
 @ApiTags('statics')
 @Controller('statics')
 export class StaticsController {
@@ -16,6 +18,7 @@ export class StaticsController {
     );
   }
 
+  @SkipAuth()
   @Get('/default-profile-image')
   @ApiQuery({ name: 'theme', enum: Theme })
   async getDefaultImage(@Query('theme') theme: Theme, @Res() res: Response) {

@@ -8,18 +8,20 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateUserErrors } from '../users/application/use-cases/create-user/create-user.errors';
 import { AuthProvider } from '../users/domain/value-objects/auth-provider.value';
 import { CheckUserStatusErrors } from './application/use-cases/check-user-status/check-user-status.errors';
 import { CheckUserStatusFacebook } from './application/use-cases/check-user-status/check-user-status.facebook.usecase';
 import { LoginUser } from './application/use-cases/login/login.usecase';
 import { RegisterUser } from './application/use-cases/register-user/register-user.usecase';
+import { SkipAuth } from './decorators/skip-auth.decorator';
 import { JwtAuthGuard } from './guards/auth.guard';
 import { CheckUserStatusFbRequest } from './presentation/check-user-status';
 import { LoginUserRequest } from './presentation/login-user';
 import { RegisterUserRequest } from './presentation/register-user';
 
+@ApiBearerAuth()
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -29,6 +31,7 @@ export class AuthController {
     private loginUserUC: LoginUser,
   ) {}
 
+  @SkipAuth()
   @Post('/facebook/check-user-status')
   async checkUserStatusFb(@Body() data: CheckUserStatusFbRequest) {
     const result = await this.checkUserStatusFbUC.execute(data);
@@ -45,6 +48,7 @@ export class AuthController {
     }
   }
 
+  @SkipAuth()
   @Post('/facebook/register')
   async registerUser(@Body() data: RegisterUserRequest) {
     const { loginParams, ...rest } = data;
@@ -68,6 +72,7 @@ export class AuthController {
     }
   }
 
+  @SkipAuth()
   @Post('facebook/login')
   async loginUser(@Body() data: LoginUserRequest) {
     const result = await this.loginUserUC.execute(data);
@@ -86,7 +91,6 @@ export class AuthController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('test')
   testing() {
     return 'hello';

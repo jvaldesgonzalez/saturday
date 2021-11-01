@@ -1,7 +1,8 @@
 import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { NotificationsReadService } from './notifications.read-service';
 
+@ApiBearerAuth()
 @ApiTags('notifications')
 @Controller('notifications')
 export class NotificationsController {

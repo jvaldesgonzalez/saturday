@@ -4,7 +4,6 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
-import { Integer } from 'neo4j-driver-core';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
@@ -28,7 +27,7 @@ export class PurchasesReadService {
 				MATCH (u:User)--(p:Purchase)--(t:Ticket)--(o:EventOccurrence)--(e:Event)--(pl:Place),
 				(e)-[:PUBLISH_EVENT]-(c:Partner)
 				WHERE u.id = "8de83b51-04aa-42d8-861e-4289160694ef"
-				RETURN {
+				RETURN DISTINCT {
 					ticket:{
 						name:t.name,
 						id:t.id,
@@ -61,15 +60,13 @@ export class PurchasesReadService {
 					}
 				} AS purchase
 				ORDER BY purchase.event.dateTimeInit
-				SKIP $skip
-				LIMIT $limit
 			`,
         )
           .bind({
             uId: userId,
-            limit: Integer.fromInt(limit),
-            skip: Integer.fromInt(skip),
           })
+          .skip(skip)
+          .limit(limit)
           .map((r) => {
             return {
               ...r,

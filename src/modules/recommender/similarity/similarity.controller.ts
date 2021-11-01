@@ -6,9 +6,10 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { SimilarityReadService } from './similarity.read-service';
 
+@ApiBearerAuth()
 @ApiTags('similarity')
 @Controller('similarity')
 export class SimilarityController {

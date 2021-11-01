@@ -10,7 +10,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { BlockInteraction } from './social-services/block/block.interaction';
 import { BlockService } from './social-services/block/block.service';
@@ -42,6 +42,7 @@ import {
 } from './social-services/view-story/view-story.interaction';
 import { ViewStoryService } from './social-services/view-story/view-story.service';
 
+@ApiBearerAuth()
 @ApiTags('interactions')
 @Controller('interactions')
 export class SocialGraphController {
@@ -235,6 +236,7 @@ export class SocialGraphController {
   }
 }
 
+@ApiBearerAuth()
 @ApiTags('users')
 @Controller('users')
 export class UsersGraphController {
@@ -375,6 +377,7 @@ export class UsersGraphController {
   }
 }
 
+@ApiBearerAuth()
 @ApiTags('events')
 @Controller('events')
 export class EventsGraphController {
@@ -405,6 +408,7 @@ export class EventsGraphController {
   }
 }
 
+@ApiBearerAuth()
 @ApiTags('partners')
 @Controller('partners')
 export class PartnersGraphController {

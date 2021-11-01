@@ -1,8 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Stories } from './presentation/stories';
 import { StoriesReadService } from './stories.read-service';
 
+@ApiBearerAuth()
 @ApiTags('stories')
 @Controller('stories')
 export class StoriesController {

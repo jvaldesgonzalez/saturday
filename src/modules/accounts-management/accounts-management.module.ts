@@ -13,6 +13,8 @@ import { AccountsController } from './accounts-management.controller';
 import { AccountsManagementReadService } from './accounts-management.read-service';
 import { PartnersReadService } from './partners/partners.read-service';
 import { PartnersController } from './partners/partners.controller';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/guards/auth.guard';
 
 @Module({
   providers: [
@@ -29,6 +31,10 @@ import { PartnersController } from './partners/partners.controller';
     {
       provide: AuthProviders.IFacebookProvider,
       useClass: FacebookProvider,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
   ],
   controllers: [

@@ -4,9 +4,11 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { SkipAuth } from 'src/modules/accounts-management/auth/decorators/skip-auth.decorator';
 import { CategoryEntity } from './infrastructure/entities/category.entity';
 
+@ApiBearerAuth()
 @ApiTags('categories')
 @Controller('categories')
 export class CategoriesController {
@@ -14,6 +16,7 @@ export class CategoriesController {
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
 
+  @SkipAuth()
   @Get('')
   async getAll() {
     const cats = await this.persistenceManager.query<CategoryEntity>(

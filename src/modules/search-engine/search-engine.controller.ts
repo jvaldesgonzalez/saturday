@@ -6,7 +6,7 @@ import {
   ParseIntPipe,
   Query,
 } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GetCombinedProcessed } from './common/search-query.abstract';
 import { FilterEventsBody } from './presentation/search-event';
 import { AccountQuery } from './search-services/accounts/account.query';
@@ -17,6 +17,7 @@ import { GeneralSearchService } from './search-services/general/general.search-s
 import { HashtagQuery } from './search-services/hashtags/hashtag.query';
 import { HashtagSearchService } from './search-services/hashtags/hashtag.search-service';
 
+@ApiBearerAuth()
 @ApiTags('search')
 @Controller('search')
 export class SearchEngineController {

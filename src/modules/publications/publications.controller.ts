@@ -1,7 +1,8 @@
 import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { PublicationsReadService } from './publications.read-service';
 
+@ApiBearerAuth()
 @ApiTags('publications')
 @Controller('publications')
 export class PublicationsController {

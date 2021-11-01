@@ -7,10 +7,16 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { MyPurchases } from './presentation/my-purchases';
 import { PurchasesReadService } from './purchases.read-service';
 
+@ApiBearerAuth()
 @ApiTags('purchases')
 @Controller('purchases')
 export class PurchasesController {

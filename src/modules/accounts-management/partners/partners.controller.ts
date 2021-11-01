@@ -1,7 +1,8 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
-import { ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PartnersReadService } from './partners.read-service';
 
+@ApiBearerAuth()
 @ApiTags('partners')
 @Controller('partners')
 export class PartnersController {

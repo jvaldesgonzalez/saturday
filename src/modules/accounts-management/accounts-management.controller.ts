@@ -1,7 +1,8 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AccountsManagementReadService } from './accounts-management.read-service';
 
+@ApiBearerAuth()
 @ApiTags('accounts')
 @Controller('accounts')
 export class AccountsController {
