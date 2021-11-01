@@ -1,5 +1,6 @@
-import { Controller, Get, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Query, Res } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Theme } from './enums/themes.enum';
 import { StaticsService } from './statics.service';
 
 @ApiTags('statics')
@@ -15,10 +16,8 @@ export class StaticsController {
   }
 
   @Get('/default-profile-image')
-  async getDefaultImage(@Req() req, @Res() res) {
-    const url = await this.service.getDefaultProfileImageUrl(
-      req.headers['theme'],
-    );
+  async getDefaultImage(@Query('theme') theme: Theme, @Res() res) {
+    const url = await this.service.getDefaultProfileImageUrl(theme);
     res.redirect(url);
   }
 
