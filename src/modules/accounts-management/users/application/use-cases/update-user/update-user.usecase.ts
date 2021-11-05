@@ -1,4 +1,4 @@
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
@@ -17,6 +17,7 @@ type Response = Either<
   Result<void>
 >;
 
+@Injectable()
 export class UpdateUser
   implements IUseCase<UpdateUserDto, Response>, IWithChanges
 {
@@ -34,7 +35,6 @@ export class UpdateUser
 
     const userId = new UniqueEntityID(request.id);
     const userOrNone = await this.repo.findById(userId);
-    console.log(userOrNone);
 
     if (!userOrNone) return left(new UpdateUserErrors.UserNotFound(userId));
 

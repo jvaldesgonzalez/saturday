@@ -1,8 +1,10 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import { IPaymentService } from '../payment.service.interface';
+import {
+  IPaymentService,
+  PaymentPayload,
+} from '../../application/interfaces/payment-service.interface';
 import { enzonaConfig } from './config/enzona.config';
-import { EnzonaPaymentPayload } from './enzona.payload';
 
 @Injectable()
 export class EnzonaPaymentService implements IPaymentService {
@@ -11,9 +13,10 @@ export class EnzonaPaymentService implements IPaymentService {
   }
 
   async generatePaymentLink(
-    payload?: EnzonaPaymentPayload,
-  ): Promise<{ link: string }> {
+    payload: PaymentPayload,
+  ): Promise<{ redirectUrl: string; transactionUUID: string }> {
     try {
+      console.log(payload);
       const res: any = await this.httpService
         .request({
           url: `${enzonaConfig.baseUrl}/payment/v1.0.0/payments`,
@@ -22,10 +25,10 @@ export class EnzonaPaymentService implements IPaymentService {
           },
           method: 'POST',
           data: {
-            desctiption: 'blabla',
+            description: 'Compra del ticket',
             currency: 'CUP',
             amount: {
-              total: '10.00',
+              total: payload.total.toFixed(2),
               details: {
                 shipping: '0.00',
                 tax: '0.00',
@@ -36,16 +39,16 @@ export class EnzonaPaymentService implements IPaymentService {
             items: [
               {
                 name: 'Ticket',
-                description: 'Un tickecito man',
-                quantity: 1,
-                price: '10.00',
+                description: 'descripcion',
+                quantity: payload.quantity,
+                price: payload.ticketPrice.toFixed(2),
                 tax: '0.00',
               },
             ],
             merchant_op_id: 123456789123,
             invoice_number: 1212,
-            return_url: 'http://localhost/dimequetodobien',
-            cancel_url: 'http://localhost/dimequetodomal',
+            return_url: 'https://localhost/return',
+            cancel_url: 'http://localhost/cancel',
             terminal_id: 12121,
             buyer_identity_code: '',
           },
@@ -53,9 +56,12 @@ export class EnzonaPaymentService implements IPaymentService {
         .toPromise();
       const { data } = res;
       console.log(data);
-      return { link: data.links.find((l) => l.method == 'REDIRECT') };
+      return {
+        redirectUrl: data.links.find((l) => l.method == 'REDIRECT').href,
+        transactionUUID: data.transaction_uuid,
+      };
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
       throw error;
     }
   }

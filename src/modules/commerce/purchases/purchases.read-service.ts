@@ -26,7 +26,7 @@ export class PurchasesReadService {
           `
 				MATCH (u:User)--(p:Purchase)--(t:Ticket)--(o:EventOccurrence)--(e:Event)--(pl:Place),
 				(e)-[:PUBLISH_EVENT]-(c:Partner)
-				WHERE u.id = $uId
+				WHERE u.id = $uId AND p.status = "successful"
 				RETURN DISTINCT {
 					ticket:{
 						name:t.name,

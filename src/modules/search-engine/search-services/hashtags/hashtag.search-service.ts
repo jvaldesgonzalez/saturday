@@ -30,7 +30,7 @@ export class HashtagSearchService implements ISearchService<HashtagItem> {
     >(
       QuerySpecification.withStatement(
         `
-				CALL db.index.fulltext.queryNodes('search_engine','${q.processedQuery}') yield node, score
+				CALL db.index.fulltext.queryNodes('search_engine',$search) yield node, score
 				WHERE node:Hashtag
 				RETURN {
     			data: {
@@ -40,10 +40,11 @@ export class HashtagSearchService implements ISearchService<HashtagItem> {
 					},
     			score:score
 				}
-				SKIP $skip
-				LIMIT $limit
 			`,
-      ).bind({ limit: Integer.fromInt(limit), skip: Integer.fromInt(skip) }),
+      )
+        .bind({ search: q.processedQuery })
+        .skip(skip)
+        .limit(limit),
     );
     const total = await this.persistenceManager.getOne<number>(
       QuerySpecification.withStatement(`

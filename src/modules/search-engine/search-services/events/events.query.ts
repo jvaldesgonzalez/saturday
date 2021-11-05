@@ -12,8 +12,8 @@ export class EventQuery extends Query {
   private makeNameQuery() {
     const termsFuzzy = this.raw
       .split(' ')
-      .map((t) => (t.length > 3 ? `${t}~^2 OR ${t}*^2` : `${t}*^2`))
+      .map((t) => (t.length > 3 ? `${t}~^2 OR name:${t}*^2` : `${t}*^2`))
       .filter((i) => i);
-    return `name: ${termsFuzzy.join(' OR ')}`;
+    return `name: ${termsFuzzy.join(' OR name:')}`;
   }
 }
