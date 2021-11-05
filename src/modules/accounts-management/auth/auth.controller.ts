@@ -3,6 +3,7 @@ import {
   ConflictException,
   Controller,
   Get,
+  ImATeapotException,
   InternalServerErrorException,
   NotFoundException,
   Post,
@@ -104,7 +105,7 @@ export class AuthController {
       const error = result.value;
       switch (error.constructor) {
         case RefreshTokenErrors.UserNotFoundInDatabase:
-          throw new NotFoundException(error.getValue().message);
+          throw new ImATeapotException(error.errorValue().message);
         default:
           throw new InternalServerErrorException(error.errorValue().message);
       }
