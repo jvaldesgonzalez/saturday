@@ -100,7 +100,9 @@ export class EventSearchService implements ISearchService<EventItem> {
           q.processedQuery
         }') yield node, score
 				WHERE node:Event
-				AND node.dateTimeEnd >= datetime()
+				MATCH (l:Location)--(place:Place)--(node)-[:PUBLISH_EVENT]-(publisher:Partner),
+				(c:Category)--(node)
+				WHERE node.dateTimeEnd >= datetime()
 				${
           dateInterval
             ? 'AND node.dateTimeInit >= $fromDate AND node.dateTimeEnd <= $toDate'
