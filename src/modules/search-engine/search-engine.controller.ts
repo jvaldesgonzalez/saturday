@@ -68,19 +68,29 @@ export class SearchEngineController {
   }
 
   @Get('events')
-  @ApiQuery({ name: 'q' })
+  @ApiQuery({ name: 'q', allowEmptyValue: true })
   @ApiQuery({ name: 'skip' })
   @ApiQuery({ name: 'take' })
   async searchEvents(
-    @Query('q') q: string,
+    @Query('q') q: string | undefined,
     @Query('skip', ParseIntPipe) skip: number,
     @Query('take', ParseIntPipe) limit: number,
     @Body() data: FilterEventsBody,
     @CurrentUser() payload: JWTClaim,
   ) {
+    if (!q)
+      return await this.eventsService.filter(
+        skip,
+        limit,
+        payload.id,
+        data.dateInterval,
+        data.categories,
+        data.priceInterval,
+        data.locationId,
+      );
     const query = new EventQuery(q);
     if (q.length === 0) throw new BadRequestException('q must not be empty');
-    return this.eventsService.search(
+    return await this.eventsService.search(
       query,
       skip,
       limit,
