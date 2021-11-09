@@ -51,9 +51,9 @@ export class GeneralSearchService implements ISearchService<GeneralSearchItem> {
 							return a{.businessName, .username, .id, .avatar, type:"partner", followers:count(distinct n), IFollowThis: r is not null } as result',
 						node:Hashtag,
 							'RETURN {
-									word:node.word,
+									word:a.word,
 									type:"hashtag",
-									id:node.id
+									id:a.id
 							} as result',
 						node:Event,
 							'MATCH (place:Place)--(a)-[:PUBLISH_EVENT]-(publisher:Partner),
