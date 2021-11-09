@@ -14,6 +14,7 @@ export class HashtagQuery extends Query {
   }
 
   private fuzzyOrPrefix(s: string): string {
+    if (s.length === 0) return '';
     return `word: ${s}~ OR word: ${s}*`;
   }
 

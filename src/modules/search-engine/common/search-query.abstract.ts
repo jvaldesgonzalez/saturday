@@ -10,5 +10,10 @@ export class Query {
 }
 
 export function GetCombinedProcessed(...queries: Query[]): Query {
-  return new Query(queries.map((q) => q.processedQuery).join(' OR '));
+  return new Query(
+    queries
+      .map((q) => q.processedQuery)
+      .filter((i) => i)
+      .join(' OR '),
+  );
 }
