@@ -42,7 +42,7 @@ export class EventSearchService implements ISearchService<EventItem> {
 				WHERE node:Event
 				MATCH (l:Location)--(place:Place)--(node)-[:PUBLISH_EVENT]-(publisher:Partner),
 				(c:Category)--(node)
-				WHERE node.dateTimeEnd is not null
+				WHERE node.dateTimeEnd >= datetime()
 				${
           dateInterval
             ? 'AND node.dateTimeInit >= $fromDate AND node.dateTimeEnd <= $toDate'
@@ -94,11 +94,38 @@ export class EventSearchService implements ISearchService<EventItem> {
         }),
     );
     const total = await this.persistenceManager.getOne<number>(
-      QuerySpecification.withStatement(`
-				CALL db.index.fulltext.queryNodes('search_engine','${q.processedQuery}') yield node, score
+      QuerySpecification.withStatement(
+        `
+				CALL db.index.fulltext.queryNodes('search_engine','${
+          q.processedQuery
+        }') yield node, score
 				WHERE node:Event
+				AND node.dateTimeEnd >= datetime()
+				${
+          dateInterval
+            ? 'AND node.dateTimeInit >= $fromDate AND node.dateTimeEnd <= $toDate'
+            : ''
+        } ${categories.some((i) => i) ? 'AND c.id IN $categories' : ''}
+        ${locationId ? 'AND l.id = $locationId' : ''}
+				${
+          priceInterval
+            ? 'AND node.basePrice >= $fromPrice AND node.topPrice <= $toPrice'
+            : ''
+        } 
 				RETURN count(node)
-				`),
+				`,
+      ).bind({
+        categories,
+        fromDate: dateInterval
+          ? DateTime.fromStandardDate(dateInterval.from)
+          : null,
+        toDate: dateInterval
+          ? DateTime.fromStandardDate(dateInterval.to)
+          : null,
+        fromPrice: priceInterval ? priceInterval.from : null,
+        toPrice: priceInterval ? priceInterval.to : null,
+        locationId: locationId,
+      }),
     );
     return {
       items,
