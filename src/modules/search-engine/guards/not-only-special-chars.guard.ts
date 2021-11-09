@@ -6,9 +6,10 @@ import { getDefaultPaginatedFindResult } from 'src/shared/core/PaginatedFindResu
 @Injectable()
 export class NotOnlySpecialCharsMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    const q: string = req.query.q.toString();
+    const q = req.query.q;
     if (!q) return next();
-    if (q.length <= 2) return res.json(getDefaultPaginatedFindResult());
+    if (q.toString().length <= 2)
+      return res.json(getDefaultPaginatedFindResult());
     return next();
   }
 }
