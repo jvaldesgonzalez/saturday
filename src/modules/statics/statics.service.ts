@@ -24,7 +24,7 @@ export class StaticsService implements IStaticsService {
     const url = await this.minioService.client.presignedPutObject(
       staticsBucketConfig.name,
       objectWithSlug,
-      24 * 60 * 60,
+      staticsBucketConfig.ttl,
     );
     return {
       putUrl: url,

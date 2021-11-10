@@ -4,7 +4,7 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
-import { Integer, DateTime } from 'neo4j-driver-core';
+import { DateTime } from 'neo4j-driver-core';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import {

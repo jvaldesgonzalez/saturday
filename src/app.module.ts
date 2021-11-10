@@ -11,6 +11,7 @@ import { RecommenderModule } from './modules/recommender/recommender.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { GeolocationModule } from './modules/geolocation/geolocation.module';
 import { StaticsModule } from './modules/statics/statics.module';
+import { StatsModule } from './modules/stats/stats.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { StaticsModule } from './modules/statics/statics.module';
     NotificationsModule,
     GeolocationModule,
     StaticsModule,
+    StatsModule,
   ],
 })
 export class AppModule {}

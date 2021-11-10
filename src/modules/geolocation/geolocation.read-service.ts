@@ -19,19 +19,27 @@ export class GeolocationReadService {
   async getNearEvents(
     location: MapLocation,
     radius: number,
-    dateInterval: { from: Date; to: Date },
+    dateInterval?: { from: Date; to: Date },
     categories: string[] = [],
+    priceInterval?: { from: number; to: number },
   ): Promise<PlaceWithEvent[]> {
-    console.log(dateInterval);
     return await this.persistenceManager.query<PlaceWithEvent>(
       QuerySpecification.withStatement(
         `
 				WITH point({latitude:$latitude, longitude:$longitude}) as center
 				MATCH (o:EventOccurrence)--(e:Event)--(place:Place),
 				(c:Category)--(e)--(p:Partner)
-				WHERE o.dateTimeInit >= $fromDate AND o.dateTimeEnd <= $toDate ${
-          categories.some((i) => i) ? 'AND c.id IN $categories' : ''
-        }
+				WHERE e.dateTimeEnd >= datetime()
+				${
+          dateInterval
+            ? 'AND e.dateTimeInit >= $fromDate AND e.dateTimeEnd <= $toDate'
+            : ''
+        } ${categories.some((i) => i) ? 'AND c.id IN $categories' : ''}
+				${
+          priceInterval
+            ? 'AND e.basePrice >= $fromPrice AND e.topPrice <= $toPrice'
+            : ''
+        } 
 				WITH {
 					publisher: p{.id, .avatar, .username},
 					dateTimeInit:o.dateTimeInit,
@@ -54,8 +62,14 @@ export class GeolocationReadService {
           latitude: location.latitude,
           longitude: location.longitude,
           radius,
-          fromDate: DateTime.fromStandardDate(dateInterval.from),
-          toDate: DateTime.fromStandardDate(dateInterval.to),
+          fromDate: dateInterval
+            ? DateTime.fromStandardDate(dateInterval.from)
+            : null,
+          toDate: dateInterval
+            ? DateTime.fromStandardDate(dateInterval.to)
+            : null,
+          fromPrice: priceInterval ? priceInterval.from : null,
+          toPrice: priceInterval ? priceInterval.to : null,
           categories,
         })
         .map((r) => {

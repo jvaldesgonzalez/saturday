@@ -4,7 +4,6 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
-import { Integer } from 'neo4j-driver-core';
 import { EventDetails } from 'src/modules/publications/events/presentation/event-details';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
@@ -33,8 +32,6 @@ export class SimilarityReadService {
 				WHERE metric > $threshold
 				WITH account,metric,u
 				ORDER BY metric DESC
-				SKIP $skip
-				LIMIT $limit
 				call apoc.when(account:User,'
 					optional match (item)-[:FRIEND]-(common:User)-[:FRIEND]-(user)
 					optional match (user)-[rfriend:FRIEND|FRIEND_REQUEST]-(item)
@@ -59,12 +56,13 @@ export class SimilarityReadService {
 					{item:account,user:u}) yield value
 				return value.result
 				`,
-        ).bind({
-          accountId,
-          skip: Integer.fromInt(skip),
-          limit: Integer.fromInt(limit),
-          threshold,
-        }),
+        )
+          .bind({
+            accountId,
+            threshold,
+          })
+          .skip(skip)
+          .limit(limit),
       ),
       this.persistenceManager.getOne<number>(
         QuerySpecification.withStatement(
@@ -100,8 +98,6 @@ export class SimilarityReadService {
 					WHERE e.id = $eventId
 					WITH similar as e,count(whoLike) as commonLikes
 					ORDER BY commonLikes
-					SKIP $skip
-					LIMIT $limit
 
 					MATCH (pl:Place)<-[:HAS_PLACE]-(e)<-[:PUBLISH_EVENT]-(p:Partner),
 					(e)-[:HAS_CATEGORY]->(cat:Category)
@@ -154,9 +150,9 @@ export class SimilarityReadService {
           .bind({
             eventId,
             meId,
-            skip: Integer.fromInt(skip),
-            limit: Integer.fromInt(limit),
           })
+          .skip(skip)
+          .limit(limit)
           .map((r) => {
             return {
               ...r,
