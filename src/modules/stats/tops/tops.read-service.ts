@@ -5,7 +5,7 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
-import { EventEntity } from './entities/event.entity';
+import { EventReadEntity } from './entities/event.entity';
 import { ITopsService } from './interfaces/tops.read-service.interface';
 import { TopsEventMapper } from './mappers/event.mapper';
 
@@ -17,9 +17,9 @@ export class TopsReadService implements ITopsService {
   async getTopCheap(
     skip: number,
     limit: number,
-  ): Promise<PaginatedFindResult<EventEntity>> {
+  ): Promise<PaginatedFindResult<EventReadEntity>> {
     const [items, total] = await Promise.all([
-      this.persistenceManager.query<EventEntity>(
+      this.persistenceManager.query<EventReadEntity>(
         QuerySpecification.withStatement(
           `
 					MATCH (publisher:Partner)--(e:Event)--(place:Place)
@@ -38,7 +38,8 @@ export class TopsReadService implements ITopsService {
         )
           .skip(skip)
           .limit(limit)
-          .map(TopsEventMapper.toDto),
+          .map(TopsEventMapper.toDto)
+          .transform(EventReadEntity),
       ),
       this.persistenceManager.getOne<number>(
         QuerySpecification.withStatement(
@@ -60,14 +61,21 @@ export class TopsReadService implements ITopsService {
   async getTopSellers(
     skip: number,
     limit: number,
-  ): Promise<PaginatedFindResult<EventEntity>> {
+  ): Promise<PaginatedFindResult<EventReadEntity>> {
     const [items, total] = await Promise.all([
-      this.persistenceManager.query<EventEntity>(
+      this.persistenceManager.query<EventReadEntity>(
         QuerySpecification.withStatement(
           `
-					MATCH (publisher:Partner)--(e:Event)--(place:Place),
-					(e)--(o:EventOccurrence)--(t:Ticket)--(p:Purchase)
-					WITH e,place,publisher,count(p) as purchases
+					MATCH (publisher:Partner)-[:PUBLISH_EVENT]-(e:Event)-[:HAS_PLACE]-(place:Place),
+					(e)-[:HAS_OCCURRENCE]-(o:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(p:Purchase),
+					(e)-[:HAS_CATEGORY]->(cat:Category)
+					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
+					WITH o{.id, .dateTimeInit, .dateTimeEnd} as occ,
+						e,
+						place{.name, .latitude, .longitude} as place,
+						publisher{.id, .avatar, .username} as publisher,
+						count(p) as purchases,
+						collect(distinct cat{.id, .name})
 					WHERE purchases > 0
 					RETURN {
 						publisher:publisher{.avatar, .id, .username},
@@ -84,7 +92,8 @@ export class TopsReadService implements ITopsService {
         )
           .skip(skip)
           .limit(limit)
-          .map(TopsEventMapper.toDto),
+          .map(TopsEventMapper.toDto)
+          .transform(EventReadEntity),
       ),
       this.persistenceManager.getOne<number>(
         QuerySpecification.withStatement(

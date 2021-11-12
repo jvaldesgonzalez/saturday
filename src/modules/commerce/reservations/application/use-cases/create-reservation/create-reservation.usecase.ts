@@ -16,7 +16,7 @@ type Response = Either<
   | CreateReservationErrors.TicketNotFound
   | CreateReservationErrors.NotAvailableAmount
   | AppError.UnexpectedError,
-  Result<void>
+  Result<{ reservationId: string }>
 >;
 
 export class CreateReservation
@@ -82,6 +82,6 @@ export class CreateReservation
 
     await repo.save(reservation);
 
-    return right(Ok());
+    return right(Ok({ reservationId: reservation._id.toString() }));
   }
 }
