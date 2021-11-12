@@ -27,7 +27,7 @@ export class TopsReadService implements ITopsService {
 						publisher:publisher{.avatar, .id, .username},
 						name:e.name,
 						multimedia:e.multimedia,
-						place:place{.name, .address},
+						place:place{.name, .address, .latitude, .longitude},
 						dateTimeInit:e.dateTimeInit,
 						dateTimeEnd:e.dateTimeEnd,
 						id:e.id,

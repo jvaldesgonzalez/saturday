@@ -1,7 +1,7 @@
 import { JWTClaim, JWTToken } from '../login-payload.type';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { jwtSecret } from '../constants/jwt-secrets';
-import * as crypto from 'crypto';
+import crypto from 'crypto';
 
 export namespace JWTUtils {
   export function sign(claim: JWTClaim) {

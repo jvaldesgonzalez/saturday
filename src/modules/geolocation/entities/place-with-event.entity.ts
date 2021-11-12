@@ -1,38 +1,41 @@
-export class MapPlaceData {
-  latitude: number;
-  longitude: number;
-  name: string;
-  address: string;
-  partnerRef?: string;
-}
+import { DateTime } from 'neo4j-driver-core';
 
-class PartnerDetails {
-  id: string;
+class PartnerPartialInfo {
   avatar: string;
+  id: string;
   username: string;
 }
 
-class MultimediaDetails {
-  type: string;
-  url: string;
-}
-
-class CategoryDetails {
+export class EventWithPlaceEntity {
+  publisher: PartnerPartialInfo;
   name: string;
-  id: string;
-}
-
-class EventsInPlace {
-  publisher: PartnerDetails;
+  multimedia: { type: string; url: string }[];
+  place: {
+    name: string;
+    address: string;
+    latitude: number;
+    longitude: number;
+    partnerRef?: PartnerPartialInfo;
+  };
   dateTimeInit: Date;
   dateTimeEnd: Date;
-  name: string;
-  multimedia: MultimediaDetails[];
-  categories: CategoryDetails[];
+  id: string;
+  basePrice: number;
 }
 
-export class PlaceWithEvent {
-  place: MapPlaceData;
-  events: EventsInPlace[];
-  distance: number;
+export class EventWithPlaceFromDBEntity {
+  publisher: PartnerPartialInfo;
+  name: string;
+  multimedia: string;
+  place: {
+    name: string;
+    address: string;
+    latitude: number;
+    longitude: number;
+    partnerRef: PartnerPartialInfo;
+  };
+  dateTimeInit: DateTime<number>;
+  dateTimeEnd: DateTime<number>;
+  id: string;
+  basePrice: number;
 }

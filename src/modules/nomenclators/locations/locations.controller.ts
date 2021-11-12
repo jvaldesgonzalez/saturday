@@ -5,7 +5,6 @@ import {
 } from '@liberation-data/drivine';
 import { Controller, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import * as _ from 'faker';
 import { SkipAuth } from 'src/modules/accounts-management/auth/decorators/skip-auth.decorator';
 import { LocationEntity } from './infrastructure/entities/location.entity';
 
@@ -30,7 +29,7 @@ export class LocationsController {
       return {
         id: l.id,
         name: l.name,
-        imageUrl: _.image.nightlife(),
+        imageUrl: l.imageUrl,
       };
     });
   }

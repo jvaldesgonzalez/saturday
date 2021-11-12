@@ -1,15 +1,13 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import * as https from 'https';
+import https from 'https';
 import { Neo4jUnitOfWorkFactory } from 'src/shared/modules/data-access/neo4j/unit-of-work.neo4j.factory';
-import paymentUseCases from './payments/application/use-cases';
-import { PaymentsRepository } from './payments/infrastructure/repository/payments.repository';
-import { PaymentRepositoryFactory } from './payments/infrastructure/repository/payments.repository.factory';
-import { PaymentController } from './payments/payments.controller';
-import { PaymentProviders } from './payments/providers/providers.enum';
-import { EnzonaPaymentService } from './payments/services/enzona/enzona.service';
-import { PurchasesController } from './purchases/purchases.controller';
-import { PurchasesReadService } from './purchases/purchases.read-service';
+import reservationUseCases from './reservations/application/use-cases';
+import { ReservationsRepository } from './reservations/infrastructure/repository/reservations.repository';
+import { ReservationRepositoryFactory } from './reservations/infrastructure/repository/reservations.repository.factory';
+import { ReservationProviders } from './reservations/providers/providers.enum';
+import { ReservationsController } from './reservations/reservations.controller';
+import { ReservationsReadService } from './reservations/reservations.read-service';
 
 @Module({
   imports: [
@@ -18,25 +16,21 @@ import { PurchasesReadService } from './purchases/purchases.read-service';
     }),
   ],
   providers: [
-    PurchasesReadService,
+    ReservationsReadService,
     {
-      provide: PaymentProviders.IPaymentsRepository,
-      useClass: PaymentsRepository,
+      provide: ReservationProviders.IReservationsRepository,
+      useClass: ReservationsRepository,
     },
     {
-      provide: PaymentProviders.IPaymentRepositoryFactory,
-      useClass: PaymentRepositoryFactory,
+      provide: ReservationProviders.IReservationRepositoryFactory,
+      useClass: ReservationRepositoryFactory,
     },
     {
-      provide: PaymentProviders.IPaymentUnitOfWorkFactory,
+      provide: ReservationProviders.IReservationUnitOfWorkFactory,
       useClass: Neo4jUnitOfWorkFactory,
     },
-    {
-      provide: PaymentProviders.IPaymentService,
-      useClass: EnzonaPaymentService,
-    },
-    ...paymentUseCases,
+    ...reservationUseCases,
   ],
-  controllers: [PurchasesController, PaymentController],
+  controllers: [ReservationsController],
 })
 export class CommerceModule {}

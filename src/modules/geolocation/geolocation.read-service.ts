@@ -8,7 +8,8 @@ import { DateTime } from 'neo4j-driver-core';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { MapLocation } from 'src/shared/typedefs/map-location';
 import { TextUtils } from 'src/shared/utils/text.utils';
-import { PlaceWithEvent } from './entities/place-with-event.entity';
+import { EventWithPlaceEntity } from './entities/place-with-event.entity';
+import { EventWithPlaceMapper } from './mappers/event-with-place.mapper';
 
 @Injectable()
 export class GeolocationReadService {
@@ -22,13 +23,12 @@ export class GeolocationReadService {
     dateInterval?: { from: Date; to: Date },
     categories: string[] = [],
     priceInterval?: { from: number; to: number },
-  ): Promise<PlaceWithEvent[]> {
-    return await this.persistenceManager.query<PlaceWithEvent>(
+  ): Promise<EventWithPlaceEntity[]> {
+    return await this.persistenceManager.query<EventWithPlaceEntity>(
       QuerySpecification.withStatement(
         `
 				WITH point({latitude:$latitude, longitude:$longitude}) as center
-				MATCH (o:EventOccurrence)--(e:Event)--(place:Place),
-				(c:Category)--(e)--(p:Partner)
+				MATCH (publisher:Partner)--(e:Event)--(place:Place)
 				WHERE e.dateTimeEnd >= datetime()
 				${
           dateInterval
@@ -40,22 +40,25 @@ export class GeolocationReadService {
             ? 'AND e.basePrice >= $fromPrice AND e.topPrice <= $toPrice'
             : ''
         } 
+				OPTIONAL MATCH (hostPartner:Partner)-[:HAS_PLACE]-(place)
 				WITH {
-					publisher: p{.id, .avatar, .username},
-					dateTimeInit:o.dateTimeInit,
-					dateTimeEnd:o.dateTimeEnd,
+					publisher: publisher{.id, .avatar, .username},
+					dateTimeInit:e.dateTimeInit,
+					dateTimeEnd:e.dateTimeEnd,
 					name:e.name,
 					id:e.id,
-					multimedia:e.multimedia,
-					categories:collect(distinct c{.name, .id})
-				} as eventInPlace, place, distance(center, point(place{.latitude, .longitude})) AS distance
+					place: place{
+						.name,
+						.address, 
+						.latitude, 
+						.longitude,
+						partnerRef: hostPartner{.username, .id, .avatar}
+					},
+					multimedia:e.multimedia
+				} as eventWithPlace, distance(center, point(place{.latitude, .longitude})) AS distance
 				WHERE distance <= $radius
-				RETURN {
-					place: place{.latitude, .longitude, .name, .address},
-					events: collect(eventInPlace),
-					distance:distance
-				} AS result
-				ORDER BY result.distance
+				RETURN eventWithPlace
+				ORDER BY distance
 				`,
       )
         .bind({
@@ -72,19 +75,7 @@ export class GeolocationReadService {
           toPrice: priceInterval ? priceInterval.to : null,
           categories,
         })
-        .map((r) => {
-          return {
-            ...r,
-            events: r.events.map((e) => {
-              return {
-                ...e,
-                multimedia: TextUtils.escapeAndParse(e.multimedia),
-                dateTimeInit: parseDate(e.dateTimeInit),
-                dateTimeEnd: parseDate(e.dateTimeEnd),
-              };
-            }),
-          };
-        }),
+        .map(EventWithPlaceMapper.toDto),
     );
   }
 }

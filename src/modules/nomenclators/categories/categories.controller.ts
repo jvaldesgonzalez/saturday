@@ -30,6 +30,7 @@ export class CategoriesController {
         id: c.id,
         name: c.name,
         imageUrl: c.imageUrl,
+        description: c.description,
       };
     });
   }

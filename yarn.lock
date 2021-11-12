@@ -1060,6 +1060,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.9.1.tgz#0611b37db4246c937feef529ddcc018cf8e35708"
   integrity sha512-QpLcX9ZSsq3YYUUnD3nFDY8H7wctAhQj/TFKL8Ya8v5fMm3CFXxo8zStsLAl780ltoYoo1WvKUVGBQK+1ifr7g==
 
+"@types/omgopass@^3.2.1":
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@types/omgopass/-/omgopass-3.2.1.tgz#c7de4ea87060d647d1eb3c543c6d8d839636c990"
+  integrity sha512-5CMq8TogOSK8mY6ta3KmCRSFSqrn2XzurSp9DahtAZb6ijWAXPh/SizVN3MGlJBaVDA8x5eTzPWc7Fx4XPQ1/w==
+
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
@@ -5179,6 +5184,11 @@ object.assign@^4.1.2:
     define-properties "^1.1.3"
     has-symbols "^1.0.1"
     object-keys "^1.1.1"
+
+omgopass@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/omgopass/-/omgopass-3.2.1.tgz#6ebdde17775017e2c5eef272d935f435731af053"
+  integrity sha512-Q0QqwwL3ag1Pyjhx6vfieaz73pHNLa3v59qhRcTCUINmJOwdcLu0kNKncBSF2ylnzrqmZw9VRgOEdAwvCSxffA==
 
 on-finished@^2.3.0, on-finished@~2.3.0:
   version "2.3.0"

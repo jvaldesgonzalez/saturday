@@ -3,8 +3,8 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import * as helmet from 'helmet';
-import * as morgan from 'morgan';
+import helmet from 'helmet';
+import morgan from 'morgan';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
