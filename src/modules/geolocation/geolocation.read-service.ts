@@ -5,9 +5,7 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { DateTime } from 'neo4j-driver-core';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { MapLocation } from 'src/shared/typedefs/map-location';
-import { TextUtils } from 'src/shared/utils/text.utils';
 import { EventWithPlaceEntity } from './entities/place-with-event.entity';
 import { EventWithPlaceMapper } from './mappers/event-with-place.mapper';
 

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsDate,
@@ -6,10 +6,12 @@ import {
   IsLongitude,
   IsNotEmptyObject,
   IsNumber,
+  IsOptional,
   IsUUID,
   Max,
   Min,
 } from 'class-validator';
+import { PriceInterval } from 'src/modules/search-engine/presentation/search-event';
 
 export class Location {
   @IsLatitude()
@@ -46,6 +48,11 @@ export class GetNearEventsBody {
   @ApiProperty({ type: DateInterval })
   @Type(() => DateInterval)
   dateInterval: DateInterval;
+
+  @ApiPropertyOptional({ type: PriceInterval })
+  @IsOptional()
+  @Type(() => PriceInterval)
+  priceInterval: PriceInterval;
 
   @IsUUID(4, { each: true })
   @ApiProperty({ type: [String] })

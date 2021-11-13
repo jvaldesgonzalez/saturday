@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { GeolocationReadService } from './geolocation.read-service';
 import { GetNearEventsBody } from './presentation/get-near-events';
