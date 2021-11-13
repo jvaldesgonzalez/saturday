@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Either } from 'src/shared/core/Either';
+import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
-import { Result } from 'src/shared/core/Result';
+import { Ok, Result } from 'src/shared/core/Result';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { ReservationProviders } from '../../../providers/providers.enum';
 import { CancelReservationDto } from '../../dtos/cancel-reservation.dto';
@@ -23,11 +23,18 @@ export class CancelReservation
     private repo: IReservationsRepository,
   ) {}
   async execute(request: CancelReservationDto): Promise<Response> {
-    // try {
-    // 	const theReservationId = new UniqueEntityID(request.reservationId);
-    // 	const reservationOrNone = await this.repo.getById(theReservationId)
-
-    // }
-    throw new Error(`Cannot find reservation`);
+    try {
+      const theReservationId = new UniqueEntityID(request.reservationId);
+      const reservationOrNone = await this.repo.getById(theReservationId);
+      console.log(reservationOrNone);
+      if (!reservationOrNone || reservationOrNone.issuerId !== request.userId)
+        return left(
+          new CancelReservationErrors.ReservationNotFound(theReservationId),
+        );
+      await this.repo.drop(reservationOrNone);
+      return right(Ok());
+    } catch (error) {
+      return left(new AppError.UnexpectedError());
+    }
   }
 }

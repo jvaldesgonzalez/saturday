@@ -14,11 +14,14 @@ import {
 import {
   ApiBearerAuth,
   ApiOkResponse,
+  ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser } from 'src/modules/accounts-management/auth/decorators/current-user.decorator';
 import { JWTClaim } from 'src/modules/accounts-management/auth/login-payload.type';
+import { CancelReservationErrors } from './application/use-cases/cancel-reservation/cancel-reservation.errors';
+import { CancelReservation } from './application/use-cases/cancel-reservation/cancel-reservation.usecase';
 import { CreateReservationErrors } from './application/use-cases/create-reservation/create-reservation.errors';
 import { CreateReservation } from './application/use-cases/create-reservation/create-reservation.usecase';
 import { CreateReservationBody } from './presentation/create-payment';
@@ -32,6 +35,7 @@ export class ReservationsController {
   constructor(
     private readService: ReservationsReadService,
     private createReservationUC: CreateReservation,
+    private cancelReservationUC: CancelReservation,
   ) {}
 
   @Get()
@@ -77,6 +81,30 @@ export class ReservationsController {
         case CreateReservationErrors.TicketNotFound:
           throw new ConflictException(error.errorValue().message);
         case CreateReservationErrors.NotAvailableAmount:
+          throw new ConflictException(error.errorValue().message);
+        default:
+          throw new InternalServerErrorException(error.errorValue().message);
+      }
+    } else if (result.isRight()) {
+      return result.value.getValue();
+    }
+  }
+
+  @Post('/:id/cancel')
+  @ApiParam({ name: 'id', type: String })
+  async cancelReservation(
+    @Param('id', ParseUUIDPipe) reservationId: string,
+    @CurrentUser() payload: JWTClaim,
+  ) {
+    const result = await this.cancelReservationUC.execute({
+      reservationId,
+      userId: payload.id,
+    });
+
+    if (result.isLeft()) {
+      const error = result.value;
+      switch (error.constructor) {
+        case CancelReservationErrors.ReservationNotFound:
           throw new ConflictException(error.errorValue().message);
         default:
           throw new InternalServerErrorException(error.errorValue().message);

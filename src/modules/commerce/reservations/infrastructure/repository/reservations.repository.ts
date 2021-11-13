@@ -48,6 +48,23 @@ export class ReservationsRepository
       : false;
   }
 
+  private async refundAvailability(
+    theTicketId: UniqueEntityID,
+    amount: number,
+  ): Promise<void> {
+    await this.persistenceManager.execute(
+      QuerySpecification.withStatement(
+        `
+				MATCH (t:Ticket)
+				WHERE t.id = $tId AND t.amount >= $amount
+				CALL apoc.atomic.add(t,"amount",$amount,5)
+				YIELD oldValue, newValue
+				RETURN newValue
+			`,
+      ).bind({ tId: theTicketId.toString(), amount }),
+    );
+  }
+
   async getTicketMetadata(
     theTicketId: UniqueEntityID,
   ): Promise<TicketWithMetadata> {
@@ -81,7 +98,8 @@ export class ReservationsRepository
 					createdAt:p.createdAt,
 					updatedAt:p.updatedAt,
 					securityPhrase:p.securityPhrase,
-					issuerId:u.id
+					issuerId:u.id,
+					id:p.id
 				}
 			`,
         ).bind({ pId: theReservationId.toString() }),
@@ -106,6 +124,23 @@ export class ReservationsRepository
 					SET p += $data
 			`,
       ).bind({ uId: issuerId, tId: ticketId, data }),
+    );
+  }
+
+  @Transactional()
+  async drop(theReservation: Reservation): Promise<void> {
+    await this.refundAvailability(
+      new UniqueEntityID(theReservation.ticketId),
+      theReservation.amountOfTickets,
+    );
+    await this.persistenceManager.execute(
+      QuerySpecification.withStatement(
+        `
+				MATCH (r:Reservation)
+				WHERE r.id = $rId
+				DETACH DELETE r
+			`,
+      ).bind({ rId: theReservation._id.toString() }),
     );
   }
 }
