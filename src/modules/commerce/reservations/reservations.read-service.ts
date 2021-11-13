@@ -38,6 +38,7 @@ export class ReservationsReadService {
 					id:p.id,
 					amountOfTickets:p.amountOfTickets,
 					couponApplied:coupon{.code},
+					toPay:p.amountOfTickets * t.price,
 					securityPhrase:p.securityPhrase,
 					event:{
 						publisher:{
@@ -110,6 +111,7 @@ export class ReservationsReadService {
 					id:p.id,
 					amountOfTickets:p.amountOfTickets,
 					couponApplied:coupon{.code},
+					toPay:p.amountOfTickets * t.price,
 					securityPhrase:p.securityPhrase,
 					event:{
 						publisher:{

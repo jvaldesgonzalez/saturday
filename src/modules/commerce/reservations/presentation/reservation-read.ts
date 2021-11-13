@@ -77,4 +77,8 @@ export class ReservationReadResponse {
   couponApplied?: string;
   @ApiResponseProperty()
   securityPhrase: string;
+  @ApiResponseProperty()
+  toPayStr: string;
+  @ApiResponseProperty()
+  toPay: number;
 }

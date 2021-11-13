@@ -39,4 +39,5 @@ export class ReservationReadFromDBEntity {
   id: string;
   couponApplied?: { code: string };
   securityPhrase: string;
+  toPay: number;
 }

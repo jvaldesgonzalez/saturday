@@ -16,6 +16,7 @@ export namespace ReservationReadMapper {
         multimedia: TextUtils.escapeAndParse(db.event.multimedia)[0],
       },
       couponApplied: db.couponApplied ? db.couponApplied.code : null,
+      toPayStr: db.toPay.toFixed(2),
     };
     if (!preReturn.couponApplied) delete preReturn.couponApplied;
     return preReturn;
