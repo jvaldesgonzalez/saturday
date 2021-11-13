@@ -223,6 +223,7 @@ export class EventsReadService {
       current: skip,
     };
   }
+
   async getEventsWithHashtag(
     hashtagWord: string,
     skip: number,

@@ -22,16 +22,29 @@ export class TopsReadService implements ITopsService {
       this.persistenceManager.query<EventReadEntity>(
         QuerySpecification.withStatement(
           `
-					MATCH (publisher:Partner)--(e:Event)--(place:Place)
+					MATCH (publisher:Partner)-[:PUBLISH_EVENT]-(e:Event)-[:HAS_PLACE]-(place:Place),
+					(e)-[:HAS_OCCURRENCE]-(o:EventOccurrence)-[:HAS_TICKET]-(t:Ticket),
+					(e)-[:HAS_CATEGORY]->(cat:Category)
+					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
+					WITH o{.id, .dateTimeInit, .dateTimeEnd, tickets:collect(distinct t{.id, .price, .name, .amount, .description})} as occ,
+						e,
+						place{.name, .latitude, .longitude} as place,
+						publisher{.id, .avatar, .username} as publisher,
+						cat{.id, .name} as cat,
+						collect(distinct tag{.title, .color, .description}) as tags
 					RETURN {
-						publisher:publisher{.avatar, .id, .username},
+						publisher:publisher,
 						name:e.name,
 						multimedia:e.multimedia,
-						place:place{.name, .address, .latitude, .longitude},
+						place:place,
 						dateTimeInit:e.dateTimeInit,
 						dateTimeEnd:e.dateTimeEnd,
 						id:e.id,
-						basePrice:e.basePrice
+						info: e.description,
+						basePrice:e.basePrice,
+						category:cat,
+						place:place,
+						attentionTags: tags
 					} as event
 					ORDER BY event.basePrice
 				`,
@@ -67,25 +80,29 @@ export class TopsReadService implements ITopsService {
         QuerySpecification.withStatement(
           `
 					MATCH (publisher:Partner)-[:PUBLISH_EVENT]-(e:Event)-[:HAS_PLACE]-(place:Place),
-					(e)-[:HAS_OCCURRENCE]-(o:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(p:Purchase),
+					(e)-[:HAS_OCCURRENCE]-(o:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(p:Reservation),
 					(e)-[:HAS_CATEGORY]->(cat:Category)
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
-					WITH o{.id, .dateTimeInit, .dateTimeEnd} as occ,
+					WITH o{.id, .dateTimeInit, .dateTimeEnd, tickets:collect(distinct t{.id, .price, .name, .amount, .description})} as occ,
 						e,
 						place{.name, .latitude, .longitude} as place,
 						publisher{.id, .avatar, .username} as publisher,
 						count(p) as purchases,
-						collect(distinct cat{.id, .name})
-					WHERE purchases > 0
+						cat{.id, .name} as cat,
+						collect(distinct tag{.title, .color, .description}) as tags
 					RETURN {
-						publisher:publisher{.avatar, .id, .username},
+						publisher:publisher,
 						name:e.name,
 						multimedia:e.multimedia,
-						place:place{.name, .address},
+						place:place,
 						dateTimeInit:e.dateTimeInit,
 						dateTimeEnd:e.dateTimeEnd,
 						id:e.id,
-						basePrice:e.basePrice
+						info: e.description,
+						basePrice:e.basePrice,
+						category:cat,
+						place:place,
+						attentionTags: tags
 					}
 					ORDER BY purchases DESC
 				`,
@@ -98,7 +115,7 @@ export class TopsReadService implements ITopsService {
       this.persistenceManager.getOne<number>(
         QuerySpecification.withStatement(
           `
-					MATCH (e:Event)--(o:EventOccurrence)--(t:Ticket)--(p:Purchase)
+					MATCH (e:Event)--(o:EventOccurrence)--(t:Ticket)--(p:Reservation)
 					WITH e, count(p) as purchases
 					WHERE purchases > 0
 					RETURN count(e)
