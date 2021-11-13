@@ -81,4 +81,6 @@ export class ReservationReadResponse {
   toPayStr: string;
   @ApiResponseProperty()
   toPay: number;
+  @ApiResponseProperty()
+  isValidated: boolean;
 }

@@ -1,4 +1,4 @@
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IRepositoryFactory } from 'src/shared/core/interfaces/IRepository';
@@ -19,6 +19,7 @@ type Response = Either<
   Result<{ reservationId: string }>
 >;
 
+@Injectable()
 export class CreateReservation
   implements IUseCase<CreateReservationDto, Response>
 {

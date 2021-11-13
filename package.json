@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@bitnine-oss/ag-driver": "^0.1.0",
+    "@digikare/nestjs-prom": "^1.0.0",
     "@liberation-data/agensgraph": "^0.1.0-rc",
     "@liberation-data/drivine": "^2.1.3",
     "@nestjs/axios": "^0.0.3",
@@ -50,6 +51,7 @@
     "nestjs-minio-client": "^1.0.6",
     "omgopass": "^3.2.1",
     "pg": "^8.7.1",
+    "prom-client": "^14.0.1",
     "qs": "^6.10.1",
     "rand-token": "^1.0.1",
     "reflect-metadata": "^0.1.13",

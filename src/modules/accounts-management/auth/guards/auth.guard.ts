@@ -22,6 +22,7 @@ export class JwtAuthGuard implements CanActivate {
 
     const httpCtx = context.switchToHttp();
     const req = httpCtx.getRequest();
+    if (req.route.path === '/metrics') return true;
     if (!req.headers.authorization) throw new UnauthorizedException();
     const token = req.headers.authorization.split(' ')[1];
     if (!token) throw new UnauthorizedException();

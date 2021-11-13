@@ -57,6 +57,7 @@ export class ReservationsReadService {
 						dateTimeEnd:o.dateTimeEnd,
 						multimedia:e.multimedia,
 						id:e.id,
+						isValidated:p.isValidated,
 						name:e.name
 					}
 				} AS reservation
@@ -130,6 +131,7 @@ export class ReservationsReadService {
 						dateTimeEnd:o.dateTimeEnd,
 						multimedia:e.multimedia,
 						id:e.id,
+						isValidated:p.isValidated,
 						name:e.name
 					}
 				} AS reservation`,
