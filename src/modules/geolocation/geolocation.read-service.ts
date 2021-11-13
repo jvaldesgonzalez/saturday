@@ -26,7 +26,8 @@ export class GeolocationReadService {
       QuerySpecification.withStatement(
         `
 				WITH point({latitude:$latitude, longitude:$longitude}) as center
-				MATCH (publisher:Partner)--(e:Event)--(place:Place)
+				MATCH (publisher:Partner)-[:PUBLISH_EVENT]-(e:Event)--(place:Place),
+				(c:Category)--(e:Event)
 				WHERE e.dateTimeEnd >= datetime()
 				${
           dateInterval
