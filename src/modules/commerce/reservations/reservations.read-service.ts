@@ -39,6 +39,7 @@ export class ReservationsReadService {
 					amountOfTickets:p.amountOfTickets,
 					couponApplied:coupon{.code},
 					toPay:p.amountOfTickets * t.price,
+					isValidated:p.isValidated,
 					securityPhrase:p.securityPhrase,
 					event:{
 						publisher:{
@@ -57,7 +58,6 @@ export class ReservationsReadService {
 						dateTimeEnd:o.dateTimeEnd,
 						multimedia:e.multimedia,
 						id:e.id,
-						isValidated:p.isValidated,
 						name:e.name
 					}
 				} AS reservation
@@ -113,6 +113,7 @@ export class ReservationsReadService {
 					amountOfTickets:p.amountOfTickets,
 					couponApplied:coupon{.code},
 					toPay:p.amountOfTickets * t.price,
+					isValidated:p.isValidated,
 					securityPhrase:p.securityPhrase,
 					event:{
 						publisher:{
@@ -131,7 +132,6 @@ export class ReservationsReadService {
 						dateTimeEnd:o.dateTimeEnd,
 						multimedia:e.multimedia,
 						id:e.id,
-						isValidated:p.isValidated,
 						name:e.name
 					}
 				} AS reservation`,

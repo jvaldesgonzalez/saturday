@@ -78,9 +78,9 @@ export class ReservationsRepository
 				RETURN {
 					ticketId:t.id,
 					amountOfTickets:p.amountOfTickets,
-					gateway:p.gateway,
-					executedAt:p.executedAt,
-					status:p.status,
+					createdAt:p.createdAt,
+					updatedAt:p.updatedAt,
+					securityPhrase:p.securityPhrase,
 					issuerId:u.id
 				}
 			`,

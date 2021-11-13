@@ -3,6 +3,7 @@ import { Either } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { Result } from 'src/shared/core/Result';
+import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { ReservationProviders } from '../../../providers/providers.enum';
 import { CancelReservationDto } from '../../dtos/cancel-reservation.dto';
 import { IReservationsRepository } from '../../interfaces/payments.repository.interface';
@@ -22,6 +23,11 @@ export class CancelReservation
     private repo: IReservationsRepository,
   ) {}
   async execute(request: CancelReservationDto): Promise<Response> {
-    throw new Error('NotImplementedException');
+    // try {
+    // 	const theReservationId = new UniqueEntityID(request.reservationId);
+    // 	const reservationOrNone = await this.repo.getById(theReservationId)
+
+    // }
+    throw new Error(`Cannot find reservation`);
   }
 }
