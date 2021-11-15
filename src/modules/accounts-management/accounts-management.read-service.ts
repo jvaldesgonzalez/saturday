@@ -95,7 +95,6 @@ export class AccountsManagementReadService {
         .bind({ meId: meId, username: username })
         .map((r) => {
           if (r.type === 'user') return r;
-          console.log(r.aditionalBusinessData);
           r.aditionalBusinessData = TextUtils.escapeAndParse(
             r.aditionalBusinessData,
           );

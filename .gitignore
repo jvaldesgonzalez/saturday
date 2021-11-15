@@ -36,3 +36,4 @@ lerna-debug.log*
 
 # TEST neo4j-aura connection
 test.js
+.env

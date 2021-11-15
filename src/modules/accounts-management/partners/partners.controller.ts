@@ -1,4 +1,10 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JWTClaim } from '../auth/login-payload.type';
@@ -12,7 +18,10 @@ export class PartnersController {
 
   @Get('/:id/profile')
   @ApiParam({ name: 'id' })
-  async getProfile(@Param('id') id: string, @CurrentUser() payload: JWTClaim) {
+  async getProfile(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() payload: JWTClaim,
+  ) {
     const partner = await this.readService.getProfile(id, payload.id);
     if (!partner) throw new NotFoundException('partner not found');
     return partner;

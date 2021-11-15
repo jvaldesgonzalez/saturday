@@ -68,7 +68,6 @@ export class CollectionsReadService {
         )
           .bind({ cId: collectionId })
           .map((r) => {
-            console.log(r);
             return {
               ...r,
               events: r.events.map((e) => {

@@ -128,7 +128,6 @@ export class UserRepository
         .transform(UserEntity),
     );
 
-    console.log(persistence);
     return persistence ? UserMappers.fromPersistence(persistence) : null;
   }
 
@@ -170,7 +169,6 @@ export class UserRepository
     userId: IIdentifier,
     categories: CategoryId[],
   ): Promise<void> {
-    categories.forEach((c) => console.log(c));
     for (const catId of categories) {
       await this.persistenceManager.execute(
         QuerySpecification.withStatement(

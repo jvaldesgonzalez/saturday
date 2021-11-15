@@ -28,7 +28,7 @@ export class TopsReadService implements ITopsService {
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 					WITH o{.id, .dateTimeInit, .dateTimeEnd, tickets:collect(distinct t{.id, .price, .name, .amount, .description})} as occ,
 						e,
-						place{.name, .latitude, .longitude} as place,
+						place{.name, .latitude, .longitude, .address} as place,
 						publisher{.id, .avatar, .username} as publisher,
 						cat{.id, .name} as cat,
 						collect(distinct tag{.title, .color, .description}) as tags
@@ -85,7 +85,7 @@ export class TopsReadService implements ITopsService {
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 					WITH o{.id, .dateTimeInit, .dateTimeEnd, tickets:collect(distinct t{.id, .price, .name, .amount, .description})} as occ,
 						e,
-						place{.name, .latitude, .longitude} as place,
+						place{.name, .latitude, .longitude, .address} as place,
 						publisher{.id, .avatar, .username} as publisher,
 						count(p) as purchases,
 						cat{.id, .name} as cat,

@@ -15,11 +15,11 @@ export namespace ReservationMapper {
       amountOfTickets: domain.amountOfTickets,
       issuerId: domain.issuerId,
       securityPhrase: domain.securityPhrase,
+      isValidated: domain.isValidated,
     };
   }
 
   export function fromPersistence(p: ReservationEntity): Reservation {
-    console.log({ id: p.id });
     return Reservation.create(
       {
         ...p,

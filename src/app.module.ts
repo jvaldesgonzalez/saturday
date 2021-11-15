@@ -12,16 +12,11 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { GeolocationModule } from './modules/geolocation/geolocation.module';
 import { StaticsModule } from './modules/statics/statics.module';
 import { StatsModule } from './modules/stats/stats.module';
-import { PromModule } from '@digikare/nestjs-prom';
+import { MetricsModule } from './shared/modules/metrics/metrics.module';
 
 @Module({
   imports: [
-    PromModule.forRoot({
-      defaultLabels: {
-        app: 'saturday_server',
-        version: '0.1.0',
-      },
-    }),
+    MetricsModule,
     DataAccessModule,
     AccountsManagementModule,
     PublicationsModule,
@@ -35,6 +30,7 @@ import { PromModule } from '@digikare/nestjs-prom';
     GeolocationModule,
     StaticsModule,
     StatsModule,
+    MetricsModule,
   ],
 })
 export class AppModule {}

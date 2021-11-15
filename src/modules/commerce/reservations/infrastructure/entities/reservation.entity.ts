@@ -6,4 +6,5 @@ export class ReservationEntity extends PersistentEntity {
   amountOfTickets: number;
   issuerId: string;
   securityPhrase: string;
+  isValidated: boolean;
 }

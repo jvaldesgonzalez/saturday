@@ -11,11 +11,17 @@ type PaymentProps = {
   updatedAt: Date;
   issuerId: UniqueEntityID;
   securityPhrase: string;
+  isValidated: boolean;
 };
 
 type NewPaymentProps = Omit<
   PaymentProps,
-  'createdAt' | 'updatedAt' | 'executedAt' | 'status' | 'securityPhrase'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'executedAt'
+  | 'status'
+  | 'securityPhrase'
+  | 'isValidated'
 >;
 
 export class Reservation extends DomainEntity<PaymentProps> {
@@ -41,6 +47,10 @@ export class Reservation extends DomainEntity<PaymentProps> {
 
   get securityPhrase(): string {
     return this.props.securityPhrase;
+  }
+
+  get isValidated(): boolean {
+    return this.props.isValidated;
   }
 
   get createdAt(): Date {
@@ -69,6 +79,7 @@ export class Reservation extends DomainEntity<PaymentProps> {
         createdAt: new Date(),
         updatedAt: new Date(),
         securityPhrase: Reservation.generateSecurityPhrase(),
+        isValidated: false,
       },
       new UniqueEntityID(),
     );

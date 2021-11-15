@@ -26,7 +26,6 @@ export class CancelReservation
     try {
       const theReservationId = new UniqueEntityID(request.reservationId);
       const reservationOrNone = await this.repo.getById(theReservationId);
-      console.log(reservationOrNone);
       if (!reservationOrNone || reservationOrNone.issuerId !== request.userId)
         return left(
           new CancelReservationErrors.ReservationNotFound(theReservationId),

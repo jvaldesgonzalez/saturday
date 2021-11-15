@@ -3,16 +3,17 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import helmet from 'helmet';
-import morgan from 'morgan';
+// import helmet from 'helmet';
+// import morgan from 'morgan';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
-  const port = process.env.PORT || 80;
+  const port = process.env.PORT || 8080;
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  app.use(morgan('dev'));
-  app.use(helmet());
+
+  // app.use(morgan('dev'));
+  // app.use(helmet());
   app.enableCors();
 
   // app.enableVersioning({

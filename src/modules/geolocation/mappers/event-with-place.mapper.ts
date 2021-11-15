@@ -6,7 +6,6 @@ import {
 
 export namespace EventWithPlaceMapper {
   export function toDto(e: EventWithPlaceFromDBEntity): EventWithPlaceEntity {
-    console.log(e);
     const preReturn = {
       ...e,
       multimedia: JSON.parse(e.multimedia),

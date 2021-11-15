@@ -44,7 +44,6 @@ export class CreateReservation
       const repo = uow.getRepository(this.repoFact);
       return uow.commit(() => this.work(request, repo));
     } catch (error) {
-      console.log(error);
       return left(new AppError.UnexpectedError());
     }
   }
