@@ -21,7 +21,8 @@ export class StoriesReadService {
 				MATCH (n:Partner)--(s:Story)
 				WITH n,s
 				ORDER BY s.createdAt DESC
-				OPTIONAL MATCH (u:User {username:"yansarorodriguezpaez"})--(s)
+				OPTIONAL MATCH (u:User)--(s)
+				WHERE u.id = $uId
 				WITH collect(apoc.map.merge(s {.type, .url, .id, .createdAt, .attachedText},{viewed:u.username})) as stories, n
 				RETURN {
 					user:{
@@ -33,6 +34,7 @@ export class StoriesReadService {
 			} as result
 			`,
       )
+        .bind({ uId: userId })
         .map((r) => {
           return {
             ...r,

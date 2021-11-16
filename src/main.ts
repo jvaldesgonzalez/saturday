@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-// import helmet from 'helmet';
+import helmet from 'helmet';
 // import morgan from 'morgan';
 
 async function bootstrap(): Promise<void> {
@@ -13,7 +13,7 @@ async function bootstrap(): Promise<void> {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   // app.use(morgan('dev'));
-  // app.use(helmet());
+  app.use(helmet());
   app.enableCors();
 
   // app.enableVersioning({

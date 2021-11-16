@@ -1,65 +1,32 @@
 import { Ok, Result } from 'src/shared/core/Result';
-import { DomainEntity } from 'src/shared/domain/entity.abstract';
+import { AggregateDomainEntity } from 'src/shared/domain/aggregate-entity.abstract';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { NotificationType } from '../enums/notification-type';
 import { RecipientId } from './value-objects/recipient-id.value';
 
-type NotificationProps = {
-  recipientId: RecipientId;
-  title: string;
+type NotificationEventData = {
+  name: string;
+  id: string;
   imageUrl: string;
-  url: string;
-  body: string;
-  type: NotificationType;
+};
+
+type NotificationUserData = {
+  username: string;
+  id: string;
+  imageUrl: string;
+};
+
+type NotificationProps = {
+  recipientId: RecipientId[];
+  userData?: NotificationUserData;
+  eventData?: NotificationEventData;
   createdAt: Date;
   updatedAt: Date;
 };
 
 type NewNotificationProps = Omit<NotificationProps, 'createdAt' | 'updatedAt'>;
-type OnlyRecipientProps = { recipientId: RecipientId };
 
-export type FriendRequestNotificationProps = OnlyRecipientProps & {
-  requesterId: string;
-  requesterUsername: string;
-  imageUrl: string; //Requester image (profile picture)
-};
-
-export type EventPublishedNotificationProps = OnlyRecipientProps & {
-  eventId: string;
-  eventName: string;
-
-  partnerUsername: string;
-  imageUrl: string; //Event image
-};
-
-export type EventSharedNotificationProps = OnlyRecipientProps & {
-  eventId: string;
-  eventName: string;
-  senderUsername: string;
-  imageUrl: string; //Event image
-};
-
-export class Notification extends DomainEntity<NotificationProps> {
-  get recipientId(): RecipientId {
-    return this.props.recipientId;
-  }
-
-  get title(): string {
-    return this.props.title;
-  }
-
-  get url(): string | undefined {
-    return this.props.title;
-  }
-
-  get body(): string {
-    return this.props.body;
-  }
-
-  get type(): NotificationType {
-    return this.props.type;
-  }
-
+export abstract class BaseNotification extends AggregateDomainEntity<NotificationProps> {
   get createdAt(): Date {
     return this.props.createdAt;
   }
@@ -68,53 +35,87 @@ export class Notification extends DomainEntity<NotificationProps> {
     return this.props.updatedAt;
   }
 
-  public static forFriendRequest(
-    props: FriendRequestNotificationProps,
-  ): Result<Notification> {
-    return Notification.new({
-      ...props,
-      type: NotificationType.FriendRequest,
-      url: `/users/${props.requesterId}/profile/`,
-      title: `Un tipo quiere conocerte`,
-      body: `El tigre @${props.requesterUsername} ta loco por tallar contigo`,
-    });
+  get recipientId(): RecipientId[] {
+    return this.props.recipientId;
   }
 
-  public static forEventPublished(
-    props: EventPublishedNotificationProps,
-  ): Result<Notification> {
-    return Notification.new({
-      ...props,
-      type: NotificationType.EventPublished,
-      url: `/events/${props.eventId}/`,
-      title: `Evento publicado`,
-      body: `El tigre @${props.partnerUsername} ha publicado un evento to gucci`,
-    });
+  get userData(): NotificationUserData {
+    return null;
   }
 
-  public static forEventShared(
-    props: EventSharedNotificationProps,
-  ): Result<Notification> {
-    return Notification.new({
-      ...props,
-      type: NotificationType.EventPublished,
-      url: `/events/${props.eventId}/`,
-      title: `Evento compartido`,
-      body: `El tigre @${props.senderUsername} te compartio un evento bacan`,
-    });
+  get eventData(): NotificationEventData {
+    return null;
   }
 
-  private static new(props: NewNotificationProps): Result<Notification> {
-    return Notification.create(
-      { ...props, createdAt: new Date(), updatedAt: new Date() },
-      new UniqueEntityID(),
+  abstract get type(): NotificationType;
+}
+
+export class NewFriendNotification extends BaseNotification {
+  get type(): NotificationType {
+    return NotificationType.NewFriend;
+  }
+
+  get userData() {
+    return this.props.userData!;
+  }
+
+  public static create(
+    props: NewNotificationProps,
+    id: UniqueEntityID,
+  ): Result<NewFriendNotification> {
+    return Ok(
+      new NewFriendNotification(
+        { ...props, createdAt: new Date(), updatedAt: new Date() },
+        id,
+      ),
     );
   }
+}
 
-  private static create(
-    props: NotificationProps,
+export class FriendRequestNotification extends BaseNotification {
+  get type(): NotificationType {
+    return NotificationType.FriendRequest;
+  }
+
+  get userData() {
+    return this.props.userData!;
+  }
+
+  public static create(
+    props: NewNotificationProps,
     id: UniqueEntityID,
-  ): Result<Notification> {
-    return Ok(new Notification(props, id));
+  ): Result<FriendRequestNotification> {
+    return Ok(
+      new FriendRequestNotification(
+        { ...props, createdAt: new Date(), updatedAt: new Date() },
+        id,
+      ),
+    );
+  }
+}
+
+export class EventSharedNotification extends BaseNotification {
+  get type(): NotificationType {
+    return NotificationType.EventShared;
+  }
+
+  get userData() {
+    return this.props.userData!;
+  }
+
+  get eventData() {
+    return this.props.eventData!;
+  }
+
+  public static create(
+    props: NewNotificationProps,
+    id: UniqueEntityID,
+  ): Result<EventSharedNotification> {
+    return Ok(
+      new EventSharedNotification(
+        { ...props, createdAt: new Date(), updatedAt: new Date() },
+        id,
+      ),
+    );
   }
 }

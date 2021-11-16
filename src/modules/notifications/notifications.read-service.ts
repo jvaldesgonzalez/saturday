@@ -5,8 +5,7 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
-import { TextUtils } from 'src/shared/utils/text.utils';
+import { NotificationsMapper } from './infrastructure/mappers/notifications.mapper';
 import { NotificationResponse } from './presentation/notification';
 
 @Injectable()
@@ -20,30 +19,34 @@ export class NotificationsReadService {
     skip: number,
     limit: number,
   ): Promise<PaginatedFindResult<NotificationResponse>> {
-    const items = await this.persistenceManager.query<NotificationResponse>(
-      QuerySpecification.withStatement(
-        `
-				MATCH (u:Account)-[:NOTIFICATION]->(l:NOTIFICATION_LIST)-[:NEXT*${
-          skip + 1
-        }..${limit}]-(n:Notification)
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<NotificationResponse>(
+        QuerySpecification.withStatement(
+          `
+				MATCH (u:Account)-[:HAS_NOTIFICATION]-(n:Notification)
 				WHERE u.id = $recipientId
 				RETURN n
+				ORDER BY n.createdAt
 				`,
-      )
-        .bind({ recipientId })
-        .map((r) => {
-          delete r.updatedAt;
-          return {
-            ...r,
-            createdAt: parseDate(r.createdAt),
-            eventData: TextUtils.escapeAndParse(r.eventData || null),
-            userData: TextUtils.escapeAndParse(r.userData || null),
-          };
-        }),
-    );
+        )
+          .bind({ recipientId })
+          .skip(skip)
+          .limit(limit)
+          .map(NotificationsMapper.toResponse),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(
+          `
+				MATCH (u:Account)-[:HAS_NOTIFICATION]-(n:Notification)
+				WHERE u.id = $recipientId
+				RETURN count(n)
+				`,
+        ).bind({ recipientId }),
+      ),
+    ]);
     return {
       items,
-      total: 2,
+      total,
       pageSize: items.length,
       current: skip,
     };
