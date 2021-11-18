@@ -119,3 +119,29 @@ export class EventSharedNotification extends BaseNotification {
     );
   }
 }
+
+export class EventPublishedNotification extends BaseNotification {
+  get type(): NotificationType {
+    return NotificationType.EventPublished;
+  }
+
+  get userData() {
+    return this.props.userData!;
+  }
+
+  get eventData() {
+    return this.props.eventData!;
+  }
+
+  public static create(
+    props: NewNotificationProps,
+    id: UniqueEntityID,
+  ): Result<EventPublishedNotification> {
+    return Ok(
+      new EventPublishedNotification(
+        { ...props, createdAt: new Date(), updatedAt: new Date() },
+        id,
+      ),
+    );
+  }
+}

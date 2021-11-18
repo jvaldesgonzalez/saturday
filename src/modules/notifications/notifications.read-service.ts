@@ -26,7 +26,7 @@ export class NotificationsReadService {
 				MATCH (u:Account)-[:HAS_NOTIFICATION]-(n:Notification)
 				WHERE u.id = $recipientId
 				RETURN n
-				ORDER BY n.createdAt
+				ORDER BY n.createdAt DESC
 				`,
         )
           .bind({ recipientId })

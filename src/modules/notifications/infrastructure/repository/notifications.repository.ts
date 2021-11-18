@@ -37,7 +37,7 @@ export class NotificationsRepository
 					UNION
 					MATCH (u:Account) WHERE u.id IN $uId
 					MATCH (new:Notification) WHERE new.id = $nId
-					CREATE (u)-[:HAS_NOTIFICATION]->(new)
+					MERGE (u)-[:HAS_NOTIFICATION]->(new)
 			`,
       ).bind({ uId: recipientId, data, nId: data.id }),
     );

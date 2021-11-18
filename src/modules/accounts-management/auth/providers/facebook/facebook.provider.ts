@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { AuthProvider } from 'src/modules/accounts-management/users/domain/value-objects/auth-provider.value';
+import { Gender } from 'src/modules/accounts-management/users/domain/value-objects/gender.value';
 import { RegisterUserDto } from '../../application/dtos/register-user.dto';
 import { IAuthProvider } from '../auth.provider.interface';
 
@@ -10,19 +11,25 @@ export class FacebookProvider implements IFacebookProvider {
     authToken: string,
     userId: string,
   ): Promise<Partial<RegisterUserDto>> {
-    const response = await axios({
-      method: 'GET',
-      url: `https://graph.facebook.com/${userId}?access_token=${authToken}&fields=name,email,picture.width(500).height(500),birthday,gender`,
-    });
+    const { data } = await axios.get<{
+      name: string;
+      picture: any;
+      id: string;
+      email: string;
+      birthday: string;
+      gender: Gender;
+    }>(
+      `https://graph.facebook.com/${userId}?access_token=${authToken}&fields=name,email,picture.width(500).height(500),birthday,gender`,
+    );
 
     return {
-      fullname: response.data.name,
-      avatar: response.data.picture.data.url,
-      authProviderId: response.data.id,
+      fullname: data.name,
+      avatar: data.picture.data.url,
+      authProviderId: data.id,
       authProvider: AuthProvider.Facebook,
-      email: response.data.email,
-      birthday: new Date(response.data.birthday),
-      gender: response.data.gender,
+      email: data.email,
+      birthday: new Date(data.birthday),
+      gender: data.gender,
     };
   }
 
@@ -31,10 +38,9 @@ export class FacebookProvider implements IFacebookProvider {
     userId: string,
   ): Promise<boolean> {
     try {
-      const response = await axios({
-        method: 'GET',
-        url: `https://graph.facebook.com/${userId}?access_token=${authToken}`,
-      });
+      const response = await axios.get<{ id: string }>(
+        `https://graph.facebook.com/${userId}?access_token=${authToken}`,
+      );
       return Number(response.data.id) === Number(userId);
     } catch (err) {
       console.error(err);

@@ -4,6 +4,7 @@ import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import {
   BaseNotification,
+  EventPublishedNotification,
   EventSharedNotification,
   FriendRequestNotification,
   NewFriendNotification,
@@ -51,6 +52,8 @@ export namespace NotificationsMapper {
         return FriendRequestNotification.create(data, id).getValue();
       case NotificationType.EventShared:
         return EventSharedNotification.create(data, id).getValue();
+      case NotificationType.EventPublished:
+        return EventPublishedNotification.create(data, id).getValue();
     }
   }
 
