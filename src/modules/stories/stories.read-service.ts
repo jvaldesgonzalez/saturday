@@ -5,8 +5,8 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { Stories } from './presentation/stories';
+import { StoriesReadMapper } from './read-model/mappers/story.read-mapper';
 
 @Injectable()
 export class StoriesReadService {
@@ -35,20 +35,7 @@ export class StoriesReadService {
 			`,
       )
         .bind({ uId: userId })
-        .map((r) => {
-          return {
-            ...r,
-            stories: r.stories.map((s) => {
-              const result = {
-                ...s,
-                createdAt: parseDate(s.createdAt),
-                viewed: !!s.viewed,
-              };
-              if (!result.attachedText) delete result.attachedText;
-              return result;
-            }),
-          };
-        })
+        .map(StoriesReadMapper.toResponse)
         .transform(Stories),
     );
 

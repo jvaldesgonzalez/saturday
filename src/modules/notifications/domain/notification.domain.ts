@@ -4,13 +4,13 @@ import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { NotificationType } from '../enums/notification-type';
 import { RecipientId } from './value-objects/recipient-id.value';
 
-type NotificationEventData = {
+export type NotificationEventData = {
   name: string;
   id: string;
   imageUrl: string;
 };
 
-type NotificationUserData = {
+export type NotificationUserData = {
   username: string;
   id: string;
   imageUrl: string;

@@ -6,8 +6,13 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import { INotificationsRepository } from '../../application/interfaces/notifications.repository';
-import { BaseNotification } from '../../domain/notification.domain';
+import {
+  BaseNotification,
+  NotificationEventData,
+  NotificationUserData,
+} from '../../domain/notification.domain';
 import { NotificationEntity } from '../entities/notification.entity';
 import { NotificationsMapper } from '../mappers/notifications.mapper';
 
@@ -25,6 +30,43 @@ export class NotificationsRepository
       'NotificationsRepository',
       persistenceManager,
     );
+  }
+  async getNotificationData(
+    theEventId?: string,
+    theUserId?: string,
+  ): Promise<{ user?: NotificationUserData; event?: NotificationEventData }> {
+    let eventPromise: NotificationEventData;
+    let userPromise: NotificationUserData;
+    if (theEventId) {
+      eventPromise =
+        await this.persistenceManager.getOne<NotificationEventData>(
+          QuerySpecification.withStatement(
+            `
+						MATCH (e:Event) WHERE e.id = $eId
+						RETURN e{.name, .multimedia, .id}
+				`,
+          )
+            .bind({ eId: theEventId })
+            .map((r) => {
+              return {
+                name: r.name,
+                id: r.id,
+                imageUrl: TextUtils.escapeAndParse(r.multimedia)[0].url,
+              };
+            }),
+        );
+    }
+    if (theUserId) {
+      userPromise = await this.persistenceManager.getOne<NotificationUserData>(
+        QuerySpecification.withStatement(
+          `
+						MATCH (e:User) WHERE e.id = $eId
+						RETURN e{.username, .avatar, .id}
+				`,
+        ).bind({ eId: theEventId }),
+      );
+    }
+    return { user: userPromise, event: eventPromise };
   }
 
   @Transactional()

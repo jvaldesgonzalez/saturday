@@ -4,7 +4,6 @@ import {
   Param,
   ParseArrayPipe,
   ParseIntPipe,
-  ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -39,7 +38,6 @@ export class NotificationsController {
   @SkipAuth()
   @Get('test-send/:to')
   async testSend(@Param('to', ParseArrayPipe) to: string[]) {
-    console.log(to);
     const not = FriendRequestNotification.create(
       {
         recipientId: to.map((t) => new UniqueEntityID(t)),
