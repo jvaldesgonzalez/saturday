@@ -25,6 +25,7 @@ export class AccountSearchService implements ISearchService<AccountItem> {
     limit: number,
     requesterId: string,
   ): Promise<ISearchResult<AccountItem>> {
+    console.log(q.processedQuery);
     const [items, total] = await Promise.all([
       this.persistenceManager.query<ISearchResultItem<AccountItem>>(
         QuerySpecification.withStatement(

@@ -138,6 +138,7 @@ export class UserRepository
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(
         `MERGE (u:User {id:$uId})
+				SET u:Account
 				SET u += $data`,
       ).bind({
         uId: persistent.id,
