@@ -18,3 +18,12 @@ export class StoryReadFromDBEntity {
   };
   stories: Story[];
 }
+
+export class StoryReadByHostFromDBEntity {
+  type: MultimediaType;
+  url: string;
+  id: string;
+  createdAt: DateTime<number>;
+  attachedText: string;
+  views: number;
+}

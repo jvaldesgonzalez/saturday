@@ -1,6 +1,9 @@
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
-import { Stories } from '../../presentation/stories';
-import { StoryReadFromDBEntity } from '../entities/story.read-entity';
+import { Stories, StoriesByHost } from '../../presentation/stories';
+import {
+  StoryReadByHostFromDBEntity,
+  StoryReadFromDBEntity,
+} from '../entities/story.read-entity';
 
 export namespace StoriesReadMapper {
   export function toResponse(db: StoryReadFromDBEntity): Stories {
@@ -14,6 +17,15 @@ export namespace StoriesReadMapper {
           viewed: !!r.viewed,
         };
       }),
+    };
+  }
+  export function toResponseByHost(
+    db: StoryReadByHostFromDBEntity,
+  ): StoriesByHost {
+    if (!db.attachedText) delete db.attachedText;
+    return {
+      ...db,
+      createdAt: parseDate(db.createdAt),
     };
   }
 }

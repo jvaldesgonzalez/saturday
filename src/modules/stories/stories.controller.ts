@@ -16,7 +16,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser } from '../accounts-management/auth/decorators/current-user.decorator';
-import { SkipAuth } from '../accounts-management/auth/decorators/skip-auth.decorator';
 import { JWTClaim } from '../accounts-management/auth/login-payload.type';
 import { DeleteStoryErrors } from './application/use-cases/deleteStory/delete-story.errors';
 import { DeleteStory } from './application/use-cases/deleteStory/delete-story.usecase';
@@ -41,7 +40,12 @@ export class StoriesController {
     return await this.readService.getStories(payload.id);
   }
 
-  @SkipAuth()
+  @Get('/partners/me')
+  @ApiOkResponse({ type: [Stories] })
+  async getStoriesByHost(@CurrentUser() payload: JWTClaim) {
+    return await this.readService.getStoriesByHost(payload.id);
+  }
+
   @Post('/')
   async createStory(
     @CurrentUser() user: JWTClaim,
@@ -49,7 +53,7 @@ export class StoriesController {
   ) {
     const result = await this.createStoryUC.execute({
       ...data,
-      publisher: 'f66f2836-f230-4a5b-83b4-c92f54d4156f',
+      publisher: user.id,
     });
     if (result.isLeft()) {
       const error = result.value;
@@ -62,7 +66,6 @@ export class StoriesController {
     }
   }
 
-  @SkipAuth()
   @Delete('/:id')
   @ApiParam({ name: 'id' })
   async deleteStory(
@@ -70,7 +73,7 @@ export class StoriesController {
     @Param('id', ParseUUIDPipe) id: string,
   ) {
     const result = await this.deleteStoryUC.execute({
-      partnerId: 'f66f2836-f230-4a5b-83b4-c92f54d4156f',
+      partnerId: user.id,
       storyId: id,
     });
     if (result.isLeft()) {

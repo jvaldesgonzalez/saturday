@@ -1,6 +1,6 @@
-import { ApiResponseProperty } from '@nestjs/swagger';
-import { AtMost3List } from 'src/shared/typedefs/at-most-3-list';
+import { ApiResponseProperty, OmitType } from '@nestjs/swagger';
 import { AccountProfile } from '../../common/presentation/account-profile';
+import { PartnerPlace } from '../domain/value-objects/partner-place.value';
 
 class UnknownField {
   @ApiResponseProperty()
@@ -39,4 +39,12 @@ export class PartnerProfile extends AccountProfile {
   IFollowThis: boolean;
   @ApiResponseProperty({ type: [FriendFollowersPreview] })
   friends: [FriendFollowersPreview];
+}
+
+export class PartnerMyProfile extends OmitType(PartnerProfile, [
+  'totalFriendsWhoFollowThis',
+  'IFollowThis',
+  'friends',
+] as const) {
+  place?: PartnerPlace;
 }

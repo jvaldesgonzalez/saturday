@@ -18,17 +18,16 @@ export class StaticsController {
     return await this.service.getSignedUrl(`profile-${payload.username}`);
   }
 
+  @Get('/signed-urls/media/')
+  async getSignedUrl(@CurrentUser() payload: JWTClaim) {
+    return await this.service.getSignedUrl(`media-${payload.username}`);
+  }
+
   @SkipAuth()
   @Get('/default-profile-image')
   @ApiQuery({ name: 'theme', enum: Theme })
   async getDefaultImage(@Query('theme') theme: Theme, @Res() res: Response) {
     const url = await this.service.getDefaultProfileImageUrl(theme);
     res.redirect(url);
-  }
-
-  @Get('/signed-urls/events/')
-  @ApiQuery({ name: 'name' })
-  async getEventSignedUrl(@Query('name') id: string) {
-    return await this.service.getSignedUrl(`event-${id}`);
   }
 }

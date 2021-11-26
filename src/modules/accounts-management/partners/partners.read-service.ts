@@ -5,7 +5,10 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { TextUtils } from 'src/shared/utils/text.utils';
-import { PartnerProfile } from './presentation/partner-profile';
+import {
+  PartnerMyProfile,
+  PartnerProfile,
+} from './presentation/partner-profile';
 
 @Injectable()
 export class PartnersReadService {
@@ -65,6 +68,44 @@ export class PartnersReadService {
           }
           r.place.latitude = r.place.latitude;
           r.place.longitude = r.place.longitude;
+          return r;
+        }),
+    );
+  }
+
+  async getMyProfile(partnerId: string): Promise<PartnerMyProfile> {
+    return await this.persistenceManager.maybeGetOne<PartnerMyProfile>(
+      QuerySpecification.withStatement(
+        `
+				MATCH (p:Partner)
+				WHERE p.id = $pId
+				OPTIONAL MATCH (u:User)-[:FOLLOW]->(p)
+				OPTIONAL MATCH (p)-[:PUBLISH_EVENT]->(e:Event)
+				WITH count(distinct u) as followers, p, count(e) as events
+				OPTIONAL MATCH (p)-[:HAS_PLACE]-(place:Place)
+				RETURN p{
+						.id,
+						.username,
+						.email,
+						.avatar,
+						.businessName,
+						.aditionalBusinessData,
+						followers:followers,
+						events:events,
+						place:place {.name, .address, .latitude, .longitude}
+				}
+				`,
+      )
+        .bind({ pId: partnerId })
+        .map((r) => {
+          r.aditionalBusinessData = TextUtils.escapeAndParse(
+            r.aditionalBusinessData,
+          );
+          // r.contactInfo = TextUtils.escapeAndParse(r.contactInfo);
+          if (r.place === null || r.place === undefined) {
+            delete r.place;
+            return r;
+          }
           return r;
         }),
     );

@@ -16,6 +16,13 @@ import { PartnersReadService } from './partners.read-service';
 export class PartnersController {
   constructor(private readService: PartnersReadService) {}
 
+  @Get('/me/profile')
+  async getMyProfile(@CurrentUser() payload: JWTClaim) {
+    const partner = await this.readService.getMyProfile(payload.id);
+    if (!partner) throw new NotFoundException('partner not found');
+    return partner;
+  }
+
   @Get('/:id/profile')
   @ApiParam({ name: 'id' })
   async getProfile(

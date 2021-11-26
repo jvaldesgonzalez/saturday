@@ -15,6 +15,9 @@ import { PartnersReadService } from './partners/partners.read-service';
 import { PartnersController } from './partners/partners.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
+import { PartnerProviders } from './partners/providers/providers.enum';
+import { PartnerRepository } from './partners/infrastructure/repository/partner.repository';
+import PartnerUseCases from './partners/application/usecases';
 
 @Module({
   providers: [
@@ -24,6 +27,7 @@ import { JwtAuthGuard } from './auth/guards/auth.guard';
     ...AuthUseCases,
     AccountsManagementReadService,
     PartnersReadService,
+    ...PartnerUseCases,
     {
       provide: UserProviders.IUserRepository,
       useClass: UserRepository,
@@ -31,6 +35,10 @@ import { JwtAuthGuard } from './auth/guards/auth.guard';
     {
       provide: AuthProviders.IFacebookProvider,
       useClass: FacebookProvider,
+    },
+    {
+      provide: PartnerProviders.IPartnerRepository,
+      useClass: PartnerRepository,
     },
     {
       provide: APP_GUARD,

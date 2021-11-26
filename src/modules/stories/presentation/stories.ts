@@ -1,4 +1,4 @@
-import { ApiResponseProperty } from '@nestjs/swagger';
+import { ApiResponseProperty, OmitType } from '@nestjs/swagger';
 
 export class StoryDetail {
   @ApiResponseProperty()
@@ -28,4 +28,9 @@ export class Stories {
   user: UserInfo;
   @ApiResponseProperty({ type: [StoryDetail] })
   stories: StoryDetail[];
+}
+
+export class StoriesByHost extends OmitType(StoryDetail, ['viewed'] as const) {
+  @ApiResponseProperty()
+  views: number;
 }

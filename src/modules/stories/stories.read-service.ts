@@ -5,7 +5,7 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
-import { Stories } from './presentation/stories';
+import { Stories, StoriesByHost } from './presentation/stories';
 import { StoriesReadMapper } from './read-model/mappers/story.read-mapper';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class StoriesReadService {
 						avatar:n.avatar
 					},
 					stories:stories
-			} as result
+				} as result
 			`,
       )
         .bind({ uId: userId })
@@ -47,5 +47,28 @@ export class StoriesReadService {
       pageSize: 5,
       current: 0,
     };
+  }
+
+  async getStoriesByHost(hostId: string): Promise<StoriesByHost[]> {
+    return await this.persisitenceManager.query<StoriesByHost>(
+      QuerySpecification.withStatement(
+        `
+				MATCH (s:Story)<-[:PUBLISH_STORY ]-(p:Partner)
+        WHERE p.id = $id
+				OPTIONAL MATCH (s)--(u:User)
+        RETURN {
+          id:s.id,
+          type:s.type,
+          url:s.url,
+          attachedText: s.attachedText,
+          views:count(u),
+					createdAt:s.createdAt
+        }
+        `,
+      )
+        .bind({ id: hostId })
+        .map(StoriesReadMapper.toResponseByHost)
+        .transform(StoriesByHost),
+    );
   }
 }
