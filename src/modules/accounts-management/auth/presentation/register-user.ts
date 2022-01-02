@@ -1,10 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsUrl,
   Min,
 } from 'class-validator';
@@ -28,8 +29,8 @@ export class RegisterUserRequest {
   @IsNotEmpty()
   fullname: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
+  @ApiPropertyOptional()
+  @IsOptional()
   description: string;
 
   @ApiProperty()
