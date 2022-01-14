@@ -38,18 +38,18 @@ export class NotificationsController {
   @SkipAuth()
   @Get('test-send/:to')
   async testSend(@Param('to', ParseArrayPipe) to: string[]) {
-    const not = FriendRequestNotification.create(
+    const notification = FriendRequestNotification.create(
       {
         recipientId: to.map((t) => new UniqueEntityID(t)),
         userData: {
-          username: 'chicho',
-          id: 'blabla',
-          imageUrl: 'http://pingaaaa',
+          username: 'Xavier2',
+          id: '8de83b51-04aa-42d8-861e-4289160694ef',
+          imageUrl: 'https://cdn.fakercloud.com/avatars/gt_128.jpg',
         },
       },
       new UniqueEntityID(),
     ).getValue();
-    await this.repo.save(not);
-    return not;
+    await this.repo.save(notification);
+    return notification;
   }
 }

@@ -5,6 +5,8 @@ import {
   Transactional,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
+import { MulticastMessage } from 'firebase-admin/lib/messaging/messaging-api';
+import { FirebaseAdmin, InjectFirebaseAdmin } from 'nestjs-firebase';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import { INotificationsRepository } from '../../application/interfaces/notifications.repository';
@@ -23,6 +25,7 @@ export class NotificationsRepository
 {
   constructor(
     @InjectPersistenceManager() persistenceManager: PersistenceManager,
+    @InjectFirebaseAdmin() private firebaseAdmin: FirebaseAdmin,
   ) {
     super(
       'Notifications',
@@ -34,7 +37,10 @@ export class NotificationsRepository
   async getNotificationData(
     theEventId?: string,
     theUserId?: string,
-  ): Promise<{ user?: NotificationUserData; event?: NotificationEventData }> {
+  ): Promise<{
+    userData?: NotificationUserData;
+    eventData?: NotificationEventData;
+  }> {
     let eventPromise: NotificationEventData;
     let userPromise: NotificationUserData;
     if (theEventId) {
@@ -63,25 +69,45 @@ export class NotificationsRepository
 						MATCH (e:User) WHERE e.id = $eId
 						RETURN e{.username, .avatar, .id}
 				`,
-        ).bind({ eId: theEventId }),
+        ).bind({ eId: theUserId }),
       );
     }
-    return { user: userPromise, event: eventPromise };
+    return { userData: userPromise, eventData: eventPromise };
   }
 
   @Transactional()
   async save(entity: BaseNotification): Promise<void> {
     const { recipientId, ...data } = NotificationsMapper.toPersistence(entity);
-    await this.persistenceManager.execute(
+    const tokens = await this.persistenceManager.getOne<string[]>(
       QuerySpecification.withStatement(
         `
-					CREATE (new:Notification) SET new += $data
-					UNION
-					MATCH (u:Account) WHERE u.id IN $uId
-					MATCH (new:Notification) WHERE new.id = $nId
-					MERGE (u)-[:HAS_NOTIFICATION]->(new)
-			`,
+    CREATE (new:Notification) SET new += $data
+		WITH new
+    MATCH (u:Account) WHERE u.id IN $uId
+    MERGE (u)-[:HAS_NOTIFICATION]->(new)
+		RETURN u.firebasePushId
+    `,
       ).bind({ uId: recipientId, data, nId: data.id }),
     );
+    const message: MulticastMessage = {
+      tokens,
+      data: {
+        eventData: JSON.stringify(entity.eventData || null),
+        userData: JSON.stringify(entity.userData || null),
+        id: entity._id.toString(),
+        type: data.type,
+        createdAt: data.createdAt.toString(),
+      },
+      notification: {
+        title: 'Yansaro dime los textos',
+        body: 'sisi yo no tengo los textos esos',
+      },
+    };
+    try {
+      console.log(tokens);
+      await this.firebaseAdmin.messaging.sendMulticast(message);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

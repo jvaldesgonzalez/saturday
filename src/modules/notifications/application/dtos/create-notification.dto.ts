@@ -1,16 +1,8 @@
-type CreateNotificationBaseDto = {
-  recipientId: string;
+import { NotificationType } from '../../enums/notification-type';
+
+export type CreateNotificationDto = {
+  recipientId: string[];
+  userId?: string;
+  eventId?: string;
+  type: NotificationType;
 };
-
-export type CreateFriendRequestNotificationDto = {
-  requesterId: string;
-} & CreateNotificationBaseDto;
-
-export type CreateEventPublishedNotification = {
-  eventId: string;
-} & CreateNotificationBaseDto;
-
-export type CreateEventSharedNotification = {
-  eventId: string;
-  senderId: string;
-} & CreateNotificationBaseDto;

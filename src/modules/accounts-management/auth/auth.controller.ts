@@ -2,12 +2,13 @@ import {
   Body,
   ConflictException,
   Controller,
+  Headers,
   ImATeapotException,
   InternalServerErrorException,
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { CreatePartnerErrors } from '../partners/application/usecases/createPartner/create-partner.errors';
 import { CreateUserErrors } from '../users/application/use-cases/create-user/create-user.errors';
 import { AuthProvider } from '../users/domain/value-objects/auth-provider.value';
@@ -102,9 +103,13 @@ export class AuthController {
   }
 
   @SkipAuth()
+  @ApiHeader({ name: 'fcmToken' })
   @Post('facebook/login')
-  async loginUser(@Body() data: LoginUserRequest) {
-    const result = await this.loginUserUC.execute(data);
+  async loginUser(
+    @Body() data: LoginUserRequest,
+    @Headers('fcmToken') fcmToken: string,
+  ) {
+    const result = await this.loginUserUC.execute({ ...data, fcmToken });
     if (result.isLeft()) {
       const error = result.value;
       switch (error.constructor) {

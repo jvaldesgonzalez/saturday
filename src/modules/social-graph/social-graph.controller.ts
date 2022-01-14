@@ -14,6 +14,8 @@ import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { CurrentUser } from '../accounts-management/auth/decorators/current-user.decorator';
 import { JWTClaim } from '../accounts-management/auth/login-payload.type';
+import { CreateNotification } from '../notifications/application/use-cases/createNotification/create-notification.usecase';
+import { NotificationType } from '../notifications/enums/notification-type';
 import { BlockInteraction } from './social-services/block/block.interaction';
 import { BlockService } from './social-services/block/block.service';
 import {
@@ -56,6 +58,7 @@ export class SocialGraphController {
     private viewStory: ViewStoryService,
     private share: ShareService,
     private block: BlockService,
+    private notify: CreateNotification,
   ) {}
 
   @Post('/add-to-favorites')
@@ -118,6 +121,11 @@ export class SocialGraphController {
         'Cant create friend-request interaction with this params',
       );
     await this.friendRequest.save(new UniqueEntityID(payload.id), interaction);
+    await this.notify.execute({
+      userId: payload.id,
+      recipientId: [data.userId],
+      type: NotificationType.FriendRequest,
+    });
   }
 
   @Post('/accept-friend-request')
@@ -136,6 +144,11 @@ export class SocialGraphController {
         'Cant create like interaction with this params',
       );
     await this.friend.save(new UniqueEntityID(payload.id), interaction);
+    await this.notify.execute({
+      userId: payload.id,
+      recipientId: [data.userId],
+      type: NotificationType.NewFriend,
+    });
   }
 
   @Post('/view-story/')

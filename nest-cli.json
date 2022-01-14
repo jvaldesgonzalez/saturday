@@ -2,7 +2,7 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "assets": ["**/*.cypher"]
+    "assets": ["**/*.cypher", "**/*.json"]
   },
   "watchAssets": true
 }

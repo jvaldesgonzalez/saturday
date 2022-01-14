@@ -11,7 +11,7 @@ import { JWTUtils } from '../../../jwt-utils';
 import { LoginPayload } from '../../../login-payload.type';
 import { IFacebookProvider } from '../../../providers/facebook/facebook.provider';
 import { AuthProviders } from '../../../providers/providers.enum';
-import { CheckUserStatusByFacebookDto } from '../../dtos/check-user-status.dto';
+import { LoginUserFacebooDto } from '../../dtos/check-user-status.dto';
 import { CheckUserStatusErrors } from '../check-user-status/check-user-status.errors';
 
 type Response = Either<
@@ -22,15 +22,13 @@ type Response = Either<
 >;
 
 @Injectable()
-export class LoginUser
-  implements IUseCase<CheckUserStatusByFacebookDto, Response>
-{
+export class LoginUser implements IUseCase<LoginUserFacebooDto, Response> {
   constructor(
     @Inject(AuthProviders.IFacebookProvider)
     private fbProvider: IFacebookProvider,
     @Inject(UserProviders.IUserRepository) private repo: IUserRepository,
   ) {}
-  async execute(request: CheckUserStatusByFacebookDto): Promise<Response> {
+  async execute(request: LoginUserFacebooDto): Promise<Response> {
     const providerId = new UniqueEntityID(request.authProviderId);
 
     const validInProvider = await this.fbProvider.checkValidAuthToken(
@@ -49,6 +47,8 @@ export class LoginUser
     const userOrNone = await this.repo.findByAuthProviderId(providerId);
     if (!userOrNone)
       return left(new CheckUserStatusErrors.UserNotFoundInDatabase(providerId));
+    userOrNone.changeFirebasePushId(request.fcmToken);
+    await this.repo.save(userOrNone);
     return right(
       Ok({
         accessToken: JWTUtils.sign({

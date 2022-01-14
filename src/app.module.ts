@@ -13,9 +13,11 @@ import { GeolocationModule } from './modules/geolocation/geolocation.module';
 import { StaticsModule } from './modules/statics/statics.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { MetricsModule } from './shared/modules/metrics/metrics.module';
+import { FirebaseAdminModule } from './shared/firebase/firebase.module';
 
 @Module({
   imports: [
+    FirebaseAdminModule,
     MetricsModule,
     DataAccessModule,
     AccountsManagementModule,

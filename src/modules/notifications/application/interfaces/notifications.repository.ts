@@ -10,5 +10,8 @@ export interface INotificationsRepository
   getNotificationData(
     theEventId?: string,
     theUserId?: string,
-  ): Promise<{ user?: NotificationUserData; event?: NotificationEventData }>;
+  ): Promise<{
+    userData?: NotificationUserData;
+    eventData?: NotificationEventData;
+  }>;
 }
