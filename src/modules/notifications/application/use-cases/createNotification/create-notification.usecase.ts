@@ -78,6 +78,8 @@ export class CreateNotification
         break;
     }
 
+    console.log(notification);
+
     await this.repo.save(notification);
 
     return right(Ok());

@@ -27,13 +27,13 @@ export class AccountsManagementReadService {
 					MATCH (l:Location)--(item)--(c:Category)
 					MATCH (me:User)
 					WHERE me.id = $meId
-					WITH item as u,l,collect(distinct c.id) as c,me
+					WITH distinct item as u,l,collect(distinct c.id) as c,me
 					OPTIONAL match (u)-[:FRIEND]-(friend:User)
 					OPTIONAL match (u)-[:FOLLOW]->(follow:Partner)
 					OPTIONAL match (u)-[rfriend:FRIEND|FRIEND_REQUEST]-(me)
 					OPTIONAL match (u)<-[rblock:BLOCK]-(me)
 					OPTIONAL match (u)-[:FRIEND]-(common:User)-[:FRIEND]-(me)
-					RETURN {
+					RETURN distinct {
 							type:"user",
 							id:u.id,
 							username:u.username,
@@ -94,6 +94,7 @@ export class AccountsManagementReadService {
       )
         .bind({ meId: meId, username: username })
         .map((r) => {
+          console.log(r);
           if (r.type === 'user') return r;
           r.aditionalBusinessData = TextUtils.escapeAndParse(
             r.aditionalBusinessData,

@@ -78,6 +78,7 @@ export class NotificationsRepository
   @Transactional()
   async save(entity: BaseNotification): Promise<void> {
     const { recipientId, ...data } = NotificationsMapper.toPersistence(entity);
+    console.log({ recipientId });
     const tokens = await this.persistenceManager.getOne<string[]>(
       QuerySpecification.withStatement(
         `
@@ -89,8 +90,9 @@ export class NotificationsRepository
     `,
       ).bind({ uId: recipientId, data, nId: data.id }),
     );
+
     const message: MulticastMessage = {
-      tokens,
+      tokens: [tokens].flat(),
       data: {
         eventData: JSON.stringify(entity.eventData || null),
         userData: JSON.stringify(entity.userData || null),
@@ -104,8 +106,10 @@ export class NotificationsRepository
       },
     };
     try {
-      console.log(tokens);
-      await this.firebaseAdmin.messaging.sendMulticast(message);
+      console.log({ tokens });
+      console.log(message);
+      const fails = await this.firebaseAdmin.messaging.sendMulticast(message);
+      console.log({ fails });
     } catch (error) {
       console.log(error);
     }

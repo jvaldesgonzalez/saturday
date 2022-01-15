@@ -89,6 +89,12 @@ export class SocialGraphController {
         'Cant create like interaction with this params',
       );
     await this.share.save(new UniqueEntityID(payload.id), interaction);
+    await this.notify.execute({
+      userId: payload.id,
+      eventId: data.eventId,
+      recipientId: [data.shareWith].flat(),
+      type: NotificationType.EventShared,
+    });
   }
 
   @Post('/follow-partner/')
