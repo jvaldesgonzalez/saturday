@@ -48,9 +48,21 @@ export abstract class BaseNotification extends AggregateDomainEntity<Notificatio
   }
 
   abstract get type(): NotificationType;
+
+  abstract get title(): string;
+
+  abstract get body(): string;
 }
 
 export class NewFriendNotification extends BaseNotification {
+  get title(): string {
+    return 'Texto de nuevo amigo';
+  }
+
+  get body(): string {
+    return `${this.props.userData.username} es el nuevo amigo`;
+  }
+
   get type(): NotificationType {
     return NotificationType.NewFriend;
   }
@@ -73,6 +85,13 @@ export class NewFriendNotification extends BaseNotification {
 }
 
 export class FriendRequestNotification extends BaseNotification {
+  get title(): string {
+    return 'Texto de nueva solicitud de amistad';
+  }
+
+  get body(): string {
+    return `${this.props.userData.username} es el nuevo futuro amigo.`;
+  }
   get type(): NotificationType {
     return NotificationType.FriendRequest;
   }
@@ -95,6 +114,13 @@ export class FriendRequestNotification extends BaseNotification {
 }
 
 export class EventSharedNotification extends BaseNotification {
+  get title(): string {
+    return 'Texto de evento compartido';
+  }
+
+  get body(): string {
+    return `${this.props.userData.username} ha compartido el evento ${this.props.eventData.name}.`;
+  }
   get type(): NotificationType {
     return NotificationType.EventShared;
   }
@@ -121,6 +147,13 @@ export class EventSharedNotification extends BaseNotification {
 }
 
 export class EventPublishedNotification extends BaseNotification {
+  get title(): string {
+    return 'Texto de evento publicado';
+  }
+
+  get body(): string {
+    return `${this.props.userData.username} ha publicado el evento ${this.props.eventData.name}.`;
+  }
   get type(): NotificationType {
     return NotificationType.EventPublished;
   }

@@ -77,6 +77,7 @@ export class NotificationsRepository
 
   @Transactional()
   async save(entity: BaseNotification): Promise<void> {
+    const { body, title } = entity;
     const { recipientId, ...data } = NotificationsMapper.toPersistence(entity);
     console.log({ recipientId });
     const tokens = await this.persistenceManager.getOne<string[]>(
@@ -100,14 +101,9 @@ export class NotificationsRepository
         type: data.type,
         createdAt: data.createdAt.toString(),
       },
-      notification: {
-        title: 'Yansaro dime los textos',
-        body: 'sisi yo no tengo los textos esos',
-      },
+      notification: { title, body },
     };
     try {
-      console.log({ tokens });
-      console.log(message);
       const fails = await this.firebaseAdmin.messaging.sendMulticast(message);
       console.log({ fails });
     } catch (error) {
