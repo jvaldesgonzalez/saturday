@@ -13,8 +13,8 @@ import { PrivacyStatus } from './value-objects/privacy-status.value';
 
 type UserProps = {
   fullname: string;
-  birthday: Date;
-  gender: Gender;
+  birthday?: Date;
+  gender?: Gender;
   description: string;
 
   categoryPreferences: CategoryId[];

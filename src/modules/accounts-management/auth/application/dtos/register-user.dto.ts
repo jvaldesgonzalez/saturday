@@ -6,8 +6,8 @@ export type RegisterUserDto = {
   authToken: string;
   description: string;
   fullname: string;
-  birthday: Date;
-  gender: Gender;
+  birthday?: Date;
+  gender?: Gender;
   categoryPreferences: string[];
   locationId: string;
   authProviderId: string;

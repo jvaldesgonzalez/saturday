@@ -4,9 +4,9 @@ import { Gender } from '../../domain/value-objects/gender.value';
 
 export type CreateUserDto = {
   fullname: string;
-  birthday: Date;
+  birthday?: Date;
   description: string;
-  gender: Gender;
+  gender?: Gender;
   categoryPreferences: string[];
   locationId: string;
   authProviderId: string;

@@ -36,11 +36,13 @@ export class RegisterUserRequest {
   @ApiProperty()
   @IsNotEmpty()
   @Type(() => Date)
+  @IsOptional()
   birthday: Date;
 
   @ApiProperty({ enum: Gender })
   @IsEnum(Gender)
   @IsNotEmpty()
+  @IsOptional()
   gender: Gender;
 
   @ApiProperty()
