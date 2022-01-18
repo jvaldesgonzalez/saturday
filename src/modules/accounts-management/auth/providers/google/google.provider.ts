@@ -33,7 +33,7 @@ export class GoogleProvider implements IGoogleProvider {
       authProviderId: data.resourceName.split('/')[1],
       authProvider: AuthProvider.Google,
       email: data.emailAddresses[0].value,
-      birthday: year ? new Date(year, month, day) : null,
+      birthday: year ? new Date(year, month - 1, day) : null,
       gender: data.genders ? data.genders[0].value : null,
     };
   }

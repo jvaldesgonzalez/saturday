@@ -17,8 +17,10 @@ export namespace UserMappers {
       ...common,
       fullname: domain.fullname,
       description: domain.description,
-      birthday: DateTime.fromStandardDate(domain.birthday),
-      gender: domain.gender,
+      birthday: domain.birthday
+        ? DateTime.fromStandardDate(domain.birthday)
+        : null,
+      gender: domain.gender ? domain.gender : null,
       categoryPreferences: domain.categoryPreferences.map((p) => p.toString()),
       locationId: domain.locationId.toString(),
       authProviderId: domain.authProviderId.toString(),
@@ -41,8 +43,8 @@ export namespace UserMappers {
         categoryPreferences,
         createdAt: parseDate(p.createdAt),
         updatedAt: parseDate(p.updatedAt),
-        birthday: parseDate(p.birthday),
-        gender: p.gender as Gender,
+        birthday: p.birthday ? parseDate(p.birthday) : null,
+        gender: p.gender ? (p.gender as Gender) : null,
         authProvider: p.authProvider as AuthProvider,
         authProviderId,
         privacyStatus: p.privacyStatus,
