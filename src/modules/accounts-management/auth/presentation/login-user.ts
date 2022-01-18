@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
-export class LoginUserRequest {
+export class LoginUserFbRequest {
   @ApiProperty()
   @IsNotEmpty()
   authToken: string;
@@ -9,4 +9,10 @@ export class LoginUserRequest {
   @ApiProperty()
   @IsNotEmpty()
   authProviderId: string;
+}
+
+export class LoginUserGRequest {
+  @ApiProperty()
+  @IsNotEmpty()
+  authToken: string;
 }

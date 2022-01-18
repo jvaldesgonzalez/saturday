@@ -7,6 +7,10 @@ export type CheckUserStatusByGoogleDto = {
   authToken: string;
 };
 
-export type LoginUserFacebooDto = {
+export type LoginUserFacebookDto = {
   fcmToken: string;
 } & CheckUserStatusByFacebookDto;
+
+export type LoginUserGoogleDto = {
+  fcmToken: string;
+} & CheckUserStatusByGoogleDto;

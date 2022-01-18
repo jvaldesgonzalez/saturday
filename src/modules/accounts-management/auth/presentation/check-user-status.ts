@@ -10,3 +10,9 @@ export class CheckUserStatusFbRequest {
   @IsNotEmpty()
   authProviderId: string;
 }
+
+export class CheckUserStatusGRequest {
+  @ApiProperty()
+  @IsNotEmpty()
+  authToken: string;
+}

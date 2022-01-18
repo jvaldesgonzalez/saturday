@@ -36,15 +36,15 @@ export class FacebookProvider implements IFacebookProvider {
   async checkValidAuthToken(
     authToken: string,
     userId: string,
-  ): Promise<boolean> {
+  ): Promise<string> {
     try {
       const response = await axios.get<{ id: string }>(
         `https://graph.facebook.com/${userId}?access_token=${authToken}`,
       );
-      return Number(response.data.id) === Number(userId);
+      return Number(response.data.id) === Number(userId) ? userId : null;
     } catch (err) {
       console.error(err);
-      return false;
+      return null;
     }
   }
 }

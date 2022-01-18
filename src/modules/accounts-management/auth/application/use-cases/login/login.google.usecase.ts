@@ -9,9 +9,9 @@ import { Ok, Result } from 'src/shared/core/Result';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { JWTUtils } from '../../../jwt-utils';
 import { LoginPayload } from '../../../login-payload.type';
-import { IFacebookProvider } from '../../../providers/facebook/facebook.provider';
+import { IGoogleProvider } from '../../../providers/google/google.provider';
 import { AuthProviders } from '../../../providers/providers.enum';
-import { LoginUserFacebooDto } from '../../dtos/check-user-status.dto';
+import { LoginUserGoogleDto } from '../../dtos/check-user-status.dto';
 import { CheckUserStatusErrors } from '../check-user-status/check-user-status.errors';
 
 type Response = Either<
@@ -22,19 +22,20 @@ type Response = Either<
 >;
 
 @Injectable()
-export class LoginUser implements IUseCase<LoginUserFacebooDto, Response> {
+export class LoginUserGoogle implements IUseCase<LoginUserGoogleDto, Response> {
   constructor(
-    @Inject(AuthProviders.IFacebookProvider)
-    private fbProvider: IFacebookProvider,
+    @Inject(AuthProviders.IGoogleProvider)
+    private fbProvider: IGoogleProvider,
     @Inject(UserProviders.IUserRepository) private repo: IUserRepository,
   ) {}
-  async execute(request: LoginUserFacebooDto): Promise<Response> {
-    const providerId = new UniqueEntityID(request.authProviderId);
-
+  async execute(request: LoginUserGoogleDto): Promise<Response> {
     const validInProvider = await this.fbProvider.checkValidAuthToken(
       request.authToken,
-      request.authProviderId,
     );
+
+    const providerId = validInProvider
+      ? new UniqueEntityID(validInProvider)
+      : null;
 
     if (!validInProvider)
       return left(

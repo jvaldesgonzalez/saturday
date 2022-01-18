@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CreateUserErrors } from 'src/modules/accounts-management/users/application/use-cases/create-user/create-user.errors';
-import { CreateUser } from 'src/modules/accounts-management/users/application/use-cases/create-user/create-user.usecase';
+import { IUserRepository } from 'src/modules/accounts-management/users/application/interfaces/user.repository.interface';
 import { AuthProvider } from 'src/modules/accounts-management/users/domain/value-objects/auth-provider.value';
+import { UserProviders } from 'src/modules/accounts-management/users/providers/providers.enum';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
@@ -11,26 +11,28 @@ import { JWTUtils } from '../../../jwt-utils';
 import { LoginPayload } from '../../../login-payload.type';
 import { IFacebookProvider } from '../../../providers/facebook/facebook.provider';
 import { AuthProviders } from '../../../providers/providers.enum';
-import { RegisterUserDto } from '../../dtos/register-user.dto';
+import { LoginUserFacebookDto } from '../../dtos/check-user-status.dto';
 import { CheckUserStatusErrors } from '../check-user-status/check-user-status.errors';
 
 type Response = Either<
-  | AppError.UnexpectedError
-  | CreateUserErrors.EmailExistsError
-  | CheckUserStatusErrors.UserNotFoundInProvider,
+  | CheckUserStatusErrors.UserNotFoundInProvider
+  | CheckUserStatusErrors.UserNotFoundInDatabase
+  | AppError.UnexpectedError,
   Result<LoginPayload>
 >;
 
 @Injectable()
-export class RegisterUser implements IUseCase<RegisterUserDto, Response> {
+export class LoginUserFacebook
+  implements IUseCase<LoginUserFacebookDto, Response>
+{
   constructor(
     @Inject(AuthProviders.IFacebookProvider)
     private fbProvider: IFacebookProvider,
-    private createUser: CreateUser,
+    @Inject(UserProviders.IUserRepository) private repo: IUserRepository,
   ) {}
-
-  async execute(request: RegisterUserDto): Promise<Response> {
+  async execute(request: LoginUserFacebookDto): Promise<Response> {
     const providerId = new UniqueEntityID(request.authProviderId);
+
     const validInProvider = await this.fbProvider.checkValidAuthToken(
       request.authToken,
       request.authProviderId,
@@ -44,24 +46,20 @@ export class RegisterUser implements IUseCase<RegisterUserDto, Response> {
         ),
       );
 
-    const userOrError = await this.createUser.execute({
-      ...request,
-      refreshToken: JWTUtils.signRefresh(),
-      username: request.email.split('@')[0],
-    });
-    if (userOrError.isLeft()) return left(userOrError.value);
-    else if (userOrError.isRight()) {
-      const user = userOrError.value.getValue();
-      return right(
-        Ok({
-          accessToken: JWTUtils.sign({
-            id: user._id.toString(),
-            email: user.email,
-            username: user.username,
-          }),
-          refreshToken: user.refreshToken,
+    const userOrNone = await this.repo.findByAuthProviderId(providerId);
+    if (!userOrNone)
+      return left(new CheckUserStatusErrors.UserNotFoundInDatabase(providerId));
+    userOrNone.changeFirebasePushId(request.fcmToken);
+    await this.repo.save(userOrNone);
+    return right(
+      Ok({
+        accessToken: JWTUtils.sign({
+          id: userOrNone._id.toString(),
+          email: userOrNone.email,
+          username: userOrNone.username,
         }),
-      );
-    }
+        refreshToken: userOrNone.refreshToken,
+      }),
+    );
   }
 }

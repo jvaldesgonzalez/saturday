@@ -18,6 +18,7 @@ import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { PartnerProviders } from './partners/providers/providers.enum';
 import { PartnerRepository } from './partners/infrastructure/repository/partner.repository';
 import PartnerUseCases from './partners/application/usecases';
+import { GoogleProvider } from './auth/providers/google/google.provider';
 
 @Module({
   providers: [
@@ -35,6 +36,10 @@ import PartnerUseCases from './partners/application/usecases';
     {
       provide: AuthProviders.IFacebookProvider,
       useClass: FacebookProvider,
+    },
+    {
+      provide: AuthProviders.IGoogleProvider,
+      useClass: GoogleProvider,
     },
     {
       provide: PartnerProviders.IPartnerRepository,

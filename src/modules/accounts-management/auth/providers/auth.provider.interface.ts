@@ -5,5 +5,5 @@ export interface IAuthProvider {
     authToken: string,
     userId?: string,
   ): Promise<Partial<RegisterUserDto>>;
-  checkValidAuthToken(authToken: string, userId?: string): Promise<boolean>;
+  checkValidAuthToken(authToken: string, userId?: string): Promise<string>;
 }
