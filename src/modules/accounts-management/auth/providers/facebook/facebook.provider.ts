@@ -38,10 +38,10 @@ export class FacebookProvider implements IFacebookProvider {
     userId: string,
   ): Promise<string> {
     try {
-      const response = await axios.get<{ id: string }>(
-        `https://graph.facebook.com/${userId}?access_token=${authToken}`,
+      const response = await axios.get<{ email: string }>(
+        `https://graph.facebook.com/${userId}?access_token=${authToken}&fields=email`,
       );
-      return Number(response.data.id) === Number(userId) ? userId : null;
+      return response.data.email ? response.data.email : null;
     } catch (err) {
       console.error(err);
       return null;

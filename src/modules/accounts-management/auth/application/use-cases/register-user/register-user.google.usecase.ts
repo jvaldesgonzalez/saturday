@@ -1,7 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { IUserRepository } from 'src/modules/accounts-management/users/application/interfaces/user.repository.interface';
 import { CreateUserErrors } from 'src/modules/accounts-management/users/application/use-cases/create-user/create-user.errors';
 import { CreateUser } from 'src/modules/accounts-management/users/application/use-cases/create-user/create-user.usecase';
 import { AuthProvider } from 'src/modules/accounts-management/users/domain/value-objects/auth-provider.value';
+import { UserProviders } from 'src/modules/accounts-management/users/providers/providers.enum';
 import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
@@ -27,6 +29,7 @@ export class RegisterUserGoogle implements IUseCase<RegisterUserDto, Response> {
     @Inject(AuthProviders.IGoogleProvider)
     private gProvider: IGoogleProvider,
     private createUser: CreateUser,
+    @Inject(UserProviders.IUserRepository) private repo: IUserRepository,
   ) {}
 
   async execute(request: RegisterUserDto): Promise<Response> {
@@ -34,18 +37,30 @@ export class RegisterUserGoogle implements IUseCase<RegisterUserDto, Response> {
       request.authToken,
     );
 
-    const providerId = validInProvider
-      ? new UniqueEntityID(validInProvider)
-      : null;
+    const userEmail = validInProvider ? validInProvider : null;
 
     if (!validInProvider)
       return left(
         new CheckUserStatusErrors.UserNotFoundInProvider(
-          providerId,
+          new UniqueEntityID(userEmail),
           AuthProvider.Google,
         ),
       );
 
+    const userOrNone = await this.repo.findByEmail(userEmail);
+    if (userOrNone) {
+      console.log('user found');
+      return right(
+        Ok({
+          accessToken: JWTUtils.sign({
+            id: userOrNone._id.toString(),
+            email: userOrNone.email,
+            username: userOrNone.username,
+          }),
+          refreshToken: userOrNone.refreshToken,
+        }),
+      );
+    }
     const userOrError = await this.createUser.execute({
       ...request,
       refreshToken: JWTUtils.signRefresh(),

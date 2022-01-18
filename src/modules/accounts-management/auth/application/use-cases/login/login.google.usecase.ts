@@ -33,21 +33,23 @@ export class LoginUserGoogle implements IUseCase<LoginUserGoogleDto, Response> {
       request.authToken,
     );
 
-    const providerId = validInProvider
-      ? new UniqueEntityID(validInProvider)
-      : null;
+    const userEmail = validInProvider ? validInProvider : null;
 
     if (!validInProvider)
       return left(
         new CheckUserStatusErrors.UserNotFoundInProvider(
-          providerId,
-          AuthProvider.Facebook,
+          new UniqueEntityID(userEmail),
+          AuthProvider.Google,
         ),
       );
 
-    const userOrNone = await this.repo.findByAuthProviderId(providerId);
+    const userOrNone = await this.repo.findByEmail(userEmail);
     if (!userOrNone)
-      return left(new CheckUserStatusErrors.UserNotFoundInDatabase(providerId));
+      return left(
+        new CheckUserStatusErrors.UserNotFoundInDatabase(
+          new UniqueEntityID(userEmail),
+        ),
+      );
     userOrNone.changeFirebasePushId(request.fcmToken);
     await this.repo.save(userOrNone);
     return right(

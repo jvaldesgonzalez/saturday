@@ -40,7 +40,7 @@ export class GoogleProvider implements IGoogleProvider {
 
   async checkValidAuthToken(authToken: string): Promise<string> {
     try {
-      const response = await axios.get<{ resourceName: string }>(
+      const response = await axios.get<{ emailAddresses: any }>(
         `https://people.googleapis.com/v1/people/me?personFields=names,genders,birthdays,emailAddresses,photos`,
         {
           headers: {
@@ -49,7 +49,7 @@ export class GoogleProvider implements IGoogleProvider {
         },
       );
       // console.log({ response });
-      return response.data.resourceName.split('/')[1];
+      return response.data.emailAddresses[0].value;
     } catch (err) {
       // console.error(err.response);
       return null;

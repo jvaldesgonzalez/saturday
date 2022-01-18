@@ -33,20 +33,18 @@ export class CheckUserStatusGoogle
     const validInProvider = await this.gProvider.checkValidAuthToken(
       request.authToken,
     );
-    const providerId = validInProvider
-      ? new UniqueEntityID(validInProvider)
-      : null;
+    const userEmail = validInProvider ? validInProvider : null;
+    console.log({ userEmail });
 
     if (!validInProvider)
       return left(
         new CheckUserStatusErrors.UserNotFoundInProvider(
-          providerId,
+          new UniqueEntityID(userEmail),
           AuthProvider.Google,
         ),
       );
-    console.log({ providerId });
 
-    const userOrNone = await this.repo.findByAuthProviderId(providerId);
+    const userOrNone = await this.repo.findByEmail(userEmail);
     if (userOrNone) return right(Ok({}));
 
     const userInfo = await this.gProvider.getProfileInfo(request.authToken);

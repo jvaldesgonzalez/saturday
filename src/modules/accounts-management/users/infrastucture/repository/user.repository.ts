@@ -99,11 +99,11 @@ export class UserRepository
       ? true
       : false;
   }
-  async findByAuthProviderId(theId: UniqueEntityID): Promise<User> {
+  async findByEmail(theEmail: string): Promise<User> {
     const persistence = await this.persistenceManager.maybeGetOne<UserEntity>(
       QuerySpecification.withStatement(
         `MATCH (l:Location)<-[:IN_LOCATION]-(u:User)-[:PREFER_CATEGORY]->(c:Category)
-				WHERE u.authProviderId = $theId
+				WHERE u.email = $theId
 				return {
 					fullname:u.fullname,
 					birthday:u.birthday,
@@ -124,7 +124,7 @@ export class UserRepository
 					id:u.id
 				}`,
       )
-        .bind({ theId: theId.toString() })
+        .bind({ theId: theEmail })
         .transform(UserEntity),
     );
 
