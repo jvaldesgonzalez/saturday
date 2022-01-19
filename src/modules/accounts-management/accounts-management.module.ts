@@ -19,6 +19,7 @@ import { PartnerProviders } from './partners/providers/providers.enum';
 import { PartnerRepository } from './partners/infrastructure/repository/partner.repository';
 import PartnerUseCases from './partners/application/usecases';
 import { GoogleProvider } from './auth/providers/google/google.provider';
+import { AppleProvider } from './auth/providers/apple/apple.provider';
 
 @Module({
   providers: [
@@ -36,6 +37,10 @@ import { GoogleProvider } from './auth/providers/google/google.provider';
     {
       provide: AuthProviders.IFacebookProvider,
       useClass: FacebookProvider,
+    },
+    {
+      provide: AuthProviders.IAppleProvider,
+      useClass: AppleProvider,
     },
     {
       provide: AuthProviders.IGoogleProvider,

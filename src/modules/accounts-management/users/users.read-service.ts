@@ -43,7 +43,7 @@ export class UsersReadService {
         .map((r) => {
           return {
             ...r,
-            birthday: parseDate(r.birthday),
+            birthday: r.birthday ? parseDate(r.birthday) : null,
           };
         }),
     );
