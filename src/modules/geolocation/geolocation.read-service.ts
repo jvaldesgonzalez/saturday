@@ -22,6 +22,7 @@ export class GeolocationReadService {
     categories: string[] = [],
     priceInterval?: { from: number; to: number },
   ): Promise<EventWithPlaceEntity[]> {
+    console.log({ priceInterval });
     return await this.persistenceManager.query<EventWithPlaceEntity>(
       QuerySpecification.withStatement(
         `

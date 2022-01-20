@@ -17,6 +17,7 @@ export class GeolocationController {
       data.distance,
       data.dateInterval,
       data.categories,
+      data.priceInterval,
     );
   }
 }
