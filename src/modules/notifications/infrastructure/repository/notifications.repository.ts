@@ -80,7 +80,7 @@ export class NotificationsRepository
     const { body, title } = entity;
     const { recipientId, ...data } = NotificationsMapper.toPersistence(entity);
     console.log({ recipientId });
-    const tokens = await this.persistenceManager.getOne<string[]>(
+    const tokens = await this.persistenceManager.query<string>(
       QuerySpecification.withStatement(
         `
     CREATE (new:Notification) SET new += $data

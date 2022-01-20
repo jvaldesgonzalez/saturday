@@ -4,6 +4,8 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
+import { CreateNotification } from 'src/modules/notifications/application/use-cases/createNotification/create-notification.usecase';
+import { NotificationType } from 'src/modules/notifications/enums/notification-type';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { ISocialGraphService } from '../../common/social-graph.service.interface';
 import { ShareInteraction } from './share.interaction';
@@ -14,6 +16,7 @@ export class ShareService
 {
   constructor(
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
+    private notify: CreateNotification,
   ) {}
 
   async save(
@@ -43,7 +46,7 @@ export class ShareService
     from: UniqueEntityID,
     event: UniqueEntityID,
   ): Promise<void> {
-    await this.persistenceManager.execute(
+    const friendsId = await this.persistenceManager.query<string>(
       QuerySpecification.withStatement(
         `MATCH (u:User)-[:FRIEND]-(friends:User)
 					WHERE u.id = $uId
@@ -52,12 +55,19 @@ export class ShareService
 					MATCH (e:Event)
 					WHERE e.id = $eId
 					CREATE (f)-[:FORWARDED_TO]->(friends)
-					CREATE (f)-[:EVENT_FORWARDED]->(e)`,
+					CREATE (f)-[:EVENT_FORWARDED]->(e)
+					RETURN friends.id`,
       ).bind({
         uId: from.toString(),
         eId: event.toString(),
       }),
     );
+    await this.notify.execute({
+      userId: from.toString(),
+      eventId: event.toString(),
+      recipientId: friendsId,
+      type: NotificationType.EventShared,
+    });
   }
 
   async drop(

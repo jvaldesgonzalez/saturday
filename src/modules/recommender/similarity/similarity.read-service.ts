@@ -46,8 +46,8 @@ export class SimilarityReadService {
 				with u1,u2,apoc.coll.union(u1Cats, u2Cats) as union, apoc.coll.intersection(u1Cats, u2Cats) as intersection,fjaccard,ejaccard
 				with u1,u2, CASE WHEN size(union) = 0 THEN 0.0 ELSE 1.0*size(intersection)/size(union) END as cjaccard,fjaccard,ejaccard
 
-				WITH u2 as account, (3*fjaccard + 4*ejaccard + 1*cjaccard)/8 as metric,u1 as u
-				WHERE metric >= $threshold
+				WITH u2 as account, (3.5*fjaccard + 5*ejaccard + 1.5*cjaccard)/10 as metric,u1 as u
+				WHERE metric > 0.05
 				WITH account,metric,u
 				ORDER BY metric DESC
 				call apoc.when(account:User,'
