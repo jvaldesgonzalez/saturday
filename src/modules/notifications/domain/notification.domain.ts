@@ -22,9 +22,13 @@ type NotificationProps = {
   eventData?: NotificationEventData;
   createdAt: Date;
   updatedAt: Date;
+  viewed: boolean;
 };
 
-type NewNotificationProps = Omit<NotificationProps, 'createdAt' | 'updatedAt'>;
+type NewNotificationProps = Omit<
+  NotificationProps,
+  'createdAt' | 'updatedAt' | 'viewed'
+>;
 
 export abstract class BaseNotification extends AggregateDomainEntity<NotificationProps> {
   get createdAt(): Date {
@@ -33,6 +37,10 @@ export abstract class BaseNotification extends AggregateDomainEntity<Notificatio
 
   get updatedAt(): Date {
     return this.props.updatedAt;
+  }
+
+  get viewed(): boolean {
+    return this.props.viewed;
   }
 
   get recipientId(): RecipientId[] {
@@ -56,11 +64,11 @@ export abstract class BaseNotification extends AggregateDomainEntity<Notificatio
 
 export class NewFriendNotification extends BaseNotification {
   get title(): string {
-    return 'Texto de nuevo amigo';
+    return 'Nuevo amigo';
   }
 
   get body(): string {
-    return `${this.props.userData.username} es el nuevo amigo`;
+    return `${this.props.userData.username} ha aceptado tu solicitud de amistad`;
   }
 
   get type(): NotificationType {
@@ -77,7 +85,12 @@ export class NewFriendNotification extends BaseNotification {
   ): Result<NewFriendNotification> {
     return Ok(
       new NewFriendNotification(
-        { ...props, createdAt: new Date(), updatedAt: new Date() },
+        {
+          ...props,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          viewed: false,
+        },
         id,
       ),
     );
@@ -86,11 +99,11 @@ export class NewFriendNotification extends BaseNotification {
 
 export class FriendRequestNotification extends BaseNotification {
   get title(): string {
-    return 'Texto de nueva solicitud de amistad';
+    return 'Nueva solicitud de amistad';
   }
 
   get body(): string {
-    return `${this.props.userData.username} es el nuevo futuro amigo.`;
+    return `${this.props.userData.username} te ha enviado una solicitud de amistad`;
   }
   get type(): NotificationType {
     return NotificationType.FriendRequest;
@@ -106,7 +119,12 @@ export class FriendRequestNotification extends BaseNotification {
   ): Result<FriendRequestNotification> {
     return Ok(
       new FriendRequestNotification(
-        { ...props, createdAt: new Date(), updatedAt: new Date() },
+        {
+          ...props,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          viewed: false,
+        },
         id,
       ),
     );
@@ -115,11 +133,11 @@ export class FriendRequestNotification extends BaseNotification {
 
 export class EventSharedNotification extends BaseNotification {
   get title(): string {
-    return 'Texto de evento compartido';
+    return 'Evento Compartido';
   }
 
   get body(): string {
-    return `${this.props.userData.username} ha compartido el evento ${this.props.eventData.name}.`;
+    return `${this.props.userData.username} quiere que veas el evento ${this.props.eventData.name}.`;
   }
   get type(): NotificationType {
     return NotificationType.EventShared;
@@ -139,7 +157,12 @@ export class EventSharedNotification extends BaseNotification {
   ): Result<EventSharedNotification> {
     return Ok(
       new EventSharedNotification(
-        { ...props, createdAt: new Date(), updatedAt: new Date() },
+        {
+          ...props,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          viewed: false,
+        },
         id,
       ),
     );
@@ -148,11 +171,11 @@ export class EventSharedNotification extends BaseNotification {
 
 export class EventPublishedNotification extends BaseNotification {
   get title(): string {
-    return 'Texto de evento publicado';
+    return 'Nuevo evento';
   }
 
   get body(): string {
-    return `${this.props.userData.username} ha publicado el evento ${this.props.eventData.name}.`;
+    return `${this.props.userData.username} ha publicado un nuevo evento: ${this.props.eventData.name}.`;
   }
   get type(): NotificationType {
     return NotificationType.EventPublished;
@@ -172,7 +195,12 @@ export class EventPublishedNotification extends BaseNotification {
   ): Result<EventPublishedNotification> {
     return Ok(
       new EventPublishedNotification(
-        { ...props, createdAt: new Date(), updatedAt: new Date() },
+        {
+          ...props,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          viewed: false,
+        },
         id,
       ),
     );

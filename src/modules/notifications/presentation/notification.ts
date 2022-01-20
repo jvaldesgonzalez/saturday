@@ -17,4 +17,5 @@ export class NotificationResponse {
   eventData?: NotificationEventData;
   userData?: NotificationUserData;
   createdAt: Date;
+  viewed: boolean;
 }

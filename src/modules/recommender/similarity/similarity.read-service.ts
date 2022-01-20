@@ -26,10 +26,28 @@ export class SimilarityReadService {
       this.persistenceManager.query<SimilarAccount>(
         QuerySpecification.withStatement(
           `
-				MATCH (u:User)-[simm:SIMILAR]-(acc:Account)
-				WHERE u.id = $accountId AND NOT (u)-[:FRIEND]-(acc) AND NOT (u)-[:FOLLOW]-(acc) AND NOT (u)-[:FRIEND_REQUEST]->(acc)
-				WITH acc as account, (4*simm.friendsMetric + 5*simm.eventsMetric + 1*simm.categoriesMetric + 2*simm.followeesMetric)/12 as metric,u
-				WHERE metric > $threshold
+				match (u1:User),(u2:Account)
+				WHERE u1 <> u2 AND u1.id = $accountId AND NOT (u1)-[:FRIEND]-(u2) AND NOT (u1)-[:FOLLOW]-(u2) AND NOT (u1)-[:FRIEND_REQUEST]->(u2)
+				optional match (u1)-[:FRIEND|FOLLOW]-(u1f)
+				optional match (u2)-[:FRIEND|FOLLOW]-(u2f)
+				with u1,u2,collect(distinct u1f.id) as u1Friends, collect(distinct u2f.id) as u2Friends
+				with u1,u2,apoc.coll.union(u1Friends, u2Friends) as union, apoc.coll.intersection(u1Friends, u2Friends) as intersection
+				with u1,u2, CASE WHEN size(union) = 0 THEN 0 ELSE 1.0*size(intersection)/size(union) END as fjaccard
+
+				optional match (u1)-[:LIKE]-(u1l)
+				optional match (u2)-[:LIKE|PUBLISH_EVENT]-(u2l)
+				with u1,u2,collect(distinct u1l.id) as u1Likes, collect(distinct u2l.id) as u2Likes,fjaccard
+				with u1,u2,apoc.coll.union(u1Likes, u2Likes) as union, apoc.coll.intersection(u1Likes, u2Likes) as intersection,fjaccard
+				with u1,u2, CASE WHEN size(union) = 0 THEN 0.0 ELSE 1.0*size(intersection)/size(union) END as ejaccard,fjaccard
+
+				optional match (u1)-[:PREFER_CATEGORY]-(u1cats:Category)
+				optional match (u2)-[:PREFER_CATEGORY|PUBLISH_EVENT|HAS_CATEGORY*1..2]-(u2cats:Category)
+				with u1,u2,collect(distinct u1cats.id) as u1Cats, collect(distinct u2cats.id) as u2Cats,fjaccard,ejaccard
+				with u1,u2,apoc.coll.union(u1Cats, u2Cats) as union, apoc.coll.intersection(u1Cats, u2Cats) as intersection,fjaccard,ejaccard
+				with u1,u2, CASE WHEN size(union) = 0 THEN 0.0 ELSE 1.0*size(intersection)/size(union) END as cjaccard,fjaccard,ejaccard
+
+				WITH u2 as account, (3*fjaccard + 4*ejaccard + 1*cjaccard)/8 as metric,u1 as u
+				WHERE metric >= $threshold
 				WITH account,metric,u
 				ORDER BY metric DESC
 				call apoc.when(account:User,'

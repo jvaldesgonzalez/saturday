@@ -20,6 +20,7 @@ export namespace NotificationsMapper {
       updatedAt: DateTime.fromStandardDate(d.updatedAt),
       id: d._id.toString(),
       type: d.type,
+      viewed: d.viewed,
       eventData: d.eventData ? JSON.stringify(d.eventData) : null,
       userData: d.userData ? JSON.stringify(d.userData) : null,
     };
@@ -64,6 +65,7 @@ export namespace NotificationsMapper {
       eventData: db.eventData ? TextUtils.escapeAndParse(db.eventData) : null,
       createdAt: parseDate(db.createdAt),
       type: db.type,
+      viewed: db.viewed ? db.viewed : false,
     };
     if (!withNull.eventData) delete withNull.eventData;
     if (!withNull.userData) delete withNull.userData;

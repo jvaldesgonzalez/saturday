@@ -4,6 +4,7 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
+import { Integer } from 'neo4j-driver-core';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { NotificationsMapper } from './infrastructure/mappers/notifications.mapper';
 import { NotificationResponse } from './presentation/notification';
@@ -18,20 +19,26 @@ export class NotificationsReadService {
     recipientId: string,
     skip: number,
     limit: number,
-  ): Promise<PaginatedFindResult<NotificationResponse>> {
+  ): Promise<PaginatedFindResult<NotificationResponse> & { unviewed: number }> {
     const [items, total] = await Promise.all([
       this.persistenceManager.query<NotificationResponse>(
         QuerySpecification.withStatement(
           `
-				MATCH (u:Account)-[:HAS_NOTIFICATION]-(n:Notification)
+				MATCH (u:Account)-[relation:HAS_NOTIFICATION]-(n:Notification)
 				WHERE u.id = $recipientId
-				RETURN n
+				WITH n,relation
 				ORDER BY n.createdAt DESC
+				SKIP $skip
+				LIMIT $limit
+				SET relation.viewed = true
+				RETURN apoc.map.merge(n, {viewed:relation.viewed})
 				`,
         )
-          .bind({ recipientId })
-          .skip(skip)
-          .limit(limit)
+          .bind({
+            recipientId,
+            skip: Integer.fromInt(skip),
+            limit: Integer.fromInt(limit),
+          })
           .map(NotificationsMapper.toResponse),
       ),
       this.persistenceManager.getOne<number>(
@@ -44,11 +51,21 @@ export class NotificationsReadService {
         ).bind({ recipientId }),
       ),
     ]);
+    const unviewed = await this.persistenceManager.getOne<number>(
+      QuerySpecification.withStatement(
+        `
+				MATCH (u:Account)-[relation:HAS_NOTIFICATION]-(n:Notification)
+				WHERE u.id = $recipientId AND NOT relation.viewed = true
+				RETURN count(n)
+				`,
+      ).bind({ recipientId }),
+    );
     return {
       items,
       total,
       pageSize: items.length,
       current: skip,
+      unviewed,
     };
   }
 }

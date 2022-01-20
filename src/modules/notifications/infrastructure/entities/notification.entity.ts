@@ -6,4 +6,5 @@ export class NotificationEntity extends PersistentEntity {
   type: NotificationType;
   eventData?: string;
   userData?: string;
+  viewed: boolean;
 }
