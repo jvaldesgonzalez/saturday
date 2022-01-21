@@ -39,7 +39,7 @@ export class StoriesReadService {
         .transform(Stories),
     );
     items.forEach((s) =>
-      s.stories.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1)),
+      s.stories.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)),
     );
     items.sort((_a, b) => (b.stories.every((story) => story.viewed) ? -1 : +1));
 
