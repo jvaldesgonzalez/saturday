@@ -14,9 +14,11 @@ import { StaticsModule } from './modules/statics/statics.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { MetricsModule } from './shared/modules/metrics/metrics.module';
 import { FirebaseAdminModule } from './shared/firebase/firebase.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     FirebaseAdminModule,
     MetricsModule,
     DataAccessModule,
