@@ -6,11 +6,12 @@ export class EventQuery extends Query {
   }
 
   private makeDescriptionQuery() {
-    return `description: ${this.raw}`;
+    return `description: ${this.raw.trim()}`;
   }
 
   private makeNameQuery() {
     const termsFuzzy = this.raw
+      .trim()
       .split(' ')
       .map((t) => (t.length > 3 ? `${t}~^2 OR name:${t}*^2` : `${t}*^2`))
       .filter((i) => i);

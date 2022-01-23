@@ -6,7 +6,7 @@ export class AccountQuery extends Query {
   }
 
   private makeUsernameQuery() {
-    const terms = this.raw.split(' ');
+    const terms = this.raw.trim().split(' ');
     const sum = terms.join('');
     const sumAsPrefix = `${sum}*`;
     const sumAsSubstring = `*${sumAsPrefix}`;
@@ -22,6 +22,7 @@ export class AccountQuery extends Query {
 
   private makeNameQuery() {
     const termsFuzzy = this.raw
+      .trim()
       .split(' ')
       .map((t) => (t.length > 3 ? `${t}~` : t))
       .filter((i) => i);
