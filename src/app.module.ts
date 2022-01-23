@@ -15,6 +15,7 @@ import { StatsModule } from './modules/stats/stats.module';
 import { MetricsModule } from './shared/modules/metrics/metrics.module';
 import { FirebaseAdminModule } from './shared/firebase/firebase.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AttentionTagsModule } from './modules/attention-tags/attention-tags.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     StaticsModule,
     StatsModule,
     MetricsModule,
+    AttentionTagsModule,
   ],
 })
 export class AppModule {}
