@@ -110,15 +110,22 @@ export class FriendRequestService
     interaction: FriendRequestInteraction,
     from: SocialGraphNode,
   ): Promise<boolean> {
+    console.log(interaction.to.toString());
+    console.log(from.toString());
     return await this.persistenceManager.getOne<boolean>(
       QuerySpecification.withStatement(
         `
-				OPTIONAL MATCH (n:User)-[:FRIEND_REQUEST]-(sender:User)
+				OPTIONAL MATCH (n:User)-[r:FRIEND_REQUEST|FRIEND]-(sender:User)
 				WHERE n.id = $fId AND sender.id = $senderId
-				CALL apoc.when(n is not null,'return false as result','return true as result',{}) yield value
+				CALL apoc.when(r is not null,'return false as result','return true as result',{}) yield value
 				RETURN value.result
 			`,
-      ).bind({ fId: interaction.to.toString(), senderId: from.toString() }),
+      )
+        .bind({ fId: interaction.to.toString(), senderId: from.toString() })
+        .map((r) => {
+          console.log(r);
+          return r;
+        }),
     );
   }
 }

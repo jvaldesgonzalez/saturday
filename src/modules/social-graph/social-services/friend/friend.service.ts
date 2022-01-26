@@ -176,7 +176,7 @@ export class FriendService
   ): Promise<void> {
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(
-        `MATCH (u:User)-[r:FRIEND]->(f:User)
+        `MATCH (u:User)-[r:FRIEND]-(f:User)
 				WHERE u.id = $uId AND f.id = $fId
 				DELETE r
 				`,
