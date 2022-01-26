@@ -27,7 +27,7 @@ export class PartnersReadService {
 				WHERE p.id = $pId
 				OPTIONAL MATCH (u:User)-[:FOLLOW]->(p)
 				OPTIONAL MATCH (p)-[:PUBLISH_EVENT]->(e:Event)
-				WITH count(distinct u) as followers, p, count(e) as events
+				WITH count(distinct u) as followers, p, count(distinct e) as events
 				MATCH (me:User)
 				WHERE me.id = $meId
 
@@ -81,7 +81,7 @@ export class PartnersReadService {
 				WHERE p.id = $pId
 				OPTIONAL MATCH (u:User)-[:FOLLOW]->(p)
 				OPTIONAL MATCH (p)-[:PUBLISH_EVENT]->(e:Event)
-				WITH count(distinct u) as followers, p, count(e) as events
+				WITH count(distinct u) as followers, p, count(distinct e) as events
 				OPTIONAL MATCH (p)-[:HAS_PLACE]-(place:Place)
 				RETURN p{
 						.id,

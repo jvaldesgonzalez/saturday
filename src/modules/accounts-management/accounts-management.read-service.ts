@@ -61,7 +61,7 @@ export class AccountsManagementReadService {
 				','
 					OPTIONAL MATCH (u:User)-[:FOLLOW]->(item)
 					OPTIONAL MATCH (item)-[:PUBLISH_EVENT]->(e:Event)
-					WITH count(distinct u) as followers, item, count(e) as events
+					WITH count(distinct u) as followers, item, count(distinct e) as events
 					MATCH (me:User)
 					WHERE me.id = $meId
 					OPTIONAL MATCH (item)-[r:FOLLOW]-(me)
