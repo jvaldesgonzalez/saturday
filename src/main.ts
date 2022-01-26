@@ -8,7 +8,7 @@ import helmet from 'helmet';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
-  const port = process.env.PORT || 8080;
+  const port = process.env.PORT || 80;
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
