@@ -29,7 +29,7 @@ export class FacebookProvider implements IFacebookProvider {
       authProvider: AuthProvider.Facebook,
       email: data.email,
       birthday: new Date(data.birthday),
-      gender: data.gender,
+      gender: data.gender ? data.gender : Gender.NonBinary,
     };
   }
 

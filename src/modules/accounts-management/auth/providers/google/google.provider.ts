@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { AuthProvider } from 'src/modules/accounts-management/users/domain/value-objects/auth-provider.value';
+import { Gender } from 'src/modules/accounts-management/users/domain/value-objects/gender.value';
 import { RegisterUserDto } from '../../application/dtos/register-user.dto';
 import { IAuthProvider } from '../auth.provider.interface';
 
@@ -34,7 +35,7 @@ export class GoogleProvider implements IGoogleProvider {
       authProvider: AuthProvider.Google,
       email: data.emailAddresses[0].value,
       birthday: year ? new Date(year, month - 1, day) : null,
-      gender: data.genders ? data.genders[0].value : null,
+      gender: data.genders ? data.genders[0].value : Gender.NonBinary,
     };
   }
 
