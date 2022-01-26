@@ -43,6 +43,7 @@ export class UsersController {
     @Body() data: UpdateUserBody,
     @CurrentUser() payload: JWTClaim,
   ) {
+    console.log({ data });
     const result = await this.updateProfile.execute({
       ...data,
       id: payload.id,
