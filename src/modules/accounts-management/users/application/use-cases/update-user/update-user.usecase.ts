@@ -27,11 +27,11 @@ export class UpdateUser
   constructor(
     @Inject(UserProviders.IUserRepository) private repo: IUserRepository,
   ) {
-    this.changes = new Changes();
     this.logger = new Logger('UpdateUserUseCase');
   }
   async execute(request: UpdateUserDto): Promise<Response> {
     this.logger.log('Excecuting...');
+    this.changes = new Changes();
 
     const userId = new UniqueEntityID(request.id);
     const userOrNone = await this.repo.findById(userId);
