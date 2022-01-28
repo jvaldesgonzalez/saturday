@@ -81,7 +81,7 @@ export class ReservationsController {
       const error = result.value;
       switch (error.constructor) {
         case CreateReservationErrors.TicketNotFound:
-          throw new ConflictException(error.errorValue().message);
+          throw new NotFoundException(error.errorValue().message);
         case CreateReservationErrors.NotAvailableAmount:
           throw new ConflictException(error.errorValue().message);
         case CreateReservationErrors.CantReserveTwice:
