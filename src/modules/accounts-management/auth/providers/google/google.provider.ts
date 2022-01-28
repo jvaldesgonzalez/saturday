@@ -30,7 +30,7 @@ export class GoogleProvider implements IGoogleProvider {
     console.log(data);
     return {
       fullname: data.names ? data.names[0].displayName : null,
-      avatar: data.photos ? data.photos[0].url : null,
+      avatar: data.photos ? data.photos[0].url.split('=s')[0] + '=s500' : null,
       authProviderId: data.resourceName.split('/')[1],
       authProvider: AuthProvider.Google,
       email: data.emailAddresses[0].value,
