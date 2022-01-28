@@ -20,6 +20,15 @@ export class NotificationsReadService {
     skip: number,
     limit: number,
   ): Promise<PaginatedFindResult<NotificationResponse> & { unviewed: number }> {
+    const unviewed = await this.persistenceManager.getOne<number>(
+      QuerySpecification.withStatement(
+        `
+				MATCH (u:Account)-[relation:HAS_NOTIFICATION]-(n:Notification)
+				WHERE u.id = $recipientId AND NOT relation.viewed = true
+				RETURN count(n)
+				`,
+      ).bind({ recipientId }),
+    );
     const [items, total] = await Promise.all([
       this.persistenceManager.query<NotificationResponse>(
         QuerySpecification.withStatement(
@@ -28,17 +37,14 @@ export class NotificationsReadService {
 				WHERE u.id = $recipientId
 				WITH n,relation
 				ORDER BY n.createdAt DESC
-				SKIP $skip
-				LIMIT $limit
-				SET relation.viewed = true
 				RETURN apoc.map.merge(n, {viewed:relation.viewed})
 				`,
         )
           .bind({
             recipientId,
-            skip: Integer.fromInt(skip),
-            limit: Integer.fromInt(limit),
           })
+          .skip(skip)
+          .limit(limit)
           .map(NotificationsMapper.toResponse),
       ),
       this.persistenceManager.getOne<number>(
@@ -51,14 +57,22 @@ export class NotificationsReadService {
         ).bind({ recipientId }),
       ),
     ]);
-    const unviewed = await this.persistenceManager.getOne<number>(
+
+    //mark as viewed
+    this.persistenceManager.execute(
       QuerySpecification.withStatement(
         `
 				MATCH (u:Account)-[relation:HAS_NOTIFICATION]-(n:Notification)
-				WHERE u.id = $recipientId AND NOT relation.viewed = true
-				RETURN count(n)
+				WITH n,relation
+				SKIP $skip
+				LIMIT $limit
+				SET relation.viewed = true
 				`,
-      ).bind({ recipientId }),
+      ).bind({
+        recipientId,
+        skip: Integer.fromInt(skip),
+        limit: Integer.fromInt(limit),
+      }),
     );
     return {
       items,

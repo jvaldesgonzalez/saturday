@@ -42,8 +42,8 @@ export class UpdateUserBody {
   categoryPreferences: string[];
 
   @ApiPropertyOptional({ enum: Gender })
-  @IsOptional()
   @IsEnum(Gender)
+  @IsOptional()
   gender: Gender;
 
   @ApiPropertyOptional()
@@ -53,7 +53,7 @@ export class UpdateUserBody {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @Matches('^[a-z0-9_]{3,30}$')
+  @Matches('^[a-zA-Z0-9_.]{3,30}$')
   username: string;
 
   @ApiPropertyOptional()
