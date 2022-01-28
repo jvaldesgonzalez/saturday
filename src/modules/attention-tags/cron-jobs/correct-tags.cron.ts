@@ -71,7 +71,7 @@ export class CorrectTagsForEvents {
       QuerySpecification.withStatement(`
 				MATCH (e:Event)-[:HAS_OCCURRENCE]-(:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(r:Reservation)
 				WITH e,collect(t.amount) as amounts, count(r) as reservations
-				WHERE 0.15*(apoc.coll.sum(amounts) + reservations) > apoc.coll.sum(amounts)
+				WHERE 0.15*(apoc.coll.sum(amounts) + reservations) > apoc.coll.sum(amounts) AND apoc.coll.sum(amounts) <> 0
 				MATCH (t:AttentionTag)
 				WHERE t.code = "running_out"
 				CREATE (t)<-[:HAS_TAG]-(e)
