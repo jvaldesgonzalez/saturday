@@ -40,7 +40,9 @@ export class CorrectTagsForEvents {
     this.logger.log('Correcting best seller...');
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(`
-				MATCH (e:Event)-[:HAS_OCCURRENCE]-(:EventOccurrence)-[:HAS_TICKET]-(:Ticket)--(r:Reservation)
+				MATCH (e:Event)-[:HAS_OCCURRENCE]-(:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(r:Reservation)
+				WITH collect(t.amount) as amounts,e,r
+				WHERE apoc.coll.sum(amounts) > 0
 				WITH e,count(r) as reservations
 				ORDER BY reservations DESC
 				LIMIT 1
