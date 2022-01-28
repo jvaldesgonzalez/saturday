@@ -34,4 +34,14 @@ export namespace CreateReservationErrors {
       });
     }
   }
+
+  export class MaxReservationsAttempt extends Result<IUseCaseError> {
+    readonly message: string;
+    constructor(numberOfReservations: number) {
+      super(false, {
+        message: `You can't reserve more than ${numberOfReservations} times`,
+        context,
+      });
+    }
+  }
 }

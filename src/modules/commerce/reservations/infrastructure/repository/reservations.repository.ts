@@ -29,6 +29,21 @@ export class ReservationsRepository
     );
   }
 
+  async nReservationsInATime(
+    theUser: UniqueEntityID,
+    timeInHours = 24,
+  ): Promise<number> {
+    return await this.persistenceManager.getOne<number>(
+      QuerySpecification.withStatement(
+        `
+				MATCH (u:User)--(r:Reservation)
+				WHERE u.id = $uId AND r.createdAt > datetime() - duration({hours:$hours})
+				RETURN count(r)
+					`,
+      ).bind({ uId: theUser.toString(), hours: timeInHours }),
+    );
+  }
+
   async theUserReserveForEvent(
     theUser: UniqueEntityID,
     theTicket: UniqueEntityID,

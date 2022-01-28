@@ -5,6 +5,7 @@ import {
   Get,
   ImATeapotException,
   InternalServerErrorException,
+  MethodNotAllowedException,
   NotFoundException,
   Param,
   ParseIntPipe,
@@ -85,6 +86,8 @@ export class ReservationsController {
           throw new ConflictException(error.errorValue().message);
         case CreateReservationErrors.CantReserveTwice:
           throw new ImATeapotException(error.errorValue().message);
+        case CreateReservationErrors.MaxReservationsAttempt:
+          throw new MethodNotAllowedException(error.errorValue().message);
         default:
           throw new InternalServerErrorException(error.errorValue().message);
       }

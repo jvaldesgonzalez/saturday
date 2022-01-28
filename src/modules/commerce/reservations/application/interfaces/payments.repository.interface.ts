@@ -20,4 +20,8 @@ export interface IReservationsRepository extends IRepository<Reservation> {
     theUser: UniqueEntityID,
     theTicket: UniqueEntityID,
   ): Promise<boolean>;
+  nReservationsInATime(
+    theUser: UniqueEntityID,
+    timeInHours?: number, //24h for now
+  ): Promise<number>;
 }
