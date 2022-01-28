@@ -40,7 +40,7 @@ export class EventsReadService {
 					dateTimeInit:o.dateTimeInit,
 					dateTimeEnd:o.dateTimeEnd,
 					tickets:collect(distinct t { .id, .price, .name, .amount, .description})
-				} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
+				} as occ , e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me ORDER BY occ.dateTimeInit
 				with distinct {
 					id:e.id,
 					name:e.name,
