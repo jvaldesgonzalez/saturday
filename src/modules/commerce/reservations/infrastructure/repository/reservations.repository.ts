@@ -52,8 +52,8 @@ export class ReservationsRepository
       await this.persistenceManager.query<string>(
         QuerySpecification.withStatement(
           `
-					MATCH (u:User)--(:Reservation)--(t:Ticket)--(e:EventOccurrence)
-					MATCH (:Ticket)--(other:Reservation)--(u)
+					MATCH (t:Ticket)--(e:EventOccurrence)
+					MATCH (e)--(:Ticket)--(other:Reservation)--(u:User)
 					WHERE u.id = $uId AND t.id = $tId
 					return distinct other.id
 				`,
