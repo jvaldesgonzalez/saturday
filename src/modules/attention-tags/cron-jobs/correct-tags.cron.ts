@@ -15,7 +15,7 @@ export class CorrectTagsForEvents {
     this.logger = new Logger('CorrectTagsForEvents');
   }
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCron() {
     await this.cleanTags();
   }
