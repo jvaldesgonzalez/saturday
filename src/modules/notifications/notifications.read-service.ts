@@ -60,7 +60,7 @@ export class NotificationsReadService {
     ]);
 
     //mark as viewed
-    await this.persistenceManager.execute(
+    this.persistenceManager.execute(
       QuerySpecification.withStatement(
         `
 				MATCH (u:Account)-[relation:HAS_NOTIFICATION]-(n:Notification)
