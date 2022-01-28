@@ -57,21 +57,21 @@ export class CreateReservation
     const issuerId = request.issuerId && new UniqueEntityID(request.issuerId);
 
     //you cannot reserve twice for the same event
-    const [thereIsPreviousReservation, reservationsAttempted] =
-      await Promise.all([
-        repo.theUserReserveForEvent(issuerId, ticketId),
-        repo.nReservationsInATime(issuerId),
-      ]);
+    // const [thereIsPreviousReservation, reservationsAttempted] =
+    //   await Promise.all([
+    //     repo.theUserReserveForEvent(issuerId, ticketId),
+    //     repo.nReservationsInATime(issuerId),
+    //   ]);
 
-    if (thereIsPreviousReservation)
-      return left(new CreateReservationErrors.CantReserveTwice());
+    // if (thereIsPreviousReservation)
+    //   return left(new CreateReservationErrors.CantReserveTwice());
 
-    if (reservationsAttempted > 2)
-      return left(
-        new CreateReservationErrors.MaxReservationsAttempt(
-          reservationsAttempted,
-        ),
-      );
+    // if (reservationsAttempted > 2)
+    //   return left(
+    //     new CreateReservationErrors.MaxReservationsAttempt(
+    //       reservationsAttempted,
+    //     ),
+    //   );
 
     const couldFetchAvailability = await repo.fetchAvailability(
       ticketId,
