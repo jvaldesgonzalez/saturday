@@ -25,6 +25,7 @@ export class PublicationsReadService {
       QuerySpecification.withStatement(
         `
 				MATCH (p:Publication)
+				WHERE p.dateTimeEnd > datetime()
 				CALL apoc.when(p:Event,'
 					MATCH (pl:Place)<-[:HAS_PLACE]-(item)<-[:PUBLISH_EVENT]-(p:Partner),
 					(item)-[:HAS_CATEGORY]->(cat:Category),
@@ -190,7 +191,7 @@ export class PublicationsReadService {
       items: items,
       total: 27,
       current: skip,
-      pageSize: limit,
+      pageSize: items.length,
     };
   }
 }
