@@ -37,12 +37,14 @@ export class ReservationsRepository
       await this.persistenceManager.query<string>(
         QuerySpecification.withStatement(
           `
-					MATCH (u:User)--(:Reservation)--(t:Ticket)--(e:EventOccurrence)--(:Ticket)--(other:Reservation)--(u)
+					MATCH (u:User)--(:Reservation)--(t:Ticket)--(e:EventOccurrence)
+					MATCH (:Ticket)--(other:Reservation)--(u)
 					WHERE u.id = $uId AND t.id = $tId
-					return other.id
+					return distinct other.id
 				`,
         ).bind({ uId: theUser.toString(), tId: theTicket.toString() }),
       );
+    console.log(theOtherReservationsOrNone);
     return theOtherReservationsOrNone.length > 0 ? true : false;
   }
 
