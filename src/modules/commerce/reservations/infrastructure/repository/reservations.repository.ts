@@ -71,8 +71,9 @@ export class ReservationsRepository
       QuerySpecification.withStatement(
         `
 				MATCH (t:Ticket)
+				CALL apoc.lock.nodes([t])
 				WHERE t.id = $tId AND t.amount >= $amount
-				CALL apoc.atomic.subtract(t,"amount",$amount,5)
+				CALL apoc.atomic.subtract(t,"amount",$amount,1)
 				YIELD oldValue, newValue
 				RETURN newValue
 			`,
