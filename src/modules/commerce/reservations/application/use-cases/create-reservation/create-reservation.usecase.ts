@@ -56,6 +56,15 @@ export class CreateReservation
     const couponId = request.couponId && new UniqueEntityID(request.couponId);
     const issuerId = request.issuerId && new UniqueEntityID(request.issuerId);
 
+    //you cannot reserve twice for the same event
+    const thereIsPreviousReservation = await repo.theUserReserveForEvent(
+      issuerId,
+      ticketId,
+    );
+
+    if (thereIsPreviousReservation)
+      return left(new CreateReservationErrors.CantReserveTwice());
+
     const couldFetchAvailability = await repo.fetchAvailability(
       ticketId,
       request.amountOfTickets,

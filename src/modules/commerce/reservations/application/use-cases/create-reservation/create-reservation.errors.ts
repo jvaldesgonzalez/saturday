@@ -24,4 +24,14 @@ export namespace CreateReservationErrors {
       });
     }
   }
+
+  export class CantReserveTwice extends Result<IUseCaseError> {
+    readonly message: string;
+    constructor() {
+      super(false, {
+        message: `You cannot reserve twice for the same event`,
+        context,
+      });
+    }
+  }
 }

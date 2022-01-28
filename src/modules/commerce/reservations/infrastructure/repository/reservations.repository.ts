@@ -29,6 +29,23 @@ export class ReservationsRepository
     );
   }
 
+  async theUserReserveForEvent(
+    theUser: UniqueEntityID,
+    theTicket: UniqueEntityID,
+  ): Promise<boolean> {
+    const theOtherReservationsOrNone =
+      await this.persistenceManager.query<string>(
+        QuerySpecification.withStatement(
+          `
+					MATCH (u:User)--(:Reservation)--(t:Ticket)--(e:EventOccurrence)--(:Ticket)--(other:Reservation)--(u)
+					WHERE u.id = $uId AND t.id = $tId
+					return other.id
+				`,
+        ).bind({ uId: theUser.toString(), tId: theTicket.toString() }),
+      );
+    return theOtherReservationsOrNone.length > 0 ? true : false;
+  }
+
   async fetchAvailability(
     theTicketId: UniqueEntityID,
     amount: number,

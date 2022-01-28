@@ -3,6 +3,7 @@ import {
   ConflictException,
   Controller,
   Get,
+  ImATeapotException,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -82,6 +83,8 @@ export class ReservationsController {
           throw new ConflictException(error.errorValue().message);
         case CreateReservationErrors.NotAvailableAmount:
           throw new ConflictException(error.errorValue().message);
+        case CreateReservationErrors.CantReserveTwice:
+          throw new ImATeapotException(error.errorValue().message);
         default:
           throw new InternalServerErrorException(error.errorValue().message);
       }
