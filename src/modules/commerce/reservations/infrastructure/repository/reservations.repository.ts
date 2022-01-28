@@ -77,7 +77,7 @@ export class ReservationsRepository
 				RETURN newValue
 			`,
       ).bind({ tId: theTicketId.toString(), amount }),
-    ))
+    )) + 1
       ? true
       : false;
   }
@@ -86,11 +86,11 @@ export class ReservationsRepository
     theTicketId: UniqueEntityID,
     amount: number,
   ): Promise<void> {
-    await this.persistenceManager.execute(
+    await this.persistenceManager.getOne<number>(
       QuerySpecification.withStatement(
         `
 				MATCH (t:Ticket)
-				WHERE t.id = $tId AND t.amount >= $amount
+				WHERE t.id = $tId
 				CALL apoc.atomic.add(t,"amount",$amount,5)
 				YIELD oldValue, newValue
 				RETURN newValue
