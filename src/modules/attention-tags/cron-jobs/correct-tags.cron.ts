@@ -70,7 +70,7 @@ export class CorrectTagsForEvents {
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(`
 				MATCH (e:Event)-[:HAS_OCCURRENCE]-(:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(r:Reservation)
-				WITH e,collect(t.amount) as amounts, count(r) as reservations
+				WITH e,collect(t.amount) as amounts, apoc.coll.sum(collect(r.amountOfTickets)) as reservations
 				WHERE 0.15*(apoc.coll.sum(amounts) + reservations) > apoc.coll.sum(amounts) AND apoc.coll.sum(amounts) <> 0
 				MATCH (t:AttentionTag)
 				WHERE t.code = "running_out"
