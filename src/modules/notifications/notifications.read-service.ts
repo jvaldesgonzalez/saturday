@@ -24,7 +24,7 @@ export class NotificationsReadService {
       QuerySpecification.withStatement(
         `
 				MATCH (u:Account)-[relation:HAS_NOTIFICATION]-(n:Notification)
-				WHERE u.id = $recipientId AND NOT relation.viewed = true
+				WHERE u.id = $recipientId AND (relation.viewed is null OR relation.viewed = false)
 				RETURN count(n)
 				`,
       ).bind({ recipientId }),
@@ -35,16 +35,17 @@ export class NotificationsReadService {
           `
 				MATCH (u:Account)-[relation:HAS_NOTIFICATION]-(n:Notification)
 				WHERE u.id = $recipientId
-				WITH n,relation
-				ORDER BY n.createdAt DESC
 				RETURN apoc.map.merge(n, {viewed:relation.viewed})
+				ORDER BY n.createdAt DESC
+				SKIP $skip
+				LIMIT $limit
 				`,
         )
           .bind({
             recipientId,
+            skip: Integer.fromInt(skip),
+            limit: Integer.fromInt(limit),
           })
-          .skip(skip)
-          .limit(limit)
           .map(NotificationsMapper.toResponse),
       ),
       this.persistenceManager.getOne<number>(
@@ -59,11 +60,12 @@ export class NotificationsReadService {
     ]);
 
     //mark as viewed
-    this.persistenceManager.execute(
+    await this.persistenceManager.execute(
       QuerySpecification.withStatement(
         `
 				MATCH (u:Account)-[relation:HAS_NOTIFICATION]-(n:Notification)
-				WITH n,relation
+				WHERE u.id = $recipientId
+				WITH relation,n
 				SKIP $skip
 				LIMIT $limit
 				SET relation.viewed = true
