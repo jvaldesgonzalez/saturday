@@ -125,7 +125,10 @@ export class PublicationsReadService {
 						multimedia:e.multimedia,
 						attentionTags: tags,
 						amIInterested: rlike IS NOT null,
-						totalUsersInterested: usersInterested
+						totalUsersInterested: usersInterested,
+						dateTimeInit:e.dateTimeInit,
+						dateTimeEnd:e.dateTimeEnd,
+						basePrice:e.basePrice
 					} as eventInfo, me, e,item
 					call {
 						WITH e,me
