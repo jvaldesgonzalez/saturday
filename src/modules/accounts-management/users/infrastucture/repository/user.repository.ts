@@ -68,7 +68,7 @@ export class UserRepository
   async getPayloadByRefreshToken(token: RefreshToken): Promise<JWTClaim> {
     return await this.persistenceManager.maybeGetOne<JWTClaim>(
       QuerySpecification.withStatement(
-        `MATCH (u:User)
+        `MATCH (u:Account)
 				WHERE u.refreshToken = $token
 				RETURN u{.id, .email, .username}
 			`,
@@ -79,7 +79,7 @@ export class UserRepository
   async emailIsTaken(theEmail: string): Promise<boolean> {
     return (await this.persistenceManager.maybeGetOne<UserEntity>(
       QuerySpecification.withStatement(
-        `MATCH (u:User)
+        `MATCH (u:Account)
 			WHERE u.email = $email
 				RETURN u.id`,
       ).bind({ email: theEmail }),
@@ -91,7 +91,7 @@ export class UserRepository
   async usernameIsTaken(theUsername: string): Promise<boolean> {
     return (await this.persistenceManager.maybeGetOne<UserEntity>(
       QuerySpecification.withStatement(
-        `MATCH (u:User)
+        `MATCH (u:Account)
 			WHERE u.username = $username
 				RETURN u.id`,
       ).bind({ username: theUsername }),

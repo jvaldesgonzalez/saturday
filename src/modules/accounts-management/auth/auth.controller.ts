@@ -2,6 +2,7 @@ import {
   Body,
   ConflictException,
   Controller,
+  ForbiddenException,
   Headers,
   ImATeapotException,
   InternalServerErrorException,
@@ -16,6 +17,7 @@ import { CheckUserStatusApple } from './application/use-cases/check-user-status/
 import { CheckUserStatusErrors } from './application/use-cases/check-user-status/check-user-status.errors';
 import { CheckUserStatusFacebook } from './application/use-cases/check-user-status/check-user-status.facebook.usecase';
 import { CheckUserStatusGoogle } from './application/use-cases/check-user-status/check-user.status.google.usecase';
+import { LoginPartnerErrors } from './application/use-cases/login-partner/login-partner.errors';
 import { LoginPartner } from './application/use-cases/login-partner/login-partner.usecase';
 import { LoginUserApple } from './application/use-cases/login/login.apple.usecase';
 import { LoginUserFacebook } from './application/use-cases/login/login.facebook.usecase';
@@ -213,7 +215,7 @@ export class AuthController {
           throw new InternalServerErrorException(error.errorValue().message);
       }
     } else if (result.isRight()) {
-      return result.value.getValue();
+      return;
     }
   }
 
@@ -295,6 +297,8 @@ export class AuthController {
       switch (error.constructor) {
         case CheckUserStatusErrors.UserNotFoundInDatabase:
           throw new UnauthorizedException(error.errorValue().message);
+        case LoginPartnerErrors.PartnerIsNotVerified:
+          throw new ForbiddenException(error.errorValue().message);
         default:
           throw new InternalServerErrorException(error.errorValue().message);
       }
@@ -302,6 +306,7 @@ export class AuthController {
       return result.value.getValue();
     }
   }
+
   @SkipAuth()
   @Post('issue-token')
   async issueNewToken(@Body() data: RefreshTokenBody) {

@@ -8,6 +8,7 @@ import { PartnerEntity } from '../entities/partner.entity';
 
 export namespace PartnerMapper {
   export function fromPersistence(db: PartnerEntity): Partner {
+    console.log({ db });
     return Partner.create(
       {
         ...db,
@@ -18,6 +19,7 @@ export namespace PartnerMapper {
         createdAt: parseDate(db.createdAt),
         updatedAt: parseDate(db.updatedAt),
         password: { value: db.password, isHashed: true },
+        isVerified: db.isVerified,
       },
       new UniqueEntityID(db.id),
     ).getValue();
@@ -32,6 +34,7 @@ export namespace PartnerMapper {
       phoneNumber: d.phoneNumber,
       password: d.password,
       place: d.place ? d.place : null,
+      isVerified: d.isVerified,
     };
   }
 }

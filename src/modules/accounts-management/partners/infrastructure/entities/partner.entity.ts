@@ -14,4 +14,5 @@ export class PartnerEntity extends CommonAccountEntity {
   aditionalBusinessData: string;
   place?: PartnerPlace;
   password: string;
+  isVerified: boolean;
 }

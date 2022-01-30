@@ -32,7 +32,7 @@ export class TopsReadService implements ITopsService {
 						publisher{.id, .avatar, .username} as publisher,
 						cat{.id, .name} as cat,
 						collect(distinct tag{.title, .color, .description}) as tags
-					RETURN {
+					RETURN distinct {
 						publisher:publisher,
 						name:e.name,
 						multimedia:e.multimedia,
@@ -58,7 +58,7 @@ export class TopsReadService implements ITopsService {
         QuerySpecification.withStatement(
           `
 					MATCH (e:Event)
-					RETURN count(e)
+					RETURN count(distinct e)
 					`,
         ),
       ),
@@ -90,7 +90,7 @@ export class TopsReadService implements ITopsService {
 						count(p) as purchases,
 						cat{.id, .name} as cat,
 						collect(distinct tag{.title, .color, .description}) as tags
-					RETURN {
+					RETURN distinct {
 						publisher:publisher,
 						name:e.name,
 						multimedia:e.multimedia,
@@ -118,7 +118,7 @@ export class TopsReadService implements ITopsService {
 					MATCH (e:Event)--(o:EventOccurrence)--(t:Ticket)--(p:Reservation)
 					WITH e, count(p) as purchases
 					WHERE purchases > 0
-					RETURN count(e)
+					RETURN count(distinct e)
 					`,
         ),
       ),

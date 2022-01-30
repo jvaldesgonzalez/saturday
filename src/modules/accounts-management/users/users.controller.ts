@@ -9,7 +9,9 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { EnumRoles } from 'src/shared/domain/roles.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Roles } from '../auth/decorators/role.decorator';
 import { JWTClaim } from '../auth/login-payload.type';
 import { UpdateUserErrors } from './application/use-cases/update-user/update-user.errors';
 import { UpdateUser } from './application/use-cases/update-user/update-user.usecase';
@@ -26,6 +28,7 @@ export class UsersController {
   ) {}
 
   @Get('/me/profile')
+  @Roles(EnumRoles.Client)
   async getProfile(@CurrentUser() payload: JWTClaim) {
     return await this.readService.getMyProfile(payload.id);
   }

@@ -15,11 +15,12 @@ type PartnerProps = {
   aditionalBusinessData: PartnerDescription;
   place?: PartnerPlace;
   password: PartnerPassword;
+  isVerified: boolean;
 } & CommonAccountProps;
 
 type NewPartnerProps = Omit<
   PartnerProps,
-  'createdAt' | 'updatedAt' | 'isActive'
+  'createdAt' | 'updatedAt' | 'isActive' | 'isVerified'
 >;
 
 export class Partner extends CommonAccount<PartnerProps> {
@@ -43,8 +44,18 @@ export class Partner extends CommonAccount<PartnerProps> {
     return this.props.place;
   }
 
+  get isVerified(): boolean {
+    return this.props.isVerified;
+  }
+
   changeBusinessName(name: string): Result<void> {
     this.props.businessName = name;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
+
+  verifyBusiness(): Result<void> {
+    this.props.isVerified = true;
     this.props.updatedAt = new Date();
     return Ok();
   }
@@ -99,6 +110,7 @@ export class Partner extends CommonAccount<PartnerProps> {
         createdAt: new Date(),
         updatedAt: new Date(),
         isActive: false,
+        isVerified: false,
       },
       new UniqueEntityID(),
     );

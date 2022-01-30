@@ -49,6 +49,7 @@ export class PartnerRepository
 						.aditionalBusinessData,
 						.businessName,
 						.password,
+						.isVerified,
 						place: place{.name, .address, .longitude, .latitude, locationId:l.id}
 					}
 				`,
@@ -81,6 +82,7 @@ export class PartnerRepository
 						.aditionalBusinessData,
 						.businessName,
 						.password,
+						.isVerified,
 						place: place{.name, .address, .longitude, .latitude, locationId:l.id}
 					}
 				`,
@@ -94,7 +96,7 @@ export class PartnerRepository
   async emailIsTaken(theEmail: string): Promise<boolean> {
     return (await this.persistenceManager.maybeGetOne<PartnerEntity>(
       QuerySpecification.withStatement(
-        `MATCH (u:Partner)
+        `MATCH (u:Account)
 			WHERE u.email = $email
 				RETURN u.id`,
       ).bind({ email: theEmail }),
@@ -106,7 +108,7 @@ export class PartnerRepository
   async usernameIsTaken(theUsername: string): Promise<boolean> {
     return (await this.persistenceManager.maybeGetOne<PartnerEntity>(
       QuerySpecification.withStatement(
-        `MATCH (u:Partner)
+        `MATCH (u:Account)
 				WHERE u.username = $username
 				RETURN u.id`,
       ).bind({ username: theUsername }),

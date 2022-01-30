@@ -5,11 +5,13 @@ import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { Ok, Result } from 'src/shared/core/Result';
+import { EnumRoles } from 'src/shared/domain/roles.enum';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { JWTUtils } from '../../../jwt-utils';
 import { LoginPayload } from '../../../login-payload.type';
 import { LoginPartnerDto } from '../../dtos/login-partner.dto';
 import { CheckUserStatusErrors } from '../check-user-status/check-user-status.errors';
+import { LoginPartnerErrors } from './login-partner.errors';
 
 type Response = Either<
   CheckUserStatusErrors.UserNotFoundInDatabase | AppError.UnexpectedError,
@@ -32,12 +34,16 @@ export class LoginPartner implements IUseCase<LoginPartnerDto, Response> {
           new UniqueEntityID(request.usernameOrEmail),
         ),
       );
+    console.log(partnerOrNone);
+    if (!partnerOrNone.isVerified)
+      return left(new LoginPartnerErrors.PartnerIsNotVerified());
     return right(
       Ok({
         accessToken: JWTUtils.sign({
           id: partnerOrNone._id.toString(),
           email: partnerOrNone.email,
           username: partnerOrNone.username,
+          role: EnumRoles.Partner,
         }),
         refreshToken: partnerOrNone.refreshToken,
       }),

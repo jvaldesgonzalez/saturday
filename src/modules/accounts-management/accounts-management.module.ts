@@ -20,6 +20,7 @@ import { PartnerRepository } from './partners/infrastructure/repository/partner.
 import PartnerUseCases from './partners/application/usecases';
 import { GoogleProvider } from './auth/providers/google/google.provider';
 import { AppleProvider } from './auth/providers/apple/apple.provider';
+import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
   providers: [
@@ -53,6 +54,10 @@ import { AppleProvider } from './auth/providers/apple/apple.provider';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
   controllers: [

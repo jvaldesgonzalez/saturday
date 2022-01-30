@@ -8,6 +8,7 @@ import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { Ok, Result } from 'src/shared/core/Result';
+import { EnumRoles } from 'src/shared/domain/roles.enum';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { JWTUtils } from '../../../jwt-utils';
 import { LoginPayload } from '../../../login-payload.type';
@@ -59,6 +60,7 @@ export class RegisterUserFacebook
             id: userOrNone._id.toString(),
             email: userOrNone.email,
             username: userOrNone.username,
+            role: EnumRoles.Client,
           }),
           refreshToken: userOrNone.refreshToken,
         }),
@@ -78,6 +80,7 @@ export class RegisterUserFacebook
             id: user._id.toString(),
             email: user.email,
             username: user.username,
+            role: EnumRoles.Client,
           }),
           refreshToken: user.refreshToken,
         }),
