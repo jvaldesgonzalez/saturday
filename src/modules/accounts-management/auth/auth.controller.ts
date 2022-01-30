@@ -200,11 +200,16 @@ export class AuthController {
   }
 
   @SkipAuth()
+  @ApiHeader({ name: 'fcmToken' })
   @Post('/local/register')
-  async registerPartner(@Body() data: RegisterPartnerRequest) {
+  async registerPartner(
+    @Body() data: RegisterPartnerRequest,
+    @Headers('fcmToken') fcmToken: string,
+  ) {
     const { ...rest } = data;
     const result = await this.registerPartnerUC.execute({
       ...rest,
+      firebasePushId: fcmToken,
     });
     if (result.isLeft()) {
       const error = result.value;

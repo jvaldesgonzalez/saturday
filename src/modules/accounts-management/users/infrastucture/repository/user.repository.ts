@@ -70,7 +70,7 @@ export class UserRepository
       QuerySpecification.withStatement(
         `MATCH (u:Account)
 				WHERE u.refreshToken = $token
-				RETURN u{.id, .email, .username}
+				RETURN u{.id, .email, .username, role:CASE WHEN u:User THEN "client" ELSE "partner" END}
 			`,
       ).bind({ token }),
     );

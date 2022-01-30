@@ -1,5 +1,12 @@
-import { Controller, Get, Query, Res } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  ForbiddenException,
+  Get,
+  Headers,
+  Query,
+  Res,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { CurrentUser } from '../accounts-management/auth/decorators/current-user.decorator';
 import { SkipAuth } from '../accounts-management/auth/decorators/skip-auth.decorator';
@@ -16,6 +23,17 @@ export class StaticsController {
   @Get('/signed-urls/profiles/me')
   async getProfileSignedUrl(@CurrentUser() payload: JWTClaim) {
     return await this.service.getSignedUrl(`profile-${payload.username}`);
+  }
+
+  @Get('/signed-urls/profiles-partner/me')
+  @SkipAuth()
+  @ApiHeader({ name: 'X-API-KEY' })
+  async getProfileSignedUrlForPartnerByApiKey(
+    @Headers('X-API-KEY') apiKey: string,
+  ) {
+    if (apiKey !== 'H4SDXTM-JK5M2BN-GARMKC3-T84WM0R')
+      throw new ForbiddenException('Invalid ApiKey');
+    return await this.service.getSignedUrl(`profile-partner`);
   }
 
   @Get('/signed-urls/media/')
