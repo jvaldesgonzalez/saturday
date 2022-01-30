@@ -84,13 +84,13 @@ export class TopsReadService implements ITopsService {
 					(e)-[:HAS_CATEGORY]->(cat:Category)
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 					WITH o{.id, .dateTimeInit, .dateTimeEnd, tickets:collect(distinct t{.id, .price, .name, .amount, .description})} as occ,
-						e,
 						place{.name, .latitude, .longitude, .address} as place,
 						publisher{.id, .avatar, .username} as publisher,
 						count(p) as purchases,
 						cat{.id, .name} as cat,
-						collect(distinct tag{.title, .color, .description}) as tags
-					RETURN distinct {
+						collect(distinct tag{.title, .color, .description}) as tags,
+						e
+					RETURN distinct{
 						publisher:publisher,
 						name:e.name,
 						multimedia:e.multimedia,
@@ -102,9 +102,10 @@ export class TopsReadService implements ITopsService {
 						basePrice:e.basePrice,
 						category:cat,
 						place:place,
-						attentionTags: tags
-					}
-					ORDER BY purchases DESC
+						attentionTags: tags,
+						purchases:purchases
+					} as events
+					ORDER BY events.purchases DESC
 				`,
         )
           .skip(skip)
