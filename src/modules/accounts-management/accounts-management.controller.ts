@@ -1,7 +1,8 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AccountsManagementReadService } from './accounts-management.read-service';
 import { CurrentUser } from './auth/decorators/current-user.decorator';
+import { SkipAuth } from './auth/decorators/skip-auth.decorator';
 import { JWTClaim } from './auth/login-payload.type';
 
 @ApiBearerAuth()
@@ -18,5 +19,11 @@ export class AccountsController {
     username = username[0] === '@' ? username.slice(1) : username;
 
     return await this.readService.getAccountByUsername(username, payload.id);
+  }
+
+  @Get('can-i-use-this-credential')
+  @SkipAuth()
+  async checkCredential(@Query('usernameOrEmail') usernameOrEmail: string) {
+    return !(await this.readService.usernameOrEmailExists(usernameOrEmail));
   }
 }

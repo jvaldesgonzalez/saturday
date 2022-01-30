@@ -110,4 +110,16 @@ export class AccountsManagementReadService {
         }),
     );
   }
+
+  async usernameOrEmailExists(theUsernameOrEmail: string): Promise<boolean> {
+    return !!(await this.persistenceManager.maybeGetOne<string>(
+      QuerySpecification.withStatement(
+        `
+				MATCH (a:Account)
+				WHERE a.username = $cred OR a.email = $cred
+				RETURN a.id
+			`,
+      ).bind({ cred: theUsernameOrEmail }),
+    ));
+  }
 }
