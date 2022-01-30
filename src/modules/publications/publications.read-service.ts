@@ -178,6 +178,8 @@ export class PublicationsReadService {
                     ...e,
                     info: TextUtils.escapeAndParse(e.info),
                     multimedia: TextUtils.escapeAndParse(e.multimedia),
+                    dateTimeInit: parseDate(r.dateTimeInit),
+                    dateTimeEnd: parseDate(r.dateTimeEnd),
                     occurrences: e.occurrences.map((o) => {
                       return {
                         ...o,
