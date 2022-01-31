@@ -32,14 +32,17 @@ export class HashtagSearchService implements ISearchService<HashtagItem> {
         `
 				CALL db.index.fulltext.queryNodes('search_engine',$search) yield node, score
 				WHERE node:Hashtag
+				MATCH (node)--(p:Publication)
 				RETURN {
     			data: {
 						word:node.word,
 						type:"hashtag",
-						id:node.id
+						id:node.id,
+						publications:count(distinct p)
 					},
     			score:score
-				}
+				} as hashtag
+				ORDER BY hashtag.data.publications
 			`,
       )
         .bind({ search: q.processedQuery })
