@@ -1,8 +1,8 @@
 import { Ok, Result } from 'src/shared/core/Result';
 import { DomainEntity } from 'src/shared/domain/entity.abstract';
-import { Multimedia } from 'src/shared/domain/multimedia.value';
+import { Multimedia, MultimediaType } from 'src/shared/domain/multimedia.value';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import { EventCategories } from './value-objects/event-categories.value';
+import { EventCategory } from './value-objects/event-categories.value';
 import { EventCollaborators } from './value-objects/event-collaborators.value';
 import { EventDescription } from './value-objects/event-description.value';
 import { EventPlace } from './value-objects/event-place.value';
@@ -11,10 +11,10 @@ type EventProps = {
   publisher: UniqueEntityID;
   name: string;
   description: EventDescription;
-  categories: EventCategories;
-  place?: EventPlace;
+  category: EventCategory;
+  place: EventPlace;
   collaborators?: EventCollaborators;
-  multimedia: { url: string; type: 'image' | 'video' }[];
+  multimedia: { url: string; type: MultimediaType }[];
   createdAt: Date;
   updatedAt: Date;
   dateTimeInit: Date;
@@ -45,7 +45,7 @@ export class Event extends DomainEntity<EventProps> {
     return Ok();
   }
 
-  public get place(): EventPlace | undefined {
+  public get place(): EventPlace {
     return this.props.place;
   }
 
@@ -81,8 +81,8 @@ export class Event extends DomainEntity<EventProps> {
     return this.props.multimedia;
   }
 
-  get categories(): EventCategories {
-    return this.props.categories;
+  get category(): EventCategory {
+    return this.props.category;
   }
 
   changeName(name: string): Result<void> {
@@ -108,8 +108,8 @@ export class Event extends DomainEntity<EventProps> {
     return Ok();
   }
 
-  changeCategories(cats: EventCategories): Result<void> {
-    this.props.categories = cats;
+  changeCategory(cat: EventCategory): Result<void> {
+    this.props.category = cat;
     this.props.updatedAt = new Date();
     return Ok();
   }

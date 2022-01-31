@@ -1,4 +1,10 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AccountsManagementReadService } from './accounts-management.read-service';
 import { CurrentUser } from './auth/decorators/current-user.decorator';
@@ -24,6 +30,10 @@ export class AccountsController {
   @Get('can-i-use-this-credential')
   @SkipAuth()
   async checkCredential(@Query('usernameOrEmail') usernameOrEmail: string) {
+    if (!usernameOrEmail)
+      throw new BadRequestException(
+        'Username or email must be provided in the url query',
+      );
     return !(await this.readService.usernameOrEmailExists(usernameOrEmail));
   }
 }
