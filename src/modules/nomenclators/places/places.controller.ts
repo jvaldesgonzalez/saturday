@@ -18,7 +18,7 @@ export class PlacesController {
 
   @SkipAuth()
   @Get('')
-  @ApiQuery({ name: 'q' })
+  @ApiQuery({ name: 'q', allowEmptyValue: true })
   @ApiQuery({ name: 'skip' })
   @ApiQuery({ name: 'take' })
   async getAll(
@@ -27,11 +27,16 @@ export class PlacesController {
     @Query('take', ParseIntPipe) limit: number,
   ): Promise<PaginatedFindResult<any>> {
     const q = `${query}* ${query}`;
+
+    const searchOrGetAll = ` ${
+      query
+        ? "CALL db.index.fulltext.queryNodes('places',$q) YIELD node,score"
+        : 'MATCH (node:Place)'
+    }`;
+
     const places = await this.persistenceManager.query(
       QuerySpecification.withStatement(
-        ` CALL db.index.fulltext.queryNodes('places',$q)
-					YIELD node,score
-					RETURN node
+        `${searchOrGetAll} RETURN node
 				`,
       )
         .bind({ q })
@@ -40,8 +45,7 @@ export class PlacesController {
     );
     const total = await this.persistenceManager.getOne<number>(
       QuerySpecification.withStatement(
-        `CALL db.index.fulltext.queryNodes('places',$q)
-					YIELD node,score
+        `${searchOrGetAll}
 					RETURN count(node)
 				`,
       ).bind({ q }),
