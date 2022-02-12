@@ -73,6 +73,7 @@ export class PublicationsReadService {
 						totalUsersInterested: usersInterested,
 						dateTimeInit:e.dateTimeInit,
 						dateTimeEnd:e.dateTimeEnd,
+						createdAt:e.createdAt,
 						basePrice:e.basePrice
 					} as eventInfo, me, e
 					call {
@@ -126,7 +127,6 @@ export class PublicationsReadService {
 						attentionTags: tags,
 						amIInterested: rlike IS NOT null,
 						totalUsersInterested: usersInterested,
-						createdAt:e.createdAt,
 						dateTimeInit:e.dateTimeInit,
 						dateTimeEnd:e.dateTimeEnd,
 						basePrice:e.basePrice
@@ -156,6 +156,7 @@ export class PublicationsReadService {
         .skip(skip)
         .limit(limit)
         .map((r) => {
+          delete r.createdAt;
           return r.type === 'event'
             ? {
                 ...r,
