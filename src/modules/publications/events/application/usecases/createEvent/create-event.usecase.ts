@@ -8,51 +8,55 @@ import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { CreateEventDto } from '../../dtos/create-event.dto';
 import { IEventRepository } from '../../interfaces/event.repository';
 import { Event } from '../../../domain/event.domain';
+import { EventProviders } from '../../../providers/event.providers.enum';
+import { EventOccurrence } from '../../../domain/event-occurrence.domain';
+import { OccurrenceTicket } from '../../../domain/occurrence-ticket.domain';
 
-export type CreateEventUseCaseResponse = Either<
-  AppError.UnexpectedError | Result<any>,
-  Result<void>
->;
+type Response = Either<AppError.UnexpectedError, Result<void>>;
 
-// @Injectable()
-// export class CreateEventUseCase
-//   implements IUseCase<CreateEventDto, CreateEventUseCaseResponse>
-// {
-//   private _logger: Logger;
-//   constructor(
-//     @Inject('IEventRepository') private readonly _repository: IEventRepository,
-//   ) {
-//     this._logger = new Logger('CreateEventUseCase');
-//   }
+@Injectable()
+export class CreateEvent implements IUseCase<CreateEventDto, Response> {
+  private _logger: Logger;
+  constructor(
+    @Inject(EventProviders.IEventRepository)
+    private readonly _repository: IEventRepository,
+  ) {
+    this._logger = new Logger('CreateEventUseCase');
+  }
 
-//   async execute(request: CreateEventDto): Promise<CreateEventUseCaseResponse> {
-//     this._logger.log('Executing...');
+  async execute(request: CreateEventDto): Promise<Response> {
+    this._logger.log('Executing...');
 
-//     const publisher = new UniqueEntityID(request.publisher);
-//     const categories = request.categories.map((ct) => new UniqueEntityID(ct));
-//     const collaborators = (request.collaborators || []).map(
-//       (col) => new UniqueEntityID(col),
-//     );
-//     const event = Event.new({
-//       ...request,
-//       publisher,
-//       categories,
-//       collaborators,
-//       newOccurrences: request.occurrences,
-//     }).getValue();
+    const publisher = new UniqueEntityID(request.publisher);
+    const category = new UniqueEntityID(request.category);
+    const collaborators = request.collaborators.map(
+      (c) => new UniqueEntityID(c),
+    );
+    const event = Event.new({
+      ...request,
+      publisher,
+      collaborators,
+      category,
+    }).getValue();
 
-//     try {
-//       this._logger.log(event);
-//       await this._repository.save(event);
-//       for (const occurrence of request.occurrences) {
-//         await this.createOccurrenceUseCase.execute({
-//           eventId: event._id.toString(),
-//           ...occurrence,
-//         });
-//       }
-//       return right(Ok());
-//     } catch (error) {
-//       return left(new AppError.UnexpectedError());
-//     }
-//   }
-// }
+    request.newOccurrences.forEach((o) => {
+      const occ = EventOccurrence.new({
+        ...o,
+        eventId: new UniqueEntityID(event._id.toString()),
+        newTickets: o.newTickets
+          .map((ticket) => OccurrenceTicket.new(ticket))
+          .map((r) => r.getValue()),
+      }).getValue();
+      event.addOccurrence(occ);
+    });
+
+    try {
+      this._logger.log(event);
+      await this._repository.save(event);
+      return right(Ok());
+    } catch (error) {
+      this._logger.error(error);
+      return left(new AppError.UnexpectedError());
+    }
+  }
+}

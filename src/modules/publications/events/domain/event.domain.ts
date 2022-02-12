@@ -2,6 +2,7 @@ import { Ok, Result } from 'src/shared/core/Result';
 import { DomainEntity } from 'src/shared/domain/entity.abstract';
 import { Multimedia, MultimediaType } from 'src/shared/domain/multimedia.value';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import { EventOccurrence } from './event-occurrence.domain';
 import { EventCategory } from './value-objects/event-categories.value';
 import { EventCollaborators } from './value-objects/event-collaborators.value';
 import { EventDescription } from './value-objects/event-description.value';
@@ -17,32 +18,21 @@ type EventProps = {
   multimedia: { url: string; type: MultimediaType }[];
   createdAt: Date;
   updatedAt: Date;
-  dateTimeInit: Date;
-  dateTimeEnd: Date;
+  dateTimeInit?: Date;
+  dateTimeEnd?: Date;
+  topPrice?: number;
+  hashtags: string[];
+  basePrice?: number;
   newOccurrences: EventOccurrence[];
 };
 
 export class Event extends DomainEntity<EventProps> {
-  public get publisher(): UniqueEntityID {
-    return this.props.publisher;
-  }
-
   public get newOccurrences(): EventOccurrence[] {
     return this.props.newOccurrences;
   }
 
-  addOccurrence(theOccurrence: EventOccurrence): Result<void> {
-    this.newOccurrences.push(theOccurrence);
-    this.props.dateTimeInit =
-      theOccurrence.dateTimeInit < this.props.dateTimeInit
-        ? theOccurrence.dateTimeInit
-        : this.dateTimeInit;
-    this.props.dateTimeEnd =
-      theOccurrence.dateTimeEnd > this.props.dateTimeEnd
-        ? theOccurrence.dateTimeEnd
-        : this.dateTimeEnd;
-    this.props.updatedAt = new Date();
-    return Ok();
+  public get publisher(): UniqueEntityID {
+    return this.props.publisher;
   }
 
   public get place(): EventPlace {
@@ -85,6 +75,56 @@ export class Event extends DomainEntity<EventProps> {
     return this.props.category;
   }
 
+  get topPrice(): number {
+    return this.props.topPrice;
+  }
+
+  get basePrice(): number {
+    return this.props.basePrice;
+  }
+
+  get hashtags(): string[] {
+    return this.props.hashtags;
+  }
+
+  addOccurrence(theOcc: EventOccurrence): Result<void> {
+    this.props.newOccurrences.push(theOcc);
+
+    const orderedPrices = theOcc.newTickets
+      .map((t) => t.price)
+      .sort((a, b) => a - b);
+    const [minPrice, maxPrice] = [
+      orderedPrices[0],
+      orderedPrices[orderedPrices.length - 1],
+    ];
+
+    if (!this.dateTimeInit || !this.dateTimeEnd) {
+      this.props.dateTimeInit = theOcc.dateTimeInit;
+      this.props.dateTimeEnd = theOcc.dateTimeEnd;
+    }
+
+    if (!this.topPrice || !this.basePrice) {
+      this.props.basePrice = minPrice;
+      this.props.topPrice = maxPrice;
+    }
+
+    this.props.dateTimeInit =
+      this.props.dateTimeInit < theOcc.dateTimeInit
+        ? this.props.dateTimeInit
+        : theOcc.dateTimeInit;
+    this.props.dateTimeEnd =
+      this.props.dateTimeEnd > theOcc.dateTimeEnd
+        ? this.props.dateTimeEnd
+        : theOcc.dateTimeEnd;
+
+    this.props.basePrice =
+      this.props.basePrice < minPrice ? this.props.basePrice : minPrice;
+    this.props.topPrice =
+      this.props.topPrice > maxPrice ? this.props.topPrice : maxPrice;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
+
   changeName(name: string): Result<void> {
     this.props.name = name;
     return Ok();
@@ -120,10 +160,20 @@ export class Event extends DomainEntity<EventProps> {
     return Ok();
   }
 
+  private static computeHashags(description: EventDescription): string[] {
+    return description
+      .map((d) => d.body) //focus on prop body
+      .map((txt) => txt.match(/(^|\s)#([^\d&%$_-]\S{2,49})\b/g) || []) //match hashtag
+      .flat() //flat the list of hashtags-matched list
+      .map((withSpaces) => withSpaces.trim()) // remove spaces in the edges
+      .filter((item, index, list) => list.indexOf(item) === index) //remove duplicates
+      .map((hstg) => hstg.slice(1)); // remove leading sharp(#)
+  }
+
   public static new(
     props: Omit<
       EventProps,
-      'createdAt' | 'updatedAt' | 'dateTimeInit' | 'dateTimeEnd'
+      'createdAt' | 'updatedAt' | 'hashtags' | 'newOccurrences'
     >,
   ): Result<Event> {
     return this.create(
@@ -131,12 +181,8 @@ export class Event extends DomainEntity<EventProps> {
         ...props,
         createdAt: new Date(),
         updatedAt: new Date(),
-        dateTimeInit: props.newOccurrences.reduce((o1, o2) =>
-          o1.dateTimeInit < o2.dateTimeInit ? o1 : o2,
-        ).dateTimeInit,
-        dateTimeEnd: props.newOccurrences.reduce((o1, o2) =>
-          o1.dateTimeEnd > o2.dateTimeEnd ? o1 : o2,
-        ).dateTimeEnd,
+        hashtags: Event.computeHashags(props.description),
+        newOccurrences: [],
       },
       new UniqueEntityID(),
     );

@@ -1,4 +1,7 @@
-export abstract class WatchedList<T extends { id: string }> {
+import { DomainEntity } from '../domain/entity.abstract';
+import { UniqueEntityID } from '../domain/UniqueEntityID';
+
+export abstract class WatchedList<T extends DomainEntity<never>> {
   public currentItems: T[];
   private initial: T[];
   private new: T[];
@@ -24,6 +27,10 @@ export abstract class WatchedList<T extends { id: string }> {
   public getRemovedItems(): T[] {
     return this.removed;
   }
+
+  // private findById(id:UniqueEntityID): T {
+
+  // }
 
   private isCurrentItem(item: T): boolean {
     return (

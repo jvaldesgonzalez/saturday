@@ -1,10 +1,13 @@
 import {
+  Body,
   Controller,
   Get,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   ParseIntPipe,
   ParseUUIDPipe,
+  Post,
   Query,
 } from '@nestjs/common';
 import {
@@ -16,14 +19,19 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser } from 'src/modules/accounts-management/auth/decorators/current-user.decorator';
 import { JWTClaim } from 'src/modules/accounts-management/auth/login-payload.type';
+import { CreateEvent } from './application/usecases/createEvent/create-event.usecase';
 import { EventsReadService } from './events.read-service';
+import { CreateEventBody } from './presentation/create-event.body';
 import { EventDetails } from './presentation/event-details';
 
 @ApiBearerAuth()
 @ApiTags('events')
 @Controller('events')
 export class EventsController {
-  constructor(private readService: EventsReadService) {}
+  constructor(
+    private readService: EventsReadService,
+    private createEventUC: CreateEvent,
+  ) {}
 
   @Get('/:id')
   @ApiOkResponse({ type: EventDetails })
@@ -52,6 +60,26 @@ export class EventsController {
       limit,
       payload.id,
     );
+  }
+
+  @Post('')
+  async createEvent(
+    @Body() data: CreateEventBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
+    const result = await this.createEventUC.execute({
+      ...data,
+      publisher: payload.id,
+    });
+    if (result.isLeft()) {
+      const error = result.value;
+      switch (error.constructor) {
+        default:
+          throw new InternalServerErrorException(error.errorValue().message);
+      }
+    } else if (result.isRight()) {
+      return result.value.getValue();
+    }
   }
 }
 

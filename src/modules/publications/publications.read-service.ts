@@ -126,6 +126,7 @@ export class PublicationsReadService {
 						attentionTags: tags,
 						amIInterested: rlike IS NOT null,
 						totalUsersInterested: usersInterested,
+						createdAt:e.createdAt,
 						dateTimeInit:e.dateTimeInit,
 						dateTimeEnd:e.dateTimeEnd,
 						basePrice:e.basePrice
@@ -141,20 +142,19 @@ export class PublicationsReadService {
 						id:item.id,
 						name:item.name,
 						description:item.description,
-						events:collect(events)
+						events:collect(events),
+						createdAt:item.createdAt
 					} as result
 				',{item:p,meId:$meId}) YIELD value
 				return value.result as r
-				ORDER BY r.id
-				SKIP $skip
-				LIMIT $limit
+				ORDER BY r.createdAt DESC
 			`,
       )
         .bind({
-          limit: Integer.fromInt(limit),
-          skip: Integer.fromInt(skip),
           meId: userId,
         })
+        .skip(skip)
+        .limit(limit)
         .map((r) => {
           return r.type === 'event'
             ? {

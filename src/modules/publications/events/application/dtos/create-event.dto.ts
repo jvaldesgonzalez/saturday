@@ -23,7 +23,7 @@ export type MultimediaRaw = {
 export type OccurrenceRaw = {
   dateTimeInit: Date;
   dateTimeEnd: Date;
-  tickets: TicketRaw[];
+  newTickets: TicketRaw[];
 };
 
 export type TicketRaw = {
@@ -37,9 +37,9 @@ export type CreateEventDto = {
   publisher: string;
   name: string;
   description: UnknownField[];
-  categories: string[];
+  category: string;
   place: PlaceRaw;
   collaborators?: string[];
   multimedia: MultimediaRaw[];
-  occurrences: OccurrenceRaw[];
+  newOccurrences: OccurrenceRaw[];
 };
