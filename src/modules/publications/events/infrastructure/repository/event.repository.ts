@@ -115,6 +115,7 @@ export class EventRepository
     }
   }
 
+  // FIXME support multiple locations (fix line 129)
   @Transactional()
   private async addPlace(theEvent: Event) {
     const { place, id } = EventMapper.toPersistence(theEvent);
@@ -124,7 +125,8 @@ export class EventRepository
 					MATCH (e:Event) WHERE e.id = $eId
 					OPTIONAL MATCH (p:Place {name:$data.name, latitude:$data.latitude, longitude:$data.longitude, address:$data.address})
 					CALL apoc.do.when(p IS NULL,
-						'CREATE (e)-[:HAS_PLACE]->(np:Place)
+						'MATCH (l:Location)
+						CREATE (e)-[:HAS_PLACE]->(np:Place)-[:IN_LOCATION]->(l)
 						SET np += data',
 						'CREATE (e)-[:HAS_PLACE]->(p)',
 						{e:e,p:p,data:$data}

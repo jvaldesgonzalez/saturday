@@ -4,8 +4,11 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
+import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
+import { EventDetailsReadEntity } from './entities/event-details.entity';
 import { EventListItemReadEntity } from './entities/event-list-item.entity';
 import { IEventStats } from './interfaces/event-stats.read-service.interface';
+import { EventDetailsMapper } from './mappers/event-details.mapper';
 import { EventListItemMapper } from './mappers/event-list-item.mapper';
 
 @Injectable()
@@ -14,12 +17,50 @@ export class EventsReadService implements IEventStats {
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
 
+  async getEventStatsDetails(
+    theEventId: string,
+    thePartnerId: string,
+  ): Promise<EventDetailsReadEntity> {
+    return await this.persistenceManager.getOne<EventDetailsReadEntity>(
+      QuerySpecification.withStatement(
+        `MATCH (e:Event)-[:PUBLISH_EVENT]-(publisher:Partner),
+					(c:Category)--(e)-[:HAS_PLACE]->(p:Place),
+					(t:Ticket)--(o:EventOccurrence)--(e)
+				WHERE publisher.id = $pId AND e.id = $eId
+				OPTIONAL MATCH (r:Reservation)--(t)
+				WITH e,c,p,collect(o.dateTimeInit) as occurrences, collect(t.amount) as ticketAmounts
+				RETURN distinct {
+						tickets:{
+							price:[e.basePrice,e.topPrice],
+							sold:apoc.coll.sum(ticketAmounts),
+							total:apoc.coll.sum(ticketAmounts)
+						},
+						event: e{
+							.name,
+							.multimedia,
+							.id,
+							.description,
+							place:p{.name, .address, .latitude, .longitude},
+							category:c.name,
+							occurrencesDate: occurrences
+						}
+					}
+				`,
+      )
+        .bind({ eId: theEventId, pId: thePartnerId })
+        .map((a) => {
+          console.log(a);
+          return a;
+        }),
+    );
+  }
+
   async getEventStatsListByPartner(
     thePartnerId: string,
     skip: number,
     limit: number,
-  ): Promise<EventListItemReadEntity[]> {
-    return await this.persistenceManager.query<EventListItemReadEntity>(
+  ): Promise<PaginatedFindResult<EventListItemReadEntity>> {
+    const items = await this.persistenceManager.query<EventListItemReadEntity>(
       QuerySpecification.withStatement(
         `MATCH (p:Partner)-[:PUBLISH_EVENT]->(e:Event),
 				(place:Place)--(e)--(c:Category)
@@ -49,5 +90,19 @@ export class EventsReadService implements IEventStats {
         .map(EventListItemMapper.toDto)
         .transform(EventListItemReadEntity),
     );
+    const total = await this.persistenceManager.getOne<number>(
+      QuerySpecification.withStatement(
+        `MATCH (p:Partner)-[:PUBLISH_EVENT]->(e:Event)
+				WHERE p.id = $pId
+				RETURN count(e)
+				`,
+      ).bind({ pId: thePartnerId }),
+    );
+    return {
+      total,
+      items,
+      pageSize: items.length,
+      current: skip,
+    };
   }
 }

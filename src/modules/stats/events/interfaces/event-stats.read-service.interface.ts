@@ -1,3 +1,5 @@
+import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
+import { EventDetailsReadEntity } from '../entities/event-details.entity';
 import { EventListItemReadEntity } from '../entities/event-list-item.entity';
 
 export interface IEventStats {
@@ -5,7 +7,10 @@ export interface IEventStats {
     thePartnerId: string,
     skip: number,
     limit: number,
-  ): Promise<EventListItemReadEntity[]>;
+  ): Promise<PaginatedFindResult<EventListItemReadEntity>>;
 
-  // getEventStatsDetails(theEventId: string): Promise<any>;
+  getEventStatsDetails(
+    theEventId: string,
+    thePartnerId: string,
+  ): Promise<EventDetailsReadEntity>;
 }

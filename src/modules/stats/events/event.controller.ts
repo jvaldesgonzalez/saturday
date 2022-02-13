@@ -1,4 +1,11 @@
-import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from 'src/modules/accounts-management/auth/decorators/current-user.decorator';
 import { Roles } from 'src/modules/accounts-management/auth/decorators/role.decorator';
@@ -28,14 +35,14 @@ export class EventsController {
     );
   }
 
-  @ApiQuery({ name: 'skip', type: Number })
-  @ApiQuery({ name: 'take', type: Number })
-  @Get('best-selling-events')
+  @Get('/:id')
   async getTopSellers(
-    @Query('skip', ParseIntPipe) skip: number,
-    @Query('take', ParseIntPipe) limit: number,
+    @Param('id', ParseUUIDPipe) theEventId: string,
+    @CurrentUser() payload: JWTClaim,
   ) {
-    return;
-    // return await this.eventsService.getTopSellers(skip, limit);
+    return await this.eventsService.getEventStatsDetails(
+      theEventId,
+      payload.id,
+    );
   }
 }
