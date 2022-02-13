@@ -30,18 +30,21 @@ export class SimilarityReadService {
 				WHERE u1 <> u2 AND u1.id = $accountId AND NOT (u1)-[:FRIEND]-(u2) AND NOT (u1)-[:FOLLOW]-(u2) AND NOT (u1)-[:FRIEND_REQUEST]->(u2)
 				optional match (u1)-[:FRIEND|FOLLOW]-(u1f)
 				optional match (u2)-[:FRIEND|FOLLOW]-(u2f)
-				with u1,u2,collect(distinct id(u1f)) as u1Friends, collect(distinct id(u2f)) as u2Friends
-				with u1,u2,gds.alpha.similarity.jaccard(u1Friends, u2Friends) as fjaccard
+				with u1,u2,collect(distinct u1f.id) as u1Friends, collect(distinct u2f.id) as u2Friends
+				with u1,u2,apoc.coll.union(u1Friends, u2Friends) as union, apoc.coll.intersection(u1Friends, u2Friends) as intersection
+				with u1,u2, CASE WHEN size(union) = 0 THEN 0 ELSE 1.0*size(intersection)/size(union) END as fjaccard
 
 				optional match (u1)-[:LIKE]-(u1l)
 				optional match (u2)-[:LIKE|PUBLISH_EVENT]-(u2l)
-				with u1,u2,collect(distinct id(u1l)) as u1Likes, collect(distinct id(u2l)) as u2Likes,fjaccard
-				with u1,u2,gds.alpha.similarity.jaccard(u1Likes, u2Likes) as ejaccard, fjaccard
+				with u1,u2,collect(distinct u1l.id) as u1Likes, collect(distinct u2l.id) as u2Likes,fjaccard
+				with u1,u2,apoc.coll.union(u1Likes, u2Likes) as union, apoc.coll.intersection(u1Likes, u2Likes) as intersection,fjaccard
+				with u1,u2, CASE WHEN size(union) = 0 THEN 0.0 ELSE 1.0*size(intersection)/size(union) END as ejaccard,fjaccard
 
 				optional match (u1)-[:PREFER_CATEGORY]-(u1cats:Category)
 				optional match (u2)-[:PREFER_CATEGORY|PUBLISH_EVENT|HAS_CATEGORY*1..2]-(u2cats:Category)
-				with u1,u2,collect(distinct id(u1cats)) as u1Cats, collect(distinct id(u2cats)) as u2Cats,fjaccard,ejaccard
-				with u1,u2,gds.alpha.similarity.jaccard(u1Cats, u2Cats) as cjaccard, ejaccard, fjaccard
+				with u1,u2,collect(distinct u1cats.id) as u1Cats, collect(distinct u2cats.id) as u2Cats,fjaccard,ejaccard
+				with u1,u2,apoc.coll.union(u1Cats, u2Cats) as union, apoc.coll.intersection(u1Cats, u2Cats) as intersection,fjaccard,ejaccard
+				with u1,u2, CASE WHEN size(union) = 0 THEN 0.0 ELSE 1.0*size(intersection)/size(union) END as cjaccard,fjaccard,ejaccard
 
 				WITH u2 as account, (3.5*fjaccard + 5*ejaccard + 1.5*cjaccard)/10 as metric,u1 as u
 				WHERE metric > 0.05

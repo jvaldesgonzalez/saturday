@@ -28,7 +28,7 @@ class PlaceBody {
   latitude: number;
   @ApiProperty()
   longitude: number;
-  @ApiProperty()
+  @ApiPropertyOptional()
   locationId: string;
   @ApiPropertyOptional()
   partnerRef?: string;
