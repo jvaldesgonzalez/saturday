@@ -96,7 +96,7 @@ export class SimilarityReadService {
     ]);
     return {
       items,
-      total,
+      total: 16,
       pageSize: items.length,
       current: skip,
     };
