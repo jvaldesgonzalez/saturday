@@ -57,6 +57,7 @@ export class SimilarityReadService {
 						.username, 
 						.avatar, 
 						.id, 
+						.fullname,
 						friendsInCommon: count(distinct common), 
 						friendshipStatus: CASE
 															WHEN rfriend is null THEN "none" 
@@ -68,7 +69,8 @@ export class SimilarityReadService {
 					return item {
 						.username,
 						.avatar,
-						.id, 
+						.id,
+						.businessName,
 						followers:count(distinct user), 
 						type:"partner"} as result',
 					{item:account,user:u}) yield value
