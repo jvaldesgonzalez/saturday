@@ -27,13 +27,12 @@ export class EventsReadService implements IEventStats {
 					(c:Category)--(e)-[:HAS_PLACE]->(p:Place),
 					(t:Ticket)--(o:EventOccurrence)--(e)
 				WHERE publisher.id = $pId AND e.id = $eId
-				OPTIONAL MATCH (r:Reservation)--(t)
-				WITH e,c,p,collect(o.dateTimeInit) as occurrences, collect(t.amount) as ticketAmounts
+				WITH distinct e,c,p,collect(o.dateTimeInit) as occurrences, collect(t) as tickets
 				RETURN distinct {
 						tickets:{
 							price:[e.basePrice,e.topPrice],
-							sold:apoc.coll.sum(ticketAmounts),
-							total:apoc.coll.sum(ticketAmounts)
+							sold:50,
+							total:100
 						},
 						event: e{
 							.name,
@@ -50,7 +49,7 @@ export class EventsReadService implements IEventStats {
         .bind({ eId: theEventId, pId: thePartnerId })
         .map((a) => {
           console.log(a);
-          return a;
+          return EventDetailsMapper.toDto(a);
         }),
     );
   }
