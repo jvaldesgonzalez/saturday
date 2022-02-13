@@ -25,6 +25,7 @@ export class TopsReadService implements ITopsService {
 					MATCH (publisher:Partner)-[:PUBLISH_EVENT]-(e:Event)-[:HAS_PLACE]-(place:Place),
 					(e)-[:HAS_OCCURRENCE]-(o:EventOccurrence)-[:HAS_TICKET]-(t:Ticket),
 					(e)-[:HAS_CATEGORY]->(cat:Category)
+					WHERE e.dateTimeEnd > datetime()
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 					WITH o{.id, .dateTimeInit, .dateTimeEnd, tickets:collect(distinct t{.id, .price, .name, .amount, .description})} as occ,
 						e,
@@ -82,6 +83,7 @@ export class TopsReadService implements ITopsService {
 					MATCH (publisher:Partner)-[:PUBLISH_EVENT]-(e:Event)-[:HAS_PLACE]-(place:Place),
 					(e)-[:HAS_OCCURRENCE]-(o:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(p:Reservation),
 					(e)-[:HAS_CATEGORY]->(cat:Category)
+					WHERE e.dateTimeEnd > datetime()
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 					WITH o{.id, .dateTimeInit, .dateTimeEnd, tickets:collect(distinct t{.id, .price, .name, .amount, .description})} as occ,
 						place{.name, .latitude, .longitude, .address} as place,

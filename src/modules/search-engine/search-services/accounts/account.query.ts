@@ -10,24 +10,26 @@ export class AccountQuery extends Query {
     const sum = terms.join('');
     const sumAsPrefix = `${sum}*`;
     const sumAsSubstring = `*${sumAsPrefix}`;
-    const sumFuzzy = `${sum}~`;
+    const sumFuzzy = `${sum}~1`;
     const termsFuzzy = terms
-      .map((t) => (t.length > 3 ? `${t}~` : t))
+      .map((t) => (t.length > 3 ? `${t}~1` : t))
       .filter((i) => i);
 
     return `username: ${
       sum.length > 4 ? sumAsSubstring : sumAsPrefix
-    }^3 OR username: ${sumFuzzy}^3 OR username: ${termsFuzzy.join(' ')}`;
+    }^3 OR username: ${sumFuzzy}^3 OR username: ${termsFuzzy.join(
+      ' OR username: ',
+    )}`;
   }
 
   private makeNameQuery() {
     const termsFuzzy = this.raw
       .trim()
       .split(' ')
-      .map((t) => (t.length > 3 ? `${t}~` : t))
+      .map((t) => (t.length > 4 ? `${t}~2` : t))
       .filter((i) => i);
     return `fullname: ${termsFuzzy.join(
-      ' ',
-    )} OR businessName: ${termsFuzzy.join(' ')}`;
+      ' OR fullname: ',
+    )} OR businessName: ${termsFuzzy.join(' OR fullname:')}`;
   }
 }

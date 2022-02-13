@@ -117,6 +117,7 @@ export class SearchEngineController {
       new AccountQuery(q),
       new HashtagQuery(q),
     );
+    console.log(query);
     if (query.processedQuery.length === 0)
       throw new BadRequestException('q must not be empty');
     return await this.generalService.search(query, skip, limit, payload.id);

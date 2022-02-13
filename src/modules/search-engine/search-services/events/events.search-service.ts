@@ -42,7 +42,7 @@ export class EventSearchService implements ISearchService<EventItem> {
 				WHERE node:Event
 				MATCH (l:Location)--(place:Place)--(node)-[:PUBLISH_EVENT]-(publisher:Partner),
 				(c:Category)--(node)
-				WHERE node.dateTimeEnd >= datetime()
+				WHERE true
 				${
           dateInterval
             ? 'AND node.dateTimeInit >= $fromDate AND node.dateTimeEnd <= $toDate'

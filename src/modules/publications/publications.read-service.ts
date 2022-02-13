@@ -4,7 +4,6 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
-import { Integer } from 'neo4j-driver-core';
 import { EventDetails } from './events/presentation/event-details';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';

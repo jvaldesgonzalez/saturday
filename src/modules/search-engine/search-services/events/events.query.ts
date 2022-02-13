@@ -13,8 +13,10 @@ export class EventQuery extends Query {
     const termsFuzzy = this.raw
       .trim()
       .split(' ')
-      .map((t) => (t.length > 3 ? `${t}~^2 OR name:${t}*^2` : `${t}*^2`))
+      .map((t) => `${t}*^2`)
       .filter((i) => i);
-    return `name: ${termsFuzzy.join(' OR name:')}`;
+    return `name: ${termsFuzzy.join(' OR name:')} OR name: ${
+      this.raw.length > 4 ? +this.raw + '~1' : this.raw
+    }`;
   }
 }
