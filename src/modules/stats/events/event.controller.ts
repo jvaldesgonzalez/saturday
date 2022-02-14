@@ -36,11 +36,22 @@ export class EventsController {
   }
 
   @Get('/:id')
-  async getTopSellers(
+  async getEventStats(
     @Param('id', ParseUUIDPipe) theEventId: string,
     @CurrentUser() payload: JWTClaim,
   ) {
     return await this.eventsService.getEventStatsDetails(
+      theEventId,
+      payload.id,
+    );
+  }
+
+  @Get('/:id/occurrences')
+  async getTopSellers(
+    @Param('id', ParseUUIDPipe) theEventId: string,
+    @CurrentUser() payload: JWTClaim,
+  ) {
+    return await this.eventsService.getOccurrencesDetails(
       theEventId,
       payload.id,
     );

@@ -4,18 +4,53 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
+import { EventOccurrenceMapper } from 'src/modules/publications/events/infrastructure/mappers/event-occurrence.mapper';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { EventDetailsReadEntity } from './entities/event-details.entity';
 import { EventListItemReadEntity } from './entities/event-list-item.entity';
+import { EventOccurrenceDetailsReadEntity } from './entities/event-occurrence-details.entity';
 import { IEventStats } from './interfaces/event-stats.read-service.interface';
 import { EventDetailsMapper } from './mappers/event-details.mapper';
 import { EventListItemMapper } from './mappers/event-list-item.mapper';
+import { EventOccurrenceDetailsMapper } from './mappers/event-occurrence-details.mapper';
 
 @Injectable()
 export class EventsReadService implements IEventStats {
   constructor(
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
+
+  async getOccurrencesDetails(
+    theEventId: string,
+    thePartnerId: string,
+  ): Promise<{ occurrences: EventOccurrenceDetailsReadEntity[] }> {
+    const occurrences =
+      await this.persistenceManager.query<EventOccurrenceDetailsReadEntity>(
+        QuerySpecification.withStatement(
+          `
+						MATCH (e:Event)-[:PUBLISH_EVENT]-(p:Partner),
+						(t:Ticket)--(o:EventOccurrence)--(e)
+						WHERE e.id = $eId AND p.id = $pId
+						OPTIONAL MATCH (r:Reservation)--(t:Ticket)
+						WITH o, t{
+											.name,
+											.price,
+											sold:CASE r is NULL WHEN true THEN 0 ELSE apoc.coll.sum(collect(r.amountOfTickets)) END ,
+											total:CASE r is NULL WHEN true THEN t.amount ELSE apoc.coll.sum(collect(r.amountOfTickets)) + t.amount END
+										} as tickets
+						RETURN o{
+							.id,
+							.dateTimeInit,
+							tickets: tickets
+						} AS result ORDER BY result.dateTimeInit
+					`,
+        )
+          .bind({ eId: theEventId, pId: thePartnerId })
+          .map(EventOccurrenceDetailsMapper.toDto),
+      );
+
+    return { occurrences };
+  }
 
   async getEventStatsDetails(
     theEventId: string,
