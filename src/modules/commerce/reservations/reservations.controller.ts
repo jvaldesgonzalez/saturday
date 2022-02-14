@@ -21,11 +21,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser } from 'src/modules/accounts-management/auth/decorators/current-user.decorator';
+import { Roles } from 'src/modules/accounts-management/auth/decorators/role.decorator';
 import { JWTClaim } from 'src/modules/accounts-management/auth/login-payload.type';
+import { EnumRoles } from 'src/shared/domain/roles.enum';
 import { CancelReservationErrors } from './application/use-cases/cancel-reservation/cancel-reservation.errors';
 import { CancelReservation } from './application/use-cases/cancel-reservation/cancel-reservation.usecase';
+import { ConfirmReservationErrors } from './application/use-cases/confirm-reservation/confirm-reservation.errors';
+import { ConfirmReservation } from './application/use-cases/confirm-reservation/confirm-reservation.usecase';
 import { CreateReservationErrors } from './application/use-cases/create-reservation/create-reservation.errors';
 import { CreateReservation } from './application/use-cases/create-reservation/create-reservation.usecase';
+import { ConfirmReservationBody } from './presentation/confirm-reservation';
 import { CreateReservationBody } from './presentation/create-payment';
 import { ReservationReadResponse } from './presentation/reservation-read';
 import { ReservationsReadService } from './reservations.read-service';
@@ -38,6 +43,7 @@ export class ReservationsController {
     private readService: ReservationsReadService,
     private createReservationUC: CreateReservation,
     private cancelReservationUC: CancelReservation,
+    private confirmReservationUC: ConfirmReservation,
   ) {}
 
   @Get()
@@ -111,6 +117,32 @@ export class ReservationsController {
       const error = result.value;
       switch (error.constructor) {
         case CancelReservationErrors.ReservationNotFound:
+          throw new ConflictException(error.errorValue().message);
+        default:
+          throw new InternalServerErrorException(error.errorValue().message);
+      }
+    } else if (result.isRight()) {
+      return result.value.getValue();
+    }
+  }
+
+  @Post('/confirm')
+  @Roles(EnumRoles.Partner)
+  async confirmReservation(
+    @Body() data: ConfirmReservationBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
+    const result = await this.confirmReservationUC.execute({
+      ...data,
+      validatorId: payload.id,
+    });
+
+    if (result.isLeft()) {
+      const error = result.value;
+      switch (error.constructor) {
+        case ConfirmReservationErrors.ReservationNotFound:
+          throw new NotFoundException(error.errorValue().message);
+        case ConfirmReservationErrors.ReservationIsVerified:
           throw new ConflictException(error.errorValue().message);
         default:
           throw new InternalServerErrorException(error.errorValue().message);

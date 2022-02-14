@@ -16,6 +16,11 @@ export interface IReservationsRepository extends IRepository<Reservation> {
     amount: number,
   ): Promise<boolean>;
   getById(theReservationId: UniqueEntityID): Promise<Reservation>;
+  getBySecurityPhrase(
+    theSecurityPhrase: string,
+    theValidatorId: string,
+    theEventId: string,
+  ): Promise<Reservation>;
   theUserReserveForEvent(
     theUser: UniqueEntityID,
     theTicket: UniqueEntityID,

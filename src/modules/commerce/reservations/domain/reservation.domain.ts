@@ -61,6 +61,12 @@ export class Reservation extends DomainEntity<PaymentProps> {
     return this.props.updatedAt;
   }
 
+  validate(): Result<void> {
+    this.props.isValidated = true;
+    this.props.updatedAt = new Date();
+    return Ok();
+  }
+
   public static generateSecurityPhrase(): string {
     return generatePassword({
       syllablesCount: 5,

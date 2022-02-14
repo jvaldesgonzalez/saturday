@@ -28,6 +28,39 @@ export class ReservationsRepository
       persistenceManager,
     );
   }
+  async getBySecurityPhrase(
+    theSecurityPhrase: string,
+    theValidtorId: string,
+    theEventId: string,
+  ): Promise<Reservation> {
+    const reservationOrNone =
+      await this.persistenceManager.maybeGetOne<Reservation>(
+        QuerySpecification.withStatement(
+          `
+				MATCH (t:Ticket)--(p:Reservation)--(u:User),
+						(t)--(:EventOccurrence)--(e:Event)--(partner:Partner)
+				WHERE p.securityPhrase = $pPhrase AND partner.id = $partnerId AND e.id = $eId
+				RETURN {
+					ticketId:t.id,
+					amountOfTickets:p.amountOfTickets,
+					createdAt:p.createdAt,
+					updatedAt:p.updatedAt,
+					isValidated:p.isValidated,
+					securityPhrase:p.securityPhrase,
+					issuerId:u.id,
+					id:p.id
+				}
+			`,
+        )
+          .bind({
+            pPhrase: theSecurityPhrase,
+            partnerId: theValidtorId,
+            eId: theEventId,
+          })
+          .map(ReservationMapper.fromPersistence),
+      );
+    return reservationOrNone ? reservationOrNone : null;
+  }
 
   async nReservationsInATime(
     theUser: UniqueEntityID,
@@ -133,6 +166,7 @@ export class ReservationsRepository
 					createdAt:p.createdAt,
 					updatedAt:p.updatedAt,
 					securityPhrase:p.securityPhrase,
+					isValidated:p.isValidated,
 					issuerId:u.id,
 					id:p.id
 				}
@@ -155,10 +189,10 @@ export class ReservationsRepository
 					WHERE t.id = $tId
 					MATCH (u:User)
 					WHERE u.id = $uId
-					CREATE (t)<-[:ON_TICKET]-(p:Reservation)<-[:MADE_PURCHASE]-(u)
+					MERGE (t)<-[:ON_TICKET]-(p:Reservation {id: $pId})<-[:MADE_PURCHASE]-(u)
 					SET p += $data
 			`,
-      ).bind({ uId: issuerId, tId: ticketId, data }),
+      ).bind({ uId: issuerId, tId: ticketId, data, pId: data.id }),
     );
   }
 

@@ -20,6 +20,7 @@ export namespace ReservationMapper {
   }
 
   export function fromPersistence(p: ReservationEntity): Reservation {
+    console.log(p);
     return Reservation.create(
       {
         ...p,
