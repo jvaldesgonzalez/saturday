@@ -32,12 +32,17 @@ export class EventsReadService implements IEventStats {
 						(t:Ticket)--(o:EventOccurrence)--(e)
 						WHERE e.id = $eId AND p.id = $pId
 						OPTIONAL MATCH (r:Reservation)--(t:Ticket)
-						WITH o, t{
+						WITH o,t,collect(r.amountOfTickets) as reservationAmounts
+						WITH o, collect(t{
 											.name,
 											.price,
-											sold:CASE r is NULL WHEN true THEN 0 ELSE apoc.coll.sum(collect(r.amountOfTickets)) END ,
-											total:CASE r is NULL WHEN true THEN t.amount ELSE apoc.coll.sum(collect(r.amountOfTickets)) + t.amount END
-										} as tickets
+											sold:CASE isEmpty(reservationAmounts) 
+														WHEN true THEN 0
+														ELSE apoc.coll.sum(reservationAmounts) END,
+											total:CASE isEmpty(reservationAmounts) 
+														WHEN true THEN t.amount
+														ELSE apoc.coll.sum(reservationAmounts) + t.amount END
+										}) as tickets
 						RETURN o{
 							.id,
 							.dateTimeInit,
@@ -70,8 +75,12 @@ export class EventsReadService implements IEventStats {
 				RETURN distinct {
 						tickets:{
 							price:[e.basePrice,e.topPrice],
-							sold:reservationAmounts,
-							total:apoc.coll.sum(collect(t.amount)) + reservationAmounts
+							sold:CASE reservationAmounts IS NULL 
+										WHEN true THEN 0
+										ELSE reservationAmounts END,
+							total:CASE reservationAmounts IS NULL 
+										WHEN true THEN apoc.coll.sum(collect(t.amount)) 
+										ELSE apoc.coll.sum(collect(t.amount)) + reservationAmounts END
 						},
 						event: e{
 							.name,
