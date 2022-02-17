@@ -4,7 +4,6 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
-import { EventOccurrenceMapper } from 'src/modules/publications/events/infrastructure/mappers/event-occurrence.mapper';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { EventDetailsReadEntity } from './entities/event-details.entity';
 import { EventListItemReadEntity } from './entities/event-list-item.entity';

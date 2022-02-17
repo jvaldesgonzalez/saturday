@@ -38,7 +38,7 @@ export namespace EventOccurrenceDetailsMapper {
       .build();
     return {
       ...e,
-      stats: chart,
+      charts: [chart],
       dateTimeInit: parseDate(e.dateTimeInit),
     };
   }

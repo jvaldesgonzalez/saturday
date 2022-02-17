@@ -20,8 +20,8 @@ export class EventOccurrenceDetailsReadEntity {
   tickets: Ticket[];
   @ApiResponseProperty()
   dateTimeInit: Date;
-  @ApiResponseProperty({ type: PieBarChartJSON })
-  stats: PieBarChartJSON;
+  @ApiResponseProperty({ type: [PieBarChartJSON] })
+  charts: PieBarChartJSON[];
 }
 
 export class EventOccurrenceDetailsFromDBReadEntity extends OmitType(
