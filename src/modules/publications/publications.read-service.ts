@@ -29,6 +29,7 @@ export class PublicationsReadService {
 					MATCH (pl:Place)<-[:HAS_PLACE]-(item)<-[:PUBLISH_EVENT]-(p:Partner),
 					(item)-[:HAS_CATEGORY]->(cat:Category),
 					(item)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
+					WHERE o.dateTimeEnd > datetime()
 					OPTIONAL MATCH (item)-[:HAS_TAG]-(tag:AttentionTag)
 					OPTIONAL MATCH (item)<-[:COLLABORATOR]-(c:Partner)
 					MATCH (me:User)
@@ -86,6 +87,7 @@ export class PublicationsReadService {
 					,(pl:Place)<-[:HAS_PLACE]-(e)<-[:PUBLISH_EVENT]-(p:Partner),
 					(e)-[:HAS_CATEGORY]->(cat:Category),
 					(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
+					WHERE o.dateTimeEnd > datetime() AND e.dateTimeEnd > datetime()
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 					OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
 					MATCH (me:User)

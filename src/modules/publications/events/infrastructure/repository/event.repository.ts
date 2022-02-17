@@ -4,6 +4,7 @@ import {
   QuerySpecification,
   Transactional,
 } from '@liberation-data/drivine';
+import { DateTime } from 'neo4j-driver-core';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
 import { IEventRepository } from '../../application/interfaces/event.repository';
@@ -109,7 +110,12 @@ export class EventRepository
         ).bind({
           word: hashtag,
           eId: theEvent._id.toString(),
-          data: { word: hashtag },
+          data: {
+            word: hashtag,
+            createdAt: DateTime.fromStandardDate(new Date()),
+            updatedAt: DateTime.fromStandardDate(new Date()),
+            id: new UniqueEntityID().toString(),
+          },
         }),
       );
     }

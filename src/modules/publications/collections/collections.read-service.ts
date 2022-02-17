@@ -24,7 +24,7 @@ export class CollectionsReadService {
 				(pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
 				(e)-[:HAS_CATEGORY]->(cat:Category),
 				(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-				WHERE col.id = $cId AND e.dateTimeEnd <= datetime()
+				WHERE col.id = $cId AND e.dateTimeEnd > datetime()
 				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag),
 				(e)<-[:COLLABORATOR]-(c:Partner)
 				WITH {
