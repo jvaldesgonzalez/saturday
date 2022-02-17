@@ -1,15 +1,16 @@
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { ChartsBuilder } from 'src/shared/modules/stats/charts/charts.buider';
+import { TextUtils } from 'src/shared/utils/text.utils';
 import {
-  EventOccurrenceDetailsFromDBReadEntity,
-  EventOccurrenceDetailsReadEntity,
+  EventWithOccurrenceDetailsFromDB,
+  EventWithOccurrenceDetailsReadEntity,
 } from '../entities/event-occurrence-details.entity';
 
 export namespace EventOccurrenceDetailsMapper {
   export function toDto(
-    e: EventOccurrenceDetailsFromDBReadEntity,
-  ): EventOccurrenceDetailsReadEntity {
-    const chart = new ChartsBuilder()
+    e: EventWithOccurrenceDetailsFromDB,
+  ): EventWithOccurrenceDetailsReadEntity {
+    const pie = new ChartsBuilder()
       .makePieBar()
       .withName('Sexo y edad')
       .withCategories(['Mujeres', 'Hombres', 'Non-Binary'])
@@ -36,10 +37,34 @@ export namespace EventOccurrenceDetailsMapper {
         },
       ])
       .build();
+
     return {
       ...e,
-      charts: [chart],
-      dateTimeInit: parseDate(e.dateTimeInit),
+      imageUrl: TextUtils.escapeAndParse(e.imageUrl)[0].url,
+      occurrences: e.occurrences.map((o) => {
+        const withTickets = {
+          ...o,
+          dateTimeInit: parseDate(o.dateTimeInit),
+          charts: [
+            new ChartsBuilder()
+              .makeList()
+              .withName('Tickets')
+              .addEntries(
+                o.tickets.map((tk) => {
+                  return {
+                    expectation: tk.total,
+                    value: tk.sold,
+                    name: tk.name,
+                  };
+                }),
+              )
+              .build(),
+            pie,
+          ],
+        };
+        delete withTickets.tickets;
+        return withTickets;
+      }),
     };
   }
 }

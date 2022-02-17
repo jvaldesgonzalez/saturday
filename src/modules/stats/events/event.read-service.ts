@@ -7,7 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { EventDetailsReadEntity } from './entities/event-details.entity';
 import { EventListItemReadEntity } from './entities/event-list-item.entity';
-import { EventOccurrenceDetailsReadEntity } from './entities/event-occurrence-details.entity';
+import { EventWithOccurrenceDetailsReadEntity } from './entities/event-occurrence-details.entity';
 import { IEventStats } from './interfaces/event-stats.read-service.interface';
 import { EventDetailsMapper } from './mappers/event-details.mapper';
 import { EventListItemMapper } from './mappers/event-list-item.mapper';
@@ -22,17 +22,17 @@ export class EventsReadService implements IEventStats {
   async getOccurrencesDetails(
     theEventId: string,
     thePartnerId: string,
-  ): Promise<{ occurrences: EventOccurrenceDetailsReadEntity[] }> {
+  ): Promise<EventWithOccurrenceDetailsReadEntity> {
     const occurrences =
-      await this.persistenceManager.query<EventOccurrenceDetailsReadEntity>(
+      await this.persistenceManager.getOne<EventWithOccurrenceDetailsReadEntity>(
         QuerySpecification.withStatement(
           `
 						MATCH (e:Event)-[:PUBLISH_EVENT]-(p:Partner),
 						(t:Ticket)--(o:EventOccurrence)--(e)
 						WHERE e.id = $eId AND p.id = $pId
 						OPTIONAL MATCH (r:Reservation)--(t:Ticket)
-						WITH o,t,collect(r.amountOfTickets) as reservationAmounts
-						WITH o, collect(t{
+						WITH e,o,t,collect(r.amountOfTickets) as reservationAmounts
+						WITH e,o, collect(t{
 											.name,
 											.price,
 											sold:CASE isEmpty(reservationAmounts) 
@@ -42,10 +42,15 @@ export class EventsReadService implements IEventStats {
 														WHEN true THEN t.amount
 														ELSE apoc.coll.sum(reservationAmounts) + t.amount END
 										}) as tickets
-						RETURN o{
-							.id,
-							.dateTimeInit,
-							tickets: tickets
+						RETURN {
+							eventId:e.id,
+							eventName:e.name,
+							imageUrl:e.multimedia,
+							occurrences: collect(o{
+								.id,
+								.dateTimeInit,
+								tickets: tickets
+							})
 						} AS result ORDER BY result.dateTimeInit
 					`,
         )
@@ -53,7 +58,7 @@ export class EventsReadService implements IEventStats {
           .map(EventOccurrenceDetailsMapper.toDto),
       );
 
-    return { occurrences };
+    return occurrences;
   }
 
   async getEventStatsDetails(

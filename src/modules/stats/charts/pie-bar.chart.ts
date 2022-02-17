@@ -1,5 +1,5 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
-import { ChartType } from 'src/shared/modules/stats/charts/enums/charts.enum';
+import { ChartType } from './enum/chart-type.enum';
 
 export class PieBarChartEntries {
   range: [number, number];

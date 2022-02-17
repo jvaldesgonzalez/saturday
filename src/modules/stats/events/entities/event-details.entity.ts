@@ -1,5 +1,5 @@
 import { DateTime } from 'neo4j-driver-core';
-import { PieBarChartJSON } from 'src/shared/modules/stats/charts/bar.chart';
+import { PieBarChartJSON } from '../../charts/pie-bar.chart';
 
 export class EventDetailsReadEntity {
   tickets: {
