@@ -25,9 +25,10 @@ export class EventsReadService {
         QuerySpecification.withStatement(
           `
 				MATCH (pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
-				(e)-[:HAS_CATEGORY]->(cat:Category),
-				(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-				WHERE o.dateTimeEnd > datetime() AND e.id = $eId
+				(e)-[:HAS_CATEGORY]->(cat:Category)
+				WHERE e.id = $eId
+				OPTIONAL MATCH (e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
+				WHERE o.dateTimeEnd > datetime()
 				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 				OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
 				MATCH (me:User)
@@ -82,24 +83,29 @@ export class EventsReadService {
         )
           .bind({ eId: eventId, meId: userId })
           .map((r) => {
+            // console.log(r);
+            // return;
             return {
               ...r,
               info: TextUtils.escapeAndParse(r.info),
               multimedia: TextUtils.escapeAndParse(r.multimedia),
               dateTimeInit: parseDate(r.dateTimeInit),
               dateTimeEnd: parseDate(r.dateTimeEnd),
-              occurrences: r.occurrences.map(
-                (o: {
-                  dateTimeInit: DateTime<number>;
-                  dateTimeEnd: DateTime<number>;
-                }) => {
-                  return {
-                    ...o,
-                    dateTimeInit: parseDate(o.dateTimeInit),
-                    dateTimeEnd: parseDate(o.dateTimeEnd),
-                  };
-                },
-              ),
+              occurrences: r.occurrences
+                .map(
+                  (o: {
+                    dateTimeInit: DateTime<number>;
+                    dateTimeEnd: DateTime<number>;
+                  }) => {
+                    if (!o.dateTimeEnd) return [];
+                    return {
+                      ...o,
+                      dateTimeInit: parseDate(o.dateTimeInit),
+                      dateTimeEnd: parseDate(o.dateTimeEnd),
+                    };
+                  },
+                )
+                .flat(),
             };
           })
           .transform(EventDetails),
