@@ -3,6 +3,8 @@ import { ChartType } from './enum/chart-type.enum';
 
 class ListChartEntries {
   @ApiResponseProperty()
+  trailing: string;
+  @ApiResponseProperty()
   name: string;
   @ApiResponseProperty()
   value: number;

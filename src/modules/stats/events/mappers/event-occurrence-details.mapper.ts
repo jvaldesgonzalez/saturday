@@ -1,6 +1,6 @@
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
-import { ChartsBuilder } from 'src/shared/modules/stats/charts/charts.buider';
 import { TextUtils } from 'src/shared/utils/text.utils';
+import { ChartsBuilder } from '../../charts/charts.builder';
 import {
   EventWithOccurrenceDetailsFromDB,
   EventWithOccurrenceDetailsReadEntity,
@@ -55,6 +55,9 @@ export namespace EventOccurrenceDetailsMapper {
                     expectation: tk.total,
                     value: tk.sold,
                     name: tk.name,
+                    trailing: `${tk.sold}/${tk.total} = ${
+                      Number(tk.price) * tk.sold
+                    }`,
                   };
                 }),
               )
