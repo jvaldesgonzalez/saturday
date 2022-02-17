@@ -27,8 +27,7 @@ export class EventsReadService {
 				MATCH (pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
 				(e)-[:HAS_CATEGORY]->(cat:Category),
 				(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-				WHERE o.dateTimeEnd > datetime() AND
-				WHERE e.id = $eId
+				WHERE o.dateTimeEnd > datetime() AND e.id = $eId
 				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 				OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
 				MATCH (me:User)
@@ -121,8 +120,7 @@ export class EventsReadService {
 				MATCH (pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
 				(e)-[:HAS_CATEGORY]->(cat:Category),
 				(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-				WHERE o.dateTimeEnd > datetime() AND
-				WHERE p.id = $pId
+				WHERE o.dateTimeEnd > datetime() AND p.id = $pId
 				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 				OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
 				MATCH (me:User)
