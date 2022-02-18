@@ -35,9 +35,7 @@ export class PublicationsReadService {
 				CALL apoc.case([
 					p:Event,
 						'MATCH (pl:Place)<-[:HAS_PLACE]-(item)<-[:PUBLISH_EVENT]-(p:Partner),
-						(item)-[:HAS_CATEGORY]->(cat:Category),
-						(item)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-						WHERE o.dateTimeEnd > datetime()
+						(item)-[:HAS_CATEGORY]->(cat:Category)
 						OPTIONAL MATCH (item)-[:HAS_TAG]-(tag:AttentionTag)
 						OPTIONAL MATCH (item)<-[:COLLABORATOR]-(c:Partner)
 						MATCH (me:User)
@@ -45,17 +43,12 @@ export class PublicationsReadService {
 						OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
 						OPTIONAL MATCH (me)-[rlike:LIKE]-(item)
 						OPTIONAL MATCH (u:User)-[:LIKE]->(item)
-						WITH {
-							id:o.id,
-							dateTimeInit:o.dateTimeInit,
-							dateTimeEnd:o.dateTimeEnd,
-							tickets:collect(distinct t { .id, .price, .name, .amount, .description})
-						} as occ, item as e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
+						WITH item as e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
 						with distinct {
 							type:"event",
 							id:e.id,
 							name:e.name,
-							occurrences:collect(occ),
+							occurrences:[],
 							info:e.description,
 							publisher:{
 								id:p.id,
@@ -93,9 +86,8 @@ export class PublicationsReadService {
 					p:Collection,
 						'MATCH (item)--(e:Event)
 						,(pl:Place)<-[:HAS_PLACE]-(e)<-[:PUBLISH_EVENT]-(p:Partner),
-						(e)-[:HAS_CATEGORY]->(cat:Category),
-						(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-						WHERE o.dateTimeEnd > datetime() AND e.dateTimeEnd > datetime()
+						(e)-[:HAS_CATEGORY]->(cat:Category)
+						WHERE e.dateTimeEnd > datetime()
 						OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 						OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
 						MATCH (me:User)
@@ -103,16 +95,11 @@ export class PublicationsReadService {
 						OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
 						OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
 						OPTIONAL MATCH (u:User)-[:LIKE]->(e)
-						WITH {
-							id:o.id,
-							dateTimeInit:o.dateTimeInit,
-							dateTimeEnd:o.dateTimeEnd,
-							tickets:collect(distinct t { .id, .price, .name, .amount, .description})
-						} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,item
+						WITH e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,item
 						with distinct {
 							id:e.id,
 							name:e.name,
-							occurrences:collect(occ),
+							occurrences:[],
 							info:e.description,
 							publisher:{
 								id:p.id,
@@ -156,9 +143,8 @@ export class PublicationsReadService {
 						} as result',
 					p:EmbeddedCollection,
 						'MATCH (item)--(cat:Category)--(e:Event)
-						,(pl:Place)<-[:HAS_PLACE]-(e)<-[:PUBLISH_EVENT]-(p:Partner),
-						(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-						WHERE o.dateTimeEnd > datetime() AND e.dateTimeEnd > datetime()
+						,(pl:Place)<-[:HAS_PLACE]-(e)<-[:PUBLISH_EVENT]-(p:Partner)
+						WHERE e.dateTimeEnd > datetime()
 						OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 						OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
 						MATCH (me:User)
@@ -166,16 +152,11 @@ export class PublicationsReadService {
 						OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
 						OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
 						OPTIONAL MATCH (u:User)-[:LIKE]->(e)
-						WITH {
-							id:o.id,
-							dateTimeInit:o.dateTimeInit,
-							dateTimeEnd:o.dateTimeEnd,
-							tickets:collect(distinct t { .id, .price, .name, .amount, .description})
-						} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,item
+						WITH e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,item
 						with distinct {
 							id:e.id,
 							name:e.name,
-							occurrences:collect(occ),
+							occurrences:[],
 							info:e.description,
 							publisher:{
 								id:p.id,
