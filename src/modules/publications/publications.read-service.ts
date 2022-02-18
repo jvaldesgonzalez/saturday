@@ -212,7 +212,7 @@ export class PublicationsReadService {
 							type:"collection",
 							id:item.id,
 							name:item.name,
-							description:NULL,
+							description:item.description,
 							events:collect(events),
 							showMini:true,
 							createdAt:item.createdAt
