@@ -215,7 +215,7 @@ export class PublicationsReadService {
 							name:item.name,
 							description:item.description,
 							events:collect(events),
-							showMini:true,
+							isMini:true,
 							createdAt:item.createdAt
 						} as result'
 				],
