@@ -28,6 +28,7 @@ export class PublicationsReadService {
 				OR (p:Collection AND apoc.coll.max( [ (p)--(e:Event) | e.dateTimeEnd ] )> datetime() AND size( [ (p)--(e:Event) | e ] ) > 2)
 				OR (
 					p:EmbeddedCollection 
+					AND (:User {id:$meId})-[:PREFER_CATEGORY]->(:Category)-[:HAS_EMBEDDED_COLLECTION]->(p)
 					AND (apoc.coll.max( [ (p)--(:Category)--(e:Event) | e.dateTimeEnd ] ) > datetime()) 
 					AND (size( [ (p)--(:Category)--(e:Event) WHERE e.dateTimeEnd > datetime() | e ] ) > 2)
 				)
