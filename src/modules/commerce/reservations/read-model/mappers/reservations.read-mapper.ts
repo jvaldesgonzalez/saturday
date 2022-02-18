@@ -7,6 +7,7 @@ export namespace ReservationReadMapper {
   export function toResponse(
     db: ReservationReadFromDBEntity,
   ): ReservationReadResponse {
+    delete db.createdAt;
     const preReturn: ReservationReadResponse = {
       ...db,
       event: {

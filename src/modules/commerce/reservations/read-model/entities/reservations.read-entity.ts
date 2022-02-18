@@ -41,4 +41,5 @@ export class ReservationReadFromDBEntity {
   securityPhrase: string;
   toPay: number;
   isValidated: boolean;
+  createdAt: DateTime<number>;
 }

@@ -40,6 +40,7 @@ export class ReservationsReadService {
 					couponApplied:coupon{.code},
 					toPay:p.amountOfTickets * t.price,
 					isValidated:p.isValidated,
+					createdAt:p.createdAt,
 					securityPhrase:p.securityPhrase,
 					event:{
 						publisher:{
@@ -61,7 +62,7 @@ export class ReservationsReadService {
 						name:e.name
 					}
 				} AS reservation
-				ORDER BY reservation.event.dateTimeInit
+				ORDER BY reservation.createdAt DESC
 			`,
         )
           .bind({
