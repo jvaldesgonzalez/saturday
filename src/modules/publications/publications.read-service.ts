@@ -26,7 +26,11 @@ export class PublicationsReadService {
 				MATCH (p:Publication)
 				WHERE (p:Event AND p.dateTimeEnd > datetime())
 				OR (p:Collection AND apoc.coll.max( [ (p)--(e:Event) | e.dateTimeEnd ] )> datetime() AND size( [ (p)--(e:Event) | e ] ) > 2)
-				OR (p:EmbeddedCollection AND (apoc.coll.max( [ (p)--(:Category)--(e:Event) | e.dateTimeEnd ] ) > datetime()) AND (size( [ (p)--(:Category)--(e:Event) | e ] ) > 2))
+				OR (
+					p:EmbeddedCollection 
+					AND (apoc.coll.max( [ (p)--(:Category)--(e:Event) | e.dateTimeEnd ] ) > datetime()) 
+					AND (size( [ (p)--(:Category)--(e:Event) WHERE e.dateTimeEnd > datetime() | e ] ) > 2)
+				)
 				CALL apoc.case([
 					p:Event,
 						'MATCH (pl:Place)<-[:HAS_PLACE]-(item)<-[:PUBLISH_EVENT]-(p:Partner),
