@@ -65,13 +65,13 @@ export class SimilarityReadService {
 															WHEN startNode(rfriend)=user THEN "requested"
 															ELSE "friend_request" END,
 						type:"user"} as result','
-					optional match (user:User)-[:FOLLOW]->(item)
+					optional match (follower:User)-[:FOLLOW]->(item)
 					return item {
 						.username,
 						.avatar,
 						.id,
 						.businessName,
-						followers:count(distinct user), 
+						followers:count(distinct follower), 
 						type:"partner"} as result',
 					{item:account,user:u}) yield value
 				return value.result
