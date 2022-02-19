@@ -48,7 +48,9 @@ export class ConfirmReservation
       const meta = await this.repo.getTicketMetadata(
         new UniqueEntityID(reservationOrNone.ticketId),
       );
-      return right(Ok(meta));
+      return right(
+        Ok({ ...meta, amountOfTickets: reservationOrNone.amountOfTickets }),
+      );
     } catch (error) {
       return left(new AppError.UnexpectedError());
     }
