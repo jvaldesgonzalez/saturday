@@ -7,6 +7,7 @@ import {
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
 import {
+  BuyerMetadata,
   IReservationsRepository,
   TicketWithMetadata,
 } from '../../application/interfaces/payments.repository.interface';
@@ -26,6 +27,23 @@ export class ReservationsRepository
       ReservationMapper.toPersistence,
       'ReservationsRepository',
       persistenceManager,
+    );
+  }
+  async getBuyerMetadata(
+    theReservationId: UniqueEntityID,
+  ): Promise<BuyerMetadata> {
+    return await this.persistenceManager.getOne<BuyerMetadata>(
+      QuerySpecification.withStatement(
+        `
+					MATCH (r:Reservation)--(u:User)
+					WHERE r.id = $rId
+					RETURN u{
+						.username,
+						.avatar,
+						.fullname
+					}
+				`,
+      ).bind({ rId: theReservationId.toString() }),
     );
   }
   async getBySecurityPhrase(

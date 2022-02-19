@@ -41,6 +41,11 @@ export class ConfirmReservation
         return left(
           new ConfirmReservationErrors.ReservationNotFound(thePhrase),
         );
+
+      const userData = await this.repo.getBuyerMetadata(
+        new UniqueEntityID(reservationOrNone._id.toString()),
+      );
+
       if (reservationOrNone.isValidated)
         return left(new ConfirmReservationErrors.ReservationIsVerified());
 
@@ -50,7 +55,11 @@ export class ConfirmReservation
         new UniqueEntityID(reservationOrNone.ticketId),
       );
       return right(
-        Ok({ ...meta, amountOfTickets: reservationOrNone.amountOfTickets }),
+        Ok({
+          ...meta,
+          amountOfTickets: reservationOrNone.amountOfTickets,
+          user: userData,
+        }),
       );
     } catch (error) {
       return left(new AppError.UnexpectedError());

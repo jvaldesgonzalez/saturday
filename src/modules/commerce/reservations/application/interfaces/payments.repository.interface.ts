@@ -9,8 +9,15 @@ export interface TicketWithMetadata {
   eventName: string;
 }
 
+export interface BuyerMetadata {
+  username: string;
+  fullname: string;
+  avatar: string;
+}
+
 export interface IReservationsRepository extends IRepository<Reservation> {
   getTicketMetadata(theTicketId: UniqueEntityID): Promise<TicketWithMetadata>;
+  getBuyerMetadata(theReservationId: UniqueEntityID): Promise<BuyerMetadata>;
   fetchAvailability(
     theTicketId: UniqueEntityID,
     amount: number,
