@@ -54,7 +54,6 @@ export class CreateEvent implements IUseCase<CreateEventDto, Response> {
     });
 
     try {
-      this._logger.log(event);
       await this._repository.save(event);
 
       //silent sent notifications
@@ -72,7 +71,7 @@ export class CreateEvent implements IUseCase<CreateEventDto, Response> {
     theFolloweeId: string,
     theEventId: string,
   ): Promise<void> {
-    const recipients = await this._repository.findPublisherFollowersToken(
+    const recipients = await this._repository.findPublisherFollowers(
       theFolloweeId,
     );
     await this.notify.execute({

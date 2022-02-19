@@ -94,7 +94,6 @@ export class ReservationsRepository
 				`,
         ).bind({ uId: theUser.toString(), tId: theTicket.toString() }),
       );
-    console.log(theOtherReservationsOrNone);
     return theOtherReservationsOrNone.length > 0 ? true : false;
   }
 

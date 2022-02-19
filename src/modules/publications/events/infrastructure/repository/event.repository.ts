@@ -29,13 +29,13 @@ export class EventRepository
     );
   }
 
-  async findPublisherFollowersToken(theFolloweeId: string): Promise<string[]> {
+  async findPublisherFollowers(theFolloweeId: string): Promise<string[]> {
     return await this.persistenceManager.query<string>(
       QuerySpecification.withStatement(
         `
 					MATCH (p:Partner)-[:FOLLOW]-(u:User)
 					WHERE p.id = $pId
-					RETURN u.firebasePushId
+					RETURN u.id
 			`,
       ).bind({ pId: theFolloweeId }),
     );
@@ -45,7 +45,6 @@ export class EventRepository
   async save(theEvent: Event): Promise<void> {
     this._logger.log('saving...');
     const persistent = EventMapper.toPersistence(theEvent);
-    this._logger.log(persistent);
     const {
       newOccurrences,
       hashtags,
@@ -73,9 +72,12 @@ export class EventRepository
         cId: category,
       }),
     );
-    theEvent.newOccurrences.forEach(this.addOccurrence.bind(this));
-    this.addHashtags(theEvent);
-    this.addPlace(theEvent);
+    for (const occ of theEvent.newOccurrences) {
+      await this.addOccurrence(occ);
+    }
+    // theEvent.newOccurrences.forEach(this.addOccurrence.bind(this));
+    await this.addHashtags(theEvent);
+    await this.addPlace(theEvent);
   }
 
   async findById(theEventId: UniqueEntityID): Promise<Event> {

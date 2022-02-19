@@ -66,7 +66,7 @@ export class NotificationsRepository
       userPromise = await this.persistenceManager.getOne<NotificationUserData>(
         QuerySpecification.withStatement(
           `
-						MATCH (e:User) WHERE e.id = $eId
+						MATCH (e:Account) WHERE e.id = $eId
 						RETURN e{.username, .avatar, .id}
 				`,
         ).bind({ eId: theUserId }),
@@ -75,11 +75,10 @@ export class NotificationsRepository
     return { userData: userPromise, eventData: eventPromise };
   }
 
-  @Transactional()
+  // @Transactional()
   async save(entity: BaseNotification): Promise<void> {
     const { body, title } = entity;
     const { recipientId, ...data } = NotificationsMapper.toPersistence(entity);
-    console.log({ recipientId });
     const tokens = await this.persistenceManager.query<string>(
       QuerySpecification.withStatement(
         `
@@ -91,6 +90,8 @@ export class NotificationsRepository
     `,
       ).bind({ uId: recipientId, data, nId: data.id }),
     );
+
+    if (!tokens || tokens.length === 0) return;
 
     const message: MulticastMessage = {
       tokens: [tokens].flat(),

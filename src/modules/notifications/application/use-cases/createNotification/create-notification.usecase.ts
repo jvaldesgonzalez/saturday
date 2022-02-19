@@ -36,6 +36,7 @@ export class CreateNotification
       request.eventId,
       request.userId,
     );
+    console.log(notificationData);
 
     let notification: BaseNotification;
 
