@@ -41,6 +41,7 @@ export class CorrectTagsForEvents {
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(`
 				MATCH (e:Event)-[:HAS_OCCURRENCE]-(:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(r:Reservation)
+				WHERE e.dateTimeEnd > datetime()
 				WITH collect(t.amount) as amounts,e,r
 				WHERE apoc.coll.sum(amounts) > 0
 				WITH e,count(r) as reservations
@@ -58,6 +59,7 @@ export class CorrectTagsForEvents {
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(`
 				MATCH (e:Event)-[:HAS_OCCURRENCE]-(:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)
+				WHERE e.dateTimeEnd > datetime()
 				WITH e,collect(t.amount) as amounts
 				WHERE apoc.coll.sum(amounts) = 0
 				MATCH (t:AttentionTag)
@@ -72,6 +74,7 @@ export class CorrectTagsForEvents {
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(`
 				MATCH (e:Event)-[:HAS_OCCURRENCE]-(:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(r:Reservation)
+				WHERE e.dateTimeEnd > datetime()
 				WITH e,collect(t.amount) as amounts, apoc.coll.sum(collect(r.amountOfTickets)) as reservations
 				WHERE 0.15*(apoc.coll.sum(amounts) + reservations) > apoc.coll.sum(amounts) AND apoc.coll.sum(amounts) <> 0
 				MATCH (t:AttentionTag)

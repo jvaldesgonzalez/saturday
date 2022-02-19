@@ -84,6 +84,7 @@ export class EventsController {
 }
 
 @ApiTags('partners')
+@ApiBearerAuth()
 @Controller('partners')
 export class PartnerEventsController {
   constructor(private readService: EventsReadService) {}

@@ -11,6 +11,8 @@ import { Event } from '../../../domain/event.domain';
 import { EventProviders } from '../../../providers/event.providers.enum';
 import { EventOccurrence } from '../../../domain/event-occurrence.domain';
 import { OccurrenceTicket } from '../../../domain/occurrence-ticket.domain';
+import { CreateNotification } from 'src/modules/notifications/application/use-cases/createNotification/create-notification.usecase';
+import { NotificationType } from 'src/modules/notifications/enums/notification-type';
 
 type Response = Either<AppError.UnexpectedError, Result<void>>;
 
@@ -20,6 +22,7 @@ export class CreateEvent implements IUseCase<CreateEventDto, Response> {
   constructor(
     @Inject(EventProviders.IEventRepository)
     private readonly _repository: IEventRepository,
+    private notify: CreateNotification,
   ) {
     this._logger = new Logger('CreateEventUseCase');
   }
@@ -53,10 +56,30 @@ export class CreateEvent implements IUseCase<CreateEventDto, Response> {
     try {
       this._logger.log(event);
       await this._repository.save(event);
+
+      //silent sent notifications
+      this.nofifyFollowers(request.publisher, event._id.toString());
+      //get back to work
+
       return right(Ok());
     } catch (error) {
       this._logger.error(error);
       return left(new AppError.UnexpectedError());
     }
+  }
+
+  async nofifyFollowers(
+    theFolloweeId: string,
+    theEventId: string,
+  ): Promise<void> {
+    const recipients = await this._repository.findPublisherFollowersToken(
+      theFolloweeId,
+    );
+    await this.notify.execute({
+      recipientId: recipients,
+      type: NotificationType.EventPublished,
+      eventId: theEventId,
+      userId: theFolloweeId,
+    });
   }
 }

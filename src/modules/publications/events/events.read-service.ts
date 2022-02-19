@@ -124,9 +124,8 @@ export class EventsReadService {
         QuerySpecification.withStatement(
           `
 				MATCH (pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
-				(e)-[:HAS_CATEGORY]->(cat:Category),
-				(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-				WHERE o.dateTimeEnd > datetime() AND p.id = $pId
+				(e)-[:HAS_CATEGORY]->(cat:Category)
+				WHERE p.id = $pId
 				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 				OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
 				MATCH (me:User)
@@ -134,16 +133,11 @@ export class EventsReadService {
 				OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
 				OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
 				OPTIONAL MATCH (u:User)-[:LIKE]->(e)
-				WITH {
-					id:o.id,
-					dateTimeInit:o.dateTimeInit,
-					dateTimeEnd:o.dateTimeEnd,
-					tickets:collect(distinct t { .id, .price, .name, .amount, .description})
-				} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
+				WITH e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
 				with distinct {
 					id:e.id,
 					name:e.name,
-					occurrences:collect(occ),
+					occurrences:[],
 					info:e.description,
 					publisher:{
 						id:p.id,

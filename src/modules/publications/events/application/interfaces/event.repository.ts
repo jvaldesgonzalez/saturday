@@ -4,4 +4,5 @@ import { Event } from '../../domain/event.domain';
 
 export interface IEventRepository extends IRepository<Event> {
   findById(theEventId: UniqueEntityID): Promise<Event>;
+  findPublisherFollowersToken(theFolloweeId: string): Promise<string[]>;
 }

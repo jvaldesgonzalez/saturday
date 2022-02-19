@@ -29,6 +29,18 @@ export class EventRepository
     );
   }
 
+  async findPublisherFollowersToken(theFolloweeId: string): Promise<string[]> {
+    return await this.persistenceManager.query<string>(
+      QuerySpecification.withStatement(
+        `
+					MATCH (p:Partner)-[:FOLLOW]-(u:User)
+					WHERE p.id = $pId
+					RETURN u.firebasePushId
+			`,
+      ).bind({ pId: theFolloweeId }),
+    );
+  }
+
   @Transactional()
   async save(theEvent: Event): Promise<void> {
     this._logger.log('saving...');

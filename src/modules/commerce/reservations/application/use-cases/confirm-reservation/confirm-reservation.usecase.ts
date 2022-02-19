@@ -3,16 +3,20 @@ import { Either, left, right } from 'src/shared/core/Either';
 import { AppError } from 'src/shared/core/errors/AppError';
 import { IUseCase } from 'src/shared/core/interfaces/IUseCase';
 import { Ok, Result } from 'src/shared/core/Result';
+import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { ReservationProviders } from '../../../providers/providers.enum';
 import { ConfirmReservationDto } from '../../dtos/validate-reservation.dto';
-import { IReservationsRepository } from '../../interfaces/payments.repository.interface';
+import {
+  IReservationsRepository,
+  TicketWithMetadata,
+} from '../../interfaces/payments.repository.interface';
 import { ConfirmReservationErrors } from './confirm-reservation.errors';
 
 type Response = Either<
   | ConfirmReservationErrors.ReservationNotFound
   | ConfirmReservationErrors.ReservationIsVerified
   | AppError.UnexpectedError,
-  Result<void>
+  Result<TicketWithMetadata>
 >;
 
 @Injectable()
@@ -32,7 +36,6 @@ export class ConfirmReservation
         request.validatorId,
         request.eventId,
       );
-      console.log({ reservationOrNone });
       if (!reservationOrNone)
         return left(
           new ConfirmReservationErrors.ReservationNotFound(thePhrase),
@@ -42,7 +45,10 @@ export class ConfirmReservation
 
       reservationOrNone.validate();
       await this.repo.save(reservationOrNone);
-      return right(Ok());
+      const meta = await this.repo.getTicketMetadata(
+        new UniqueEntityID(reservationOrNone.ticketId),
+      );
+      return right(Ok(meta));
     } catch (error) {
       return left(new AppError.UnexpectedError());
     }
