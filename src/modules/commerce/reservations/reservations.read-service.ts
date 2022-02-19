@@ -62,7 +62,7 @@ export class ReservationsReadService {
 						name:e.name
 					}
 				} AS reservation
-				ORDER BY reservation.createdAt DESC
+				ORDER BY reservation.isValidated, reservation.createdAt DESC
 			`,
         )
           .bind({
