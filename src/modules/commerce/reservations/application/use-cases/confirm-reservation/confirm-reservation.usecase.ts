@@ -35,6 +35,7 @@ export class ConfirmReservation
         thePhrase,
         request.validatorId,
         request.eventId,
+        request.occurrenceId,
       );
       if (!reservationOrNone)
         return left(

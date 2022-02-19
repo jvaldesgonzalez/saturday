@@ -20,9 +20,10 @@ export class PublicationsReadService {
     skip: number,
     userId: string,
   ): Promise<PaginatedFindResult<EventDetails>> {
-    const items = await this.persistenceManager.query<EventDetails>(
-      QuerySpecification.withStatement(
-        `
+    const [items, total] = await Promise.all([
+      this.persistenceManager.query<EventDetails>(
+        QuerySpecification.withStatement(
+          `
 				MATCH (p:Publication)
 				WHERE (p:Event AND p.dateTimeEnd > datetime())
 				OR (p:Collection AND apoc.coll.max( [ (p)--(e:Event) | e.dateTimeEnd ] )> datetime() AND size( [ (p)--(e:Event) | e ] ) > 2)
@@ -205,54 +206,71 @@ export class PublicationsReadService {
 				return value.result as r
 				ORDER BY r.createdAt DESC
 			`,
-      )
-        .bind({
-          meId: userId,
-        })
-        .skip(skip)
-        .limit(limit)
-        .map((r) => {
-          delete r.createdAt;
-          if (r.type === 'collection') console.log(r.name);
-          return r.type === 'event'
-            ? {
-                ...r,
-                info: TextUtils.escapeAndParse(r.info),
-                multimedia: TextUtils.escapeAndParse(r.multimedia),
-                dateTimeInit: parseDate(r.dateTimeInit),
-                dateTimeEnd: parseDate(r.dateTimeEnd),
-                occurrences: r.occurrences.map((o) => {
-                  return {
-                    ...o,
-                    dateTimeInit: parseDate(o.dateTimeInit),
-                    dateTimeEnd: parseDate(o.dateTimeEnd),
-                  };
-                }),
-              }
-            : {
-                ...r,
-                events: r.events.map((e) => {
-                  return {
-                    ...e,
-                    info: TextUtils.escapeAndParse(e.info),
-                    multimedia: TextUtils.escapeAndParse(e.multimedia),
-                    dateTimeInit: parseDate(e.dateTimeInit),
-                    dateTimeEnd: parseDate(e.dateTimeEnd),
-                    occurrences: e.occurrences.map((o) => {
-                      return {
-                        ...o,
-                        dateTimeInit: parseDate(o.dateTimeInit),
-                        dateTimeEnd: parseDate(o.dateTimeEnd),
-                      };
-                    }),
-                  };
-                }),
-              };
-        }),
-    );
+        )
+          .bind({
+            meId: userId,
+          })
+          .skip(skip)
+          .limit(limit)
+          .map((r) => {
+            delete r.createdAt;
+            if (r.type === 'collection') console.log(r.name);
+            return r.type === 'event'
+              ? {
+                  ...r,
+                  info: TextUtils.escapeAndParse(r.info),
+                  multimedia: TextUtils.escapeAndParse(r.multimedia),
+                  dateTimeInit: parseDate(r.dateTimeInit),
+                  dateTimeEnd: parseDate(r.dateTimeEnd),
+                  occurrences: r.occurrences.map((o) => {
+                    return {
+                      ...o,
+                      dateTimeInit: parseDate(o.dateTimeInit),
+                      dateTimeEnd: parseDate(o.dateTimeEnd),
+                    };
+                  }),
+                }
+              : {
+                  ...r,
+                  events: r.events.map((e) => {
+                    return {
+                      ...e,
+                      info: TextUtils.escapeAndParse(e.info),
+                      multimedia: TextUtils.escapeAndParse(e.multimedia),
+                      dateTimeInit: parseDate(e.dateTimeInit),
+                      dateTimeEnd: parseDate(e.dateTimeEnd),
+                      occurrences: e.occurrences.map((o) => {
+                        return {
+                          ...o,
+                          dateTimeInit: parseDate(o.dateTimeInit),
+                          dateTimeEnd: parseDate(o.dateTimeEnd),
+                        };
+                      }),
+                    };
+                  }),
+                };
+          }),
+      ),
+      this.persistenceManager.getOne<number>(
+        QuerySpecification.withStatement(
+          `
+					MATCH (p:Publication)
+					WHERE (p:Event AND p.dateTimeEnd > datetime())
+					OR (p:Collection AND apoc.coll.max( [ (p)--(e:Event) | e.dateTimeEnd ] )> datetime() AND size( [ (p)--(e:Event) | e ] ) > 2)
+					OR (
+						p:EmbeddedCollection 
+						AND (:User {id:$meId})-[:PREFER_CATEGORY]->(:Category)-[:HAS_EMBEDDED_COLLECTION]->(p)
+						AND (apoc.coll.max( [ (p)--(:Category)--(e:Event) | e.dateTimeEnd ] ) > datetime()) 
+						AND (size( [ (p)--(:Category)--(e:Event) WHERE e.dateTimeEnd > datetime() | e ] ) > 2)
+					)
+					RETURN count(p)
+					`,
+        ).bind({ meId: userId }),
+      ),
+    ]);
     return {
       items: items,
-      total: 27,
+      total,
       current: skip,
       pageSize: items.length,
     };

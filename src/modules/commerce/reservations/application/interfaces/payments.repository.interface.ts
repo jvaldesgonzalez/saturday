@@ -20,6 +20,7 @@ export interface IReservationsRepository extends IRepository<Reservation> {
     theSecurityPhrase: string,
     theValidatorId: string,
     theEventId: string,
+    theOccurrenceId: string,
   ): Promise<Reservation>;
   theUserReserveForEvent(
     theUser: UniqueEntityID,

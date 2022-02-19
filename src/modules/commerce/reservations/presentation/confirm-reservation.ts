@@ -8,4 +8,7 @@ export class ConfirmReservationBody {
   @ApiProperty()
   @IsUUID(4)
   eventId: string;
+  @ApiProperty()
+  @IsUUID(4)
+  occurrenceId: string;
 }

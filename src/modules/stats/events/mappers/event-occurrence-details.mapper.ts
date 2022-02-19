@@ -49,8 +49,20 @@ export namespace EventOccurrenceDetailsMapper {
             new ChartsBuilder()
               .makeList()
               .withName('Tickets')
-              .addEntries(
-                o.tickets.map((tk) => {
+              .addEntries([
+                {
+                  expectation: o.tickets.reduce<number>(
+                    (sum, tkt) => (sum += tkt.total),
+                    0,
+                  ),
+                  value: o.tickets.reduce<number>(
+                    (sum, tkt) => (sum += tkt.sold),
+                    0,
+                  ),
+                  name: 'Total',
+                  trailing: '',
+                },
+                ...o.tickets.map((tk) => {
                   return {
                     expectation: tk.total,
                     value: tk.sold,
@@ -60,7 +72,7 @@ export namespace EventOccurrenceDetailsMapper {
                     }`,
                   };
                 }),
-              )
+              ])
               .build(),
             pie,
           ],

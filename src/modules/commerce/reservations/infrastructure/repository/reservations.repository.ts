@@ -32,14 +32,15 @@ export class ReservationsRepository
     theSecurityPhrase: string,
     theValidtorId: string,
     theEventId: string,
+    theOccurrenceId: string,
   ): Promise<Reservation> {
     const reservationOrNone =
       await this.persistenceManager.maybeGetOne<Reservation>(
         QuerySpecification.withStatement(
           `
 				MATCH (t:Ticket)--(p:Reservation)--(u:User),
-						(t)--(:EventOccurrence)--(e:Event)--(partner:Partner)
-				WHERE p.securityPhrase = $pPhrase AND partner.id = $partnerId AND e.id = $eId
+						(t)--(o:EventOccurrence)--(e:Event)--(partner:Partner)
+				WHERE p.securityPhrase = $pPhrase AND partner.id = $partnerId AND e.id = $eId AND o.id = $oId
 				RETURN {
 					ticketId:t.id,
 					amountOfTickets:p.amountOfTickets,
@@ -56,6 +57,7 @@ export class ReservationsRepository
             pPhrase: theSecurityPhrase,
             partnerId: theValidtorId,
             eId: theEventId,
+            oId: theOccurrenceId,
           })
           .map(ReservationMapper.fromPersistence),
       );
