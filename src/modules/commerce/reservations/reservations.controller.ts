@@ -143,7 +143,10 @@ export class ReservationsController {
         case ConfirmReservationErrors.ReservationNotFound:
           throw new NotFoundException(error.errorValue().message);
         case ConfirmReservationErrors.ReservationIsVerified:
-          throw new ConflictException(error.errorValue().message);
+          throw new ConflictException({
+            error: error.errorValue().message,
+            data: error.errorValue().data,
+          });
         default:
           throw new InternalServerErrorException(error.errorValue().message);
       }

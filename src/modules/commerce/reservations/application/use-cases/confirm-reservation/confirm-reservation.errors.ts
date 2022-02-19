@@ -16,10 +16,11 @@ export namespace ConfirmReservationErrors {
 
   export class ReservationIsVerified extends Result<IUseCaseError> {
     readonly message: string;
-    constructor() {
+    constructor(data: any) {
       super(false, {
         message: `Reservation has been verified`,
         context,
+        data,
       });
     }
   }

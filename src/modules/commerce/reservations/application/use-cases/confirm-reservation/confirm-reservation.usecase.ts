@@ -47,7 +47,12 @@ export class ConfirmReservation
       );
 
       if (reservationOrNone.isValidated)
-        return left(new ConfirmReservationErrors.ReservationIsVerified());
+        return left(
+          new ConfirmReservationErrors.ReservationIsVerified({
+            user: userData,
+            verifiedAt: reservationOrNone.updatedAt,
+          }),
+        );
 
       reservationOrNone.validate();
       await this.repo.save(reservationOrNone);
