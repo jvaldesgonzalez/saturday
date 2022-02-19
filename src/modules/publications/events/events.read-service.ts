@@ -160,6 +160,7 @@ export class EventsReadService {
 					multimedia:e.multimedia,
 					attentionTags: tags,
 					amIInterested: rlike IS NOT null,
+					createdAt:e.createdAt,
 					totalUsersInterested: usersInterested,
 					dateTimeInit:e.dateTimeInit,
 					dateTimeEnd:e.dateTimeEnd,
@@ -171,7 +172,7 @@ export class EventsReadService {
 					RETURN f limit 3
 				}
 				WITH apoc.map.merge(eventInfo, {friends:collect( distinct f{.username, .avatar})}) as events 
-				RETURN events ORDER BY events.id
+				RETURN events ORDER BY events.createdAt DESC
 				SKIP $skip
 				LIMIT $limit
 				`,
@@ -183,6 +184,7 @@ export class EventsReadService {
             limit: Integer.fromInt(limit),
           })
           .map((r) => {
+            delete r.createdAt;
             return {
               ...r,
               info: TextUtils.escapeAndParse(r.info),
@@ -240,8 +242,7 @@ export class EventsReadService {
 					MATCH (e:Event)-[:CONTAIN_HASHTAG]->(h:Hashtag)
 					WHERE h.word = $hashtagWord
 					MATCH (pl:Place)<-[:HAS_PLACE]-(e)<-[:PUBLISH_EVENT]-(p:Partner),
-					(e)-[:HAS_CATEGORY]->(cat:Category),
-					(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
+					(e)-[:HAS_CATEGORY]->(cat:Category)
 
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 					OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
@@ -252,16 +253,11 @@ export class EventsReadService {
 					OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
 					OPTIONAL MATCH (u:User)-[:LIKE]->(e)
 
-					WITH {
-						id:o.id,
-						dateTimeInit:o.dateTimeInit,
-						dateTimeEnd:o.dateTimeEnd,
-						tickets:collect(distinct t { .id, .price, .name, .amount, .description})
-					} as occ, e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
+					WITH e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
 					with distinct {
 						id:e.id,
 						name:e.name,
-						occurrences:collect(occ),
+						occurrences:[],
 						info:e.description,
 						publisher:{
 							id:p.id,
@@ -286,6 +282,7 @@ export class EventsReadService {
 						amIInterested: rlike IS NOT null,
 						totalUsersInterested: usersInterested,
 						dateTimeInit: e.dateTimeInit,
+						createdAt:e.createdAt,
 						dateTimeEnd: e.dateTimeEnd,
 						basePrice: e.basePrice
 					} as eventInfo, me, e
@@ -308,6 +305,7 @@ export class EventsReadService {
             meId: userId,
           })
           .map((r) => {
+            delete r.createdAt;
             return {
               ...r,
               info: TextUtils.escapeAndParse(r.info),
