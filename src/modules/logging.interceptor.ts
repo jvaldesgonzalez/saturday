@@ -14,12 +14,6 @@ export class LoggingInterceptor implements NestInterceptor {
     console.log({ body: request.body, url: request.url });
 
     const now = Date.now();
-    return next.handle().pipe(
-      tap((data) => console.log({ data })),
-      catchError((err) => {
-        console.log({ error: err.response });
-        return throwError(() => err);
-      }),
-    );
+    return next.handle().pipe(tap((data) => console.log({ data })));
   }
 }
