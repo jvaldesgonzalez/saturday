@@ -26,7 +26,7 @@ export class AccountQuery extends Query {
     const termsFuzzy = this.raw
       .trim()
       .split(' ')
-      .map((t) => (t.length > 4 ? `${t}~2` : t))
+      .map((t) => `${t}~2 OR ${t}*`)
       .filter((i) => i);
     return `fullname: ${termsFuzzy.join(
       ' OR fullname: ',

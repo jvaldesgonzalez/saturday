@@ -1,19 +1,24 @@
-#Version 0.0.1
+FROM docker.uclv.cu/node:16 AS development
 
-FROM node:14
-LABEL maintainer="jvaldesgonzalez9@gmail.com"
+WORKDIR /usr/src/app
 
-WORKDIR /home/node/app
-
-COPY ./package.json .
-COPY ./yarn.lock .
+COPY ./package.json ./
+COPY ./yarn.lock ./
 
 RUN yarn global add pegjs
-RUN	yarn install 
-RUN	yarn run build
+RUN yarn install
 
+COPY . .
 
-EXPOSE 3000
+RUN yarn run build
 
-CMD ["yarn", "start:prod"]
+FROM docker.uclv.cu/node:16-alpine AS production
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+COPY --from=development /usr/scr/app/dist ./dist
+
+CMD ["node", "dist/main"]
 
