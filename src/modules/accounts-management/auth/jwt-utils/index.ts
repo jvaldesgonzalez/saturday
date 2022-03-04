@@ -5,7 +5,7 @@ import crypto from 'crypto';
 
 export namespace JWTUtils {
   export function sign(claim: JWTClaim) {
-    return jwt.sign(claim, jwtSecret, { expiresIn: '24h' });
+    return jwt.sign(claim, jwtSecret, { expiresIn: '10s' });
   }
 
   export function decode(token: JWTToken): JWTClaim {
