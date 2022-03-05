@@ -18,7 +18,8 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-COPY --from=development /usr/scr/app/dist ./dist
+COPY --from=development /usr/src/app/node_modules ./node_modules
+COPY --from=development /usr/src/app/dist ./dist
 
 CMD ["node", "dist/main"]
 
