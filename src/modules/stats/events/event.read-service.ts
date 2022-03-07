@@ -4,6 +4,7 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
+import { Gender } from 'src/modules/accounts-management/users/domain/value-objects/gender.value';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { EventDetailsReadEntity } from './entities/event-details.entity';
 import { EventListItemReadEntity } from './entities/event-list-item.entity';
@@ -19,10 +20,79 @@ export class EventsReadService implements IEventStats {
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
   ) {}
 
+  private async getEventChart(theEventId: string): Promise<{
+    likes: [{ gender: Gender; age: number }];
+    shared: [{ gender: Gender; age: number }];
+  }> {
+    return await this.persistenceManager.getOne<{
+      likes: [{ gender: Gender; age: number }];
+      shared: [{ gender: Gender; age: number }];
+    }>(
+      QuerySpecification.withStatement(
+        `
+					MATCH (e:Event)
+					WHERE e.id = $eId
+					OPTIONAL MATCH (e)-[:LIKE]-(uLike:User)
+					OPTIONAL MATCH (e)--(:ForwardedEvent)-[:FORWARD]-(uForward:User)
+					RETURN {
+							likes: collect(distinct uLike {
+								.gender,
+								age: duration.between(uLike.birthday,datetime()).years,
+								.username
+							}),
+							shared: collect(distinct uForward {
+								.gender,
+								age: duration.between(uForward.birthday,datetime()).years,
+								.username
+							})
+					}
+			`,
+      )
+        .bind({ eId: theEventId })
+        .map((r) => {
+          return r;
+        }),
+    );
+  }
+
+  private async getEventOccChart(theEventId: string): Promise<
+    {
+      id: string;
+      reservations: [{ gender: Gender; age: number }];
+    }[]
+  > {
+    return await this.persistenceManager.query<{
+      id: string;
+      reservations: [{ gender: Gender; age: number }];
+    }>(
+      QuerySpecification.withStatement(
+        `
+					MATCH (e:Event)--(o:EventOccurrence)--(:Ticket)--(r:Reservation)--(u:User)
+					WHERE e.id = $eId
+					RETURN {
+						id:o.id,
+						reservations: collect( u
+							{
+								.username,
+								age: duration.between(u.birthday,datetime()).years,
+								.gender
+							})
+					}
+			`,
+      )
+        .bind({ eId: theEventId })
+        .map((r) => {
+          console.log(r);
+          return r;
+        }),
+    );
+  }
+
   async getOccurrencesDetails(
     theEventId: string,
     thePartnerId: string,
   ): Promise<EventWithOccurrenceDetailsReadEntity> {
+    const charts = await this.getEventOccChart(theEventId);
     const occurrences =
       await this.persistenceManager.getOne<EventWithOccurrenceDetailsReadEntity>(
         QuerySpecification.withStatement(
@@ -55,7 +125,7 @@ export class EventsReadService implements IEventStats {
 					`,
         )
           .bind({ eId: theEventId, pId: thePartnerId })
-          .map(EventOccurrenceDetailsMapper.toDto),
+          .map((r) => EventOccurrenceDetailsMapper.toDto(r, charts)),
       );
 
     return occurrences;
@@ -65,6 +135,7 @@ export class EventsReadService implements IEventStats {
     theEventId: string,
     thePartnerId: string,
   ): Promise<EventDetailsReadEntity> {
+    const charts = await this.getEventChart(theEventId);
     return await this.persistenceManager.getOne<EventDetailsReadEntity>(
       QuerySpecification.withStatement(
         `MATCH (e:Event)-[:PUBLISH_EVENT]-(publisher:Partner),
@@ -99,7 +170,7 @@ export class EventsReadService implements IEventStats {
 				`,
       )
         .bind({ eId: theEventId, pId: thePartnerId })
-        .map(EventDetailsMapper.toDto),
+        .map((r) => EventDetailsMapper.toDto(r, charts)),
     );
   }
 
@@ -124,7 +195,7 @@ export class EventsReadService implements IEventStats {
 					place:place.name,
 					category:c.name,
 					stats:{
-						reached:100,
+						reached:NULL,
 						interested:count(distinct liked),
 						sharedTimes:count(distinct forwarded)
 					}

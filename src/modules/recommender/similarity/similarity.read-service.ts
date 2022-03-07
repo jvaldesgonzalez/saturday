@@ -115,7 +115,7 @@ export class SimilarityReadService {
         QuerySpecification.withStatement(
           `
 					MATCH (e:Event)-[HAS_CATEGORY]->(c:Category)<-[:HAS_CATEGORY]-(similar:Event),(similar)-[:LIKE]-(whoLike:User)-[:LIKE]-(e)
-					WHERE e.id = $eventId
+					WHERE e.id = $eventId AND e.dateTimeEnd > datetime()
 					WITH similar as e,count(whoLike) as commonLikes
 					ORDER BY commonLikes
 

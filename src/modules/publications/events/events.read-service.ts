@@ -96,10 +96,12 @@ export class EventsReadService {
                   (o: {
                     dateTimeInit: DateTime<number>;
                     dateTimeEnd: DateTime<number>;
+                    tickets: { price: number }[];
                   }) => {
                     if (!o.dateTimeEnd) return [];
                     return {
                       ...o,
+                      tickets: o.tickets.sort((t1, t2) => t1.price - t2.price),
                       dateTimeInit: parseDate(o.dateTimeInit),
                       dateTimeEnd: parseDate(o.dateTimeEnd),
                     };
@@ -344,5 +346,28 @@ export class EventsReadService {
       pageSize: items.length,
       current: skip,
     };
+  }
+
+  async cancelOccurrence(theOccurrenceId: string): Promise<{
+    eventId: string;
+    closedTickets: { userId: string; ticketId: string }[];
+  }> {
+    return await this.persistenceManager.getOne<{
+      eventId: string;
+      closedTickets: { userId: string; ticketId: string }[];
+    }>(
+      QuerySpecification.withStatement(
+        `
+					match (e:Event)--(o:EventOccurrence)--(t:Ticket)--(r:Reservation)--(u:User)
+					where o.id = $oId
+					set t.amount = 0
+					set r.cancelled = true
+					return {
+						eventId:e.id,
+						closedTickets:collect({ticketId:t.id,userId:u.id})
+					}
+				`,
+      ).bind({ oId: theOccurrenceId }),
+    );
   }
 }

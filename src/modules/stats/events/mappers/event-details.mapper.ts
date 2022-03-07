@@ -1,3 +1,4 @@
+import { Gender } from 'src/modules/accounts-management/users/domain/value-objects/gender.value';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { ChartsBuilder } from 'src/shared/modules/stats/charts/charts.buider';
 import { TextUtils } from 'src/shared/utils/text.utils';
@@ -9,6 +10,10 @@ import {
 export namespace EventDetailsMapper {
   export function toDto(
     e: EventDetailsFromDBReadEntity,
+    charts: {
+      likes: [{ gender: Gender; age: number }];
+      shared: [{ gender: Gender; age: number }];
+    },
   ): EventDetailsReadEntity {
     const formatPrice = (baseAndTop: [number, number]): string => {
       const [base, top] = baseAndTop;
@@ -16,40 +21,50 @@ export namespace EventDetailsMapper {
       return `${base} - ${top}`;
     };
 
-    //TODO add real data
-    const chart = new ChartsBuilder()
-      .makePieBar()
-      .withName('Sexo y edad')
-      .withCategories(['Mujeres', 'Hombres', 'Non-Binary'])
-      .addEntries([
-        {
-          range: [18, 20],
-          values: [10, 50, 30],
-        },
-        {
-          range: [20, 25],
-          values: [200, 400, 36],
-        },
-        {
-          range: [25, 30],
-          values: [150, 160, 200],
-        },
-        {
-          range: [30, 40],
-          values: [300, 160, 3.0],
-        },
-        {
-          range: [40, 60],
-          values: [40, 20, 0],
-        },
-      ])
-      .build();
+    const buildEntry = (
+      ageRange: [number, number],
+      chartLike: [{ gender: Gender; age: number }],
+    ) => {
+      const inRange = chartLike.filter(
+        (i) => i.age >= ageRange[0] && i.age < ageRange[1],
+      );
+      return {
+        range: ageRange,
+        values: [
+          inRange.filter((i) => i.gender === Gender.Female).length,
+          inRange.filter((i) => i.gender === Gender.Male).length,
+          inRange.filter((i) => i.gender === Gender.NonBinary).length,
+        ],
+      };
+    };
 
     return {
       ...e,
-      reachability: chart,
-      usersInterested: chart,
-      timesShared: chart,
+      reachability: null,
+      usersInterested: new ChartsBuilder()
+        .makePieBar()
+        .withName('Sexo y edad')
+        .withCategories(['Mujeres', 'Hombres', 'Non-Binary'])
+        .addEntries([
+          buildEntry([18, 20], charts.likes),
+          buildEntry([20, 25], charts.likes),
+          buildEntry([25, 30], charts.likes),
+          buildEntry([30, 40], charts.likes),
+          buildEntry([40, 60], charts.likes),
+        ])
+        .build(),
+      timesShared: new ChartsBuilder()
+        .makePieBar()
+        .withName('Sexo y edad')
+        .withCategories(['Mujeres', 'Hombres', 'Non-Binary'])
+        .addEntries([
+          buildEntry([18, 20], charts.shared),
+          buildEntry([20, 25], charts.shared),
+          buildEntry([25, 30], charts.shared),
+          buildEntry([30, 40], charts.shared),
+          buildEntry([40, 60], charts.shared),
+        ])
+        .build(),
       event: {
         ...e.event,
         multimedia: TextUtils.escapeAndParse(e.event.multimedia) as any,

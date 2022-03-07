@@ -81,6 +81,12 @@ export class EventsController {
       return result.value.getValue();
     }
   }
+
+  @Post('/occurrences/:id/close')
+  async cancelOccurrene(@Param('id', ParseUUIDPipe) theOccurrenceId: string) {
+    const result = await this.readService.cancelOccurrence(theOccurrenceId);
+    return result;
+  }
 }
 
 @ApiTags('partners')
