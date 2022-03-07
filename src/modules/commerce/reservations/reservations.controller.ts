@@ -12,6 +12,7 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -20,6 +21,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { CurrentUser } from 'src/modules/accounts-management/auth/decorators/current-user.decorator';
 import { Roles } from 'src/modules/accounts-management/auth/decorators/role.decorator';
 import { JWTClaim } from 'src/modules/accounts-management/auth/login-payload.type';
@@ -73,6 +75,8 @@ export class ReservationsController {
     return reservation;
   }
 
+  @UseGuards(ThrottlerGuard)
+  @Throttle(3, 60 * 60 * 24) // 3 times in a day per IP address
   @Post('')
   async createReservation(
     @Body() data: CreateReservationBody,
