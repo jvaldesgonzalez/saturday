@@ -11,6 +11,7 @@ async function bootstrap(): Promise<void> {
   const port = process.env.PORT || 80;
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  // app.getHttpAdapter().getInstance().disable('etag');
 
   // app.use(morgan('dev'));
   app.use(helmet());
