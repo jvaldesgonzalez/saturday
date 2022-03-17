@@ -12,7 +12,7 @@ export namespace EventDetailsReadMapper {
       multimedia: TextUtils.escapeAndParse(r.multimedia),
       dateTimeInit: parseDate(r.dateTimeInit),
       attentionTags:
-        process.env.POMO === 'true'
+        process.env.PROMO === 'true'
           ? [
               {
                 color: '#1FCF85',
