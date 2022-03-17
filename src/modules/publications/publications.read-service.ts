@@ -6,8 +6,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { EventDetails } from './events/presentation/event-details';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
-import { TextUtils } from 'src/shared/utils/text.utils';
+import { EventDetailsReadMapper } from './events/read-model/mappers/event-details.read-mapper';
 
 @Injectable()
 export class PublicationsReadService {
@@ -216,38 +215,10 @@ export class PublicationsReadService {
             delete r.createdAt;
             if (r.type === 'collection') console.log(r.name);
             return r.type === 'event'
-              ? {
-                  ...r,
-                  info: TextUtils.escapeAndParse(r.info),
-                  multimedia: TextUtils.escapeAndParse(r.multimedia),
-                  dateTimeInit: parseDate(r.dateTimeInit),
-                  dateTimeEnd: parseDate(r.dateTimeEnd),
-                  occurrences: r.occurrences.map((o) => {
-                    return {
-                      ...o,
-                      dateTimeInit: parseDate(o.dateTimeInit),
-                      dateTimeEnd: parseDate(o.dateTimeEnd),
-                    };
-                  }),
-                }
+              ? EventDetailsReadMapper.toResponse(r)
               : {
                   ...r,
-                  events: r.events.map((e) => {
-                    return {
-                      ...e,
-                      info: TextUtils.escapeAndParse(e.info),
-                      multimedia: TextUtils.escapeAndParse(e.multimedia),
-                      dateTimeInit: parseDate(e.dateTimeInit),
-                      dateTimeEnd: parseDate(e.dateTimeEnd),
-                      occurrences: e.occurrences.map((o) => {
-                        return {
-                          ...o,
-                          dateTimeInit: parseDate(o.dateTimeInit),
-                          dateTimeEnd: parseDate(o.dateTimeEnd),
-                        };
-                      }),
-                    };
-                  }),
+                  events: r.events.map(EventDetailsReadMapper.toResponse),
                 };
           }),
       ),

@@ -9,6 +9,7 @@ import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import { EventDetails } from './presentation/event-details';
+import { EventDetailsReadMapper } from './read-model/mappers/event-details.read-mapper';
 
 @Injectable()
 export class EventsReadService {
@@ -82,34 +83,7 @@ export class EventsReadService {
 				`,
         )
           .bind({ eId: eventId, meId: userId })
-          .map((r) => {
-            // console.log(r);
-            // return;
-            return {
-              ...r,
-              info: TextUtils.escapeAndParse(r.info),
-              multimedia: TextUtils.escapeAndParse(r.multimedia),
-              dateTimeInit: parseDate(r.dateTimeInit),
-              dateTimeEnd: parseDate(r.dateTimeEnd),
-              occurrences: r.occurrences
-                .map(
-                  (o: {
-                    dateTimeInit: DateTime<number>;
-                    dateTimeEnd: DateTime<number>;
-                    tickets: { price: number }[];
-                  }) => {
-                    if (!o.dateTimeEnd) return [];
-                    return {
-                      ...o,
-                      tickets: o.tickets.sort((t1, t2) => t1.price - t2.price),
-                      dateTimeInit: parseDate(o.dateTimeInit),
-                      dateTimeEnd: parseDate(o.dateTimeEnd),
-                    };
-                  },
-                )
-                .flat(),
-            };
-          })
+          .map(EventDetailsReadMapper.toResponse)
           .transform(EventDetails),
       )) ?? null
     );
@@ -185,28 +159,7 @@ export class EventsReadService {
             skip: Integer.fromInt(skip),
             limit: Integer.fromInt(limit),
           })
-          .map((r) => {
-            delete r.createdAt;
-            return {
-              ...r,
-              info: TextUtils.escapeAndParse(r.info),
-              multimedia: TextUtils.escapeAndParse(r.multimedia),
-              dateTimeInit: parseDate(r.dateTimeInit),
-              dateTimeEnd: parseDate(r.dateTimeEnd),
-              occurrences: r.occurrences.map(
-                (o: {
-                  dateTimeInit: DateTime<number>;
-                  dateTimeEnd: DateTime<number>;
-                }) => {
-                  return {
-                    ...o,
-                    dateTimeInit: parseDate(o.dateTimeInit),
-                    dateTimeEnd: parseDate(o.dateTimeEnd),
-                  };
-                },
-              ),
-            };
-          })
+          .map(EventDetailsReadMapper.toResponse)
           .transform(EventDetails),
       ),
       this.persistenceManager.getOne<number>(
@@ -306,28 +259,7 @@ export class EventsReadService {
             limit: Integer.fromInt(limit),
             meId: userId,
           })
-          .map((r) => {
-            delete r.createdAt;
-            return {
-              ...r,
-              info: TextUtils.escapeAndParse(r.info),
-              multimedia: TextUtils.escapeAndParse(r.multimedia),
-              dateTimeInit: parseDate(r.dateTimeInit),
-              dateTimeEnd: parseDate(r.dateTimeEnd),
-              occurrences: r.occurrences.map(
-                (o: {
-                  dateTimeInit: DateTime<number>;
-                  dateTimeEnd: DateTime<number>;
-                }) => {
-                  return {
-                    ...o,
-                    dateTimeInit: parseDate(o.dateTimeInit),
-                    dateTimeEnd: parseDate(o.dateTimeEnd),
-                  };
-                },
-              ),
-            };
-          })
+          .map(EventDetailsReadMapper.toResponse)
           .transform(EventDetails),
       ),
       this.persistenceManager.getOne<number>(

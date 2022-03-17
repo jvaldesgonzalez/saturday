@@ -31,7 +31,7 @@ export class AppleProvider implements IAppleProvider {
       email: jwtPayload.email,
       authProvider: AuthProvider.Apple,
       authProviderId: jwtPayload.sub,
-      gender: Gender.NonBinary,
+      gender: Gender.PreferNotSay,
     };
   }
 

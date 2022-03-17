@@ -33,7 +33,7 @@ export namespace EventDetailsMapper {
         values: [
           inRange.filter((i) => i.gender === Gender.Female).length,
           inRange.filter((i) => i.gender === Gender.Male).length,
-          inRange.filter((i) => i.gender === Gender.NonBinary).length,
+          inRange.filter((i) => i.gender === Gender.PreferNotSay).length,
         ],
       };
     };
