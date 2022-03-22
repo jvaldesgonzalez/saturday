@@ -26,11 +26,11 @@ type Response = Either<
 export class LoginUserGoogle implements IUseCase<LoginUserGoogleDto, Response> {
   constructor(
     @Inject(AuthProviders.IGoogleProvider)
-    private fbProvider: IGoogleProvider,
+    private gProvider: IGoogleProvider,
     @Inject(UserProviders.IUserRepository) private repo: IUserRepository,
   ) {}
   async execute(request: LoginUserGoogleDto): Promise<Response> {
-    const validInProvider = await this.fbProvider.checkValidAuthToken(
+    const validInProvider = await this.gProvider.checkValidAuthToken(
       request.authToken,
     );
 
