@@ -35,7 +35,7 @@ export class GoogleProvider implements IGoogleProvider {
       authProvider: AuthProvider.Google,
       email: data.emailAddresses[0].value,
       birthday: year ? new Date(year, month - 1, day) : null,
-      gender: data.genders ? data.genders[0].value : Gender.Unknown,
+      gender: data.genders ? data.genders[0].value : Gender.PreferNotSay,
     };
   }
 
