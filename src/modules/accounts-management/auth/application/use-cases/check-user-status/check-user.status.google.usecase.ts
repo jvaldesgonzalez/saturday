@@ -36,13 +36,15 @@ export class CheckUserStatusGoogle
     const userEmail = validInProvider ? validInProvider : null;
     console.log({ userEmail });
 
-    if (!validInProvider)
+    if (!validInProvider) {
+      console.log('Not valid in provider ', validInProvider);
       return left(
         new CheckUserStatusErrors.UserNotFoundInProvider(
           new UniqueEntityID(userEmail),
           AuthProvider.Google,
         ),
       );
+    }
 
     const userOrNone = await this.repo.findByEmail(userEmail);
     if (userOrNone) return right(Ok({}));
