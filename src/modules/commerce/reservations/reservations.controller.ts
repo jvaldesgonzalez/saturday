@@ -75,8 +75,8 @@ export class ReservationsController {
     return reservation;
   }
 
-  @UseGuards(ThrottlerGuard)
-  @Throttle(3, 60 * 60 * 24) // 3 times in a day per IP address
+  // @UseGuards(ThrottlerGuard)
+  // @Throttle(3, 60 * 60 * 24) // 3 times in a day per IP address
   @Post('')
   async createReservation(
     @Body() data: CreateReservationBody,
