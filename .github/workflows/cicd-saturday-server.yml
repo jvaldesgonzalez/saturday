@@ -41,7 +41,7 @@ jobs:
           host: registry.saturdayhub.com
           username: cloud
           key: ${{secrets.KEY}}
-          script: 'docker-compose up -d --build api'
+          script: './build_api.sh'
       - name: notify deploy finished
         uses: appleboy/telegram-action@master
         with:
