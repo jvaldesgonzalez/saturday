@@ -4,48 +4,51 @@ on:
     branches:
       - 'master'
 jobs:
-  init:
-    steps:
-      - name: notify process initialization
-        uses: appleboy/telegram-action@master
-        with:
-          to: -583932975 #806567508
-          token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w
-          args: |
-            "💻 New commit pushed!!"
-            "message: ${{ github.event.head_commit.message }}"
-  build:
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: registry.saturdayhub.com/saturday_nest_api:latest
-      - name: notify image pushed
-        uses: appleboy/telegram-action@master
-        with:
-          to: -583932975 #806567508
-          token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w
-          args: |
-            "Image pushed to docker registry"
-  deploy:
-    steps:
-      - name: executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@master
-        with:
-          host: registry.saturdayhub.com
-          username: cloud
-          key: ${{secrets.KEY}}
-          script: 'docker-compose up -d --build api'
-      - name: notify deploy finished
-        uses: appleboy/telegram-action@master
-        with:
-          to: -583932975 #806567508
-          token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w
-          args: |
-            "New version deployed to https://api.saturdayhub.com"
+  name: Init
+  runs-on: ubuntu-latest
+  steps:
+    - name: notify process initialization
+      uses: appleboy/telegram-action@master
+      with:
+        to: -583932975 #806567508
+        token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w
+        args: |
+          "💻 New commit pushed!!"
+          "message: ${{ github.event.head_commit.message }}"
+  name: Build
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: registry.saturdayhub.com/saturday_nest_api:latest
+    - name: notify image pushed
+      uses: appleboy/telegram-action@master
+      with:
+        to: -583932975 #806567508
+        token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w
+        args: |
+          "Image pushed to docker registry"
+  name: Deploy
+  runs-on: ubuntu-latest
+  steps:
+    - name: executing remote ssh commands using ssh key
+      uses: appleboy/ssh-action@master
+      with:
+        host: registry.saturdayhub.com
+        username: cloud
+        key: ${{secrets.KEY}}
+        script: 'docker-compose up -d --build api'
+    - name: notify deploy finished
+      uses: appleboy/telegram-action@master
+      with:
+        to: -583932975 #806567508
+        token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w
+        args: |
+          "New version deployed to https://api.saturdayhub.com"
