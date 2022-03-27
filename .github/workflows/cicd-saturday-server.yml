@@ -4,7 +4,7 @@ on:
     branches:
       - 'master'
 jobs:
-  init:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: notify process initialization
@@ -15,9 +15,7 @@ jobs:
           args: |
             "💻 New commit pushed!!"
             "message: ${{ github.event.head_commit.message }}"
-  build:
-    runs-on: ubuntu-latest
-    steps:
+
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up Docker Buildx
@@ -35,9 +33,7 @@ jobs:
           token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w
           args: |
             "Image pushed to docker registry"
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
+
       - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
         with:
