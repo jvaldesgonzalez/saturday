@@ -25,7 +25,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: registry.saturdayhub.com/saturday_nest_api:latest
+          tags: registry.saturdayhub.com/saturday_nest_api:master
       # - name: notify image pushed
       #   uses: appleboy/telegram-action@master
       #   with:
