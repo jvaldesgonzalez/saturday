@@ -2,8 +2,8 @@ import { MinioOptions } from 'nestjs-minio-client/dist/interfaces/minio.options.
 
 export const minioConfig: MinioOptions = {
   endPoint: process.env.MINIO_HOST,
-  port: 80,
-  useSSL: false,
+  port: 443,
+  useSSL: true,
   accessKey: process.env.MINIO_USER,
   secretKey: process.env.MINIO_PASS,
 };
