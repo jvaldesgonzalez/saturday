@@ -5,6 +5,9 @@ import generatePassword from 'omgopass';
 
 type PaymentProps = {
   ticketId: UniqueEntityID;
+  ticketName: string;
+  ticketPrice: number;
+  ticketDescription: string;
   couponId?: UniqueEntityID;
   amountOfTickets: number; // less than 16
   createdAt: Date;
@@ -27,6 +30,15 @@ type NewPaymentProps = Omit<
 export class Reservation extends DomainEntity<PaymentProps> {
   get ticketId(): string {
     return this.props.ticketId.toString();
+  }
+  get ticketName(): string {
+    return this.props.ticketName;
+  }
+  get ticketPrice(): number {
+    return this.props.ticketPrice;
+  }
+  get ticketDescription(): string {
+    return this.props.ticketDescription;
   }
 
   get issuerId(): string {

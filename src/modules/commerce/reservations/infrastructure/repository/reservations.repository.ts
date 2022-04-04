@@ -66,6 +66,9 @@ export class ReservationsRepository
 					updatedAt:p.updatedAt,
 					isValidated:p.isValidated,
 					securityPhrase:p.securityPhrase,
+					ticketName:p.ticketName,
+					ticketPrice:p.ticketPrice,
+					ticketDescription:p.ticketDescription,
 					issuerId:u.id,
 					id:p.id
 				}
@@ -186,6 +189,9 @@ export class ReservationsRepository
 					updatedAt:p.updatedAt,
 					securityPhrase:p.securityPhrase,
 					isValidated:p.isValidated,
+					ticketName:p.ticketName,
+					ticketPrice:p.ticketPrice,
+					ticketDescription:p.ticketDescription,
 					issuerId:u.id,
 					id:p.id
 				}

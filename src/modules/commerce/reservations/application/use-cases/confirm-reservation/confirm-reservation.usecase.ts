@@ -62,6 +62,9 @@ export class ConfirmReservation
       return right(
         Ok({
           ...meta,
+          name: reservationOrNone.ticketName,
+          price: reservationOrNone.ticketPrice,
+          description: reservationOrNone.ticketDescription,
           amountOfTickets: reservationOrNone.amountOfTickets,
           user: userData,
         }),

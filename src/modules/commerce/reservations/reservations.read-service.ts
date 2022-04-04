@@ -29,16 +29,16 @@ export class ReservationsReadService {
 				OPTIONAL MATCH (p)-[:HAS_COUPON]->(coupon:Coupon)
 				RETURN DISTINCT {
 					ticket:{
-						name:t.name,
+						name:p.ticketName,
 						id:t.id,
-						description:t.description,
-						price:t.price
+						description:p.ticketDescription,
+						price:p.ticketPrice
 					},
 					userId:u.id,
 					id:p.id,
 					amountOfTickets:p.amountOfTickets,
 					couponApplied:coupon{.code},
-					toPay:p.amountOfTickets * t.price,
+					toPay:p.amountOfTickets * p.ticketPrice,
 					isValidated:p.isValidated,
 					createdAt:p.createdAt,
 					securityPhrase:p.securityPhrase,
@@ -104,16 +104,16 @@ export class ReservationsReadService {
 				OPTIONAL MATCH (p)-[:HAS_COUPON]->(coupon:Coupon)
 				RETURN {
 					ticket:{
-						name:t.name,
+						name:p.ticketName,
 						id:t.id,
-						description:t.description,
-						price:t.price
+						description:p.ticketDescription,
+						price:p.ticketPrice
 					},
 					userId:u.id,
 					id:p.id,
 					amountOfTickets:p.amountOfTickets,
 					couponApplied:coupon{.code},
-					toPay:p.amountOfTickets * t.price,
+					toPay:p.amountOfTickets * p.ticketPrice,
 					isValidated:p.isValidated,
 					securityPhrase:p.securityPhrase,
 					event:{

@@ -91,6 +91,17 @@ export class CreateReservation
 
     const reservationOrError = Reservation.new({
       ...request,
+      ticketName:
+        process.env.PROMO === 'true'
+          ? ticketDataOrNone.name + ' (-10%)'
+          : ticketDataOrNone.name,
+      ticketPrice:
+        process.env.PROMO === 'true'
+          ? parseFloat(
+              (ticketDataOrNone.price - ticketDataOrNone.price / 10).toFixed(2),
+            )
+          : ticketDataOrNone.price,
+      ticketDescription: ticketDataOrNone.description,
       ticketId,
       couponId,
       issuerId,
