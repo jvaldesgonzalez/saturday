@@ -19,7 +19,7 @@ export class FacebookProvider implements IFacebookProvider {
       birthday: string;
       gender: Gender;
     }>(
-      `https://graph.facebook.com/${userId}?access_token=${authToken}&fields=name,email,picture.width(500).height(500),birthday,gender`,
+      `https://auth-proxy.saturdayhub.com/facebook/${userId}?access_token=${authToken}&fields=name,email,picture.width(500).height(500),birthday,gender`,
     );
 
     return {

@@ -16,7 +16,7 @@ export class GoogleProvider implements IGoogleProvider {
       birthdays: any;
       genders: any;
     }>(
-      `https://people.googleapis.com/v1/people/me?personFields=names,genders,birthdays,emailAddresses,photos&sources=READ_SOURCE_TYPE_PROFILE&key=AIzaSyD2JxB0Phyr67epKLpqQW_1vGL16uOCY7o`,
+      `https://auth-proxy.saturdayhub.com/google/v1/people/me?personFields=names,genders,birthdays,emailAddresses,photos&sources=READ_SOURCE_TYPE_PROFILE&key=AIzaSyD2JxB0Phyr67epKLpqQW_1vGL16uOCY7o`,
       {
         headers: {
           authorization: `Bearer ${authToken}`,
