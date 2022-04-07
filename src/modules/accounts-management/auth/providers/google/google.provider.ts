@@ -42,7 +42,7 @@ export class GoogleProvider implements IGoogleProvider {
   async checkValidAuthToken(authToken: string): Promise<string> {
     try {
       const response = await axios.get<{ emailAddresses: any }>(
-        `https://people.googleapis.com/v1/people/me?personFields=names,genders,birthdays,emailAddresses,photos&sources=READ_SOURCE_TYPE_PROFILE&key=AIzaSyD2JxB0Phyr67epKLpqQW_1vGL16uOCY7o`,
+        `https://auth-proxy.saturdayhub.com/google/v1/people/me?personFields=names,genders,birthdays,emailAddresses,photos&sources=READ_SOURCE_TYPE_PROFILE&key=AIzaSyD2JxB0Phyr67epKLpqQW_1vGL16uOCY7o`,
         {
           headers: {
             authorization: `Bearer ${authToken}`,

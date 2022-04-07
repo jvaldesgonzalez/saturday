@@ -39,7 +39,7 @@ export class FacebookProvider implements IFacebookProvider {
   ): Promise<string> {
     try {
       const response = await axios.get<{ email: string }>(
-        `https://graph.facebook.com/${userId}?access_token=${authToken}&fields=email`,
+        `https://auth-proxy.saturdayhub.com/facebook/${userId}?access_token=${authToken}&fields=email`,
       );
       return response.data.email ? response.data.email : null;
     } catch (err) {
