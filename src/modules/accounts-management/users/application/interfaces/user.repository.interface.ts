@@ -9,6 +9,7 @@ import { User } from '../../domain/user.domain';
 export interface IUserRepository extends IRepository<User> {
   emailIsTaken(theEmail: string): Promise<boolean>;
   findByEmail(theEmail: string): Promise<User>;
+  dropById(theUserId: string): Promise<void>;
   findById(theId: UniqueEntityID): Promise<User>;
   usernameIsTaken(theUserame: string): Promise<boolean>;
   getPayloadByRefreshToken(theToken: RefreshToken): Promise<JWTClaim>;

@@ -4,6 +4,7 @@ import {
   QuerySpecification,
   Transactional,
 } from '@liberation-data/drivine';
+import { Query } from '@nestjs/common';
 import {
   JWTClaim,
   RefreshToken,
@@ -193,6 +194,21 @@ export class UserRepository
 					AND l.id = $lId
 					MERGE (u)-[:IN_LOCATION]->(l)`,
       ).bind({ uId: userId.toString(), lId: locationId.toString() }),
+    );
+  }
+
+  @Transactional()
+  async dropById(theUserId: string): Promise<void> {
+    await this.persistenceManager.execute(
+      QuerySpecification.withStatement(
+        `
+			MATCH (u:User)
+			WHERE u.id = $uId
+			OPTIONAL MATCH (u)--(r:Reservation)
+			OPTIONAL MATCH (u)--(f:ForwardedEvent)
+			DETACH DELETE u,r,f
+				`,
+      ).bind({ uId: theUserId }),
     );
   }
 }

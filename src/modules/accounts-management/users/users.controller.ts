@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   InternalServerErrorException,
   NotFoundException,
@@ -13,6 +14,7 @@ import { EnumRoles } from 'src/shared/domain/roles.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/role.decorator';
 import { JWTClaim } from '../auth/login-payload.type';
+import { RemoveUser } from './application/use-cases/remove-user/remove-user.usecase';
 import { UpdateUserErrors } from './application/use-cases/update-user/update-user.errors';
 import { UpdateUser } from './application/use-cases/update-user/update-user.usecase';
 import { UpdateUserBody } from './presentation/update-user';
@@ -25,6 +27,7 @@ export class UsersController {
   constructor(
     private readService: UsersReadService,
     private updateProfile: UpdateUser,
+    private removeUser: RemoveUser,
   ) {}
 
   @Get('/me/profile')
@@ -49,6 +52,24 @@ export class UsersController {
     const result = await this.updateProfile.execute({
       ...data,
       id: payload.id,
+    });
+    if (result.isLeft()) {
+      const error = result.value;
+      switch (error.constructor) {
+        case UpdateUserErrors.UserNotFound:
+          throw new NotFoundException(error.errorValue().message);
+        default:
+          throw new InternalServerErrorException(error.errorValue().message);
+      }
+    } else if (result.isRight()) {
+      return result.value.getValue();
+    }
+  }
+
+  @Delete('')
+  async removeUserData(@CurrentUser() payload: JWTClaim) {
+    const result = await this.removeUser.execute({
+      userId: payload.id,
     });
     if (result.isLeft()) {
       const error = result.value;

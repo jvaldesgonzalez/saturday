@@ -40,7 +40,7 @@ export class EventsReadService implements IEventStats {
 								age: duration.between(uLike.birthday,datetime()).years,
 								.username
 							}),
-							shared: collect(distinct uForward {
+							shared: collect(uForward {
 								.gender,
 								age: duration.between(uForward.birthday,datetime()).years,
 								.username
