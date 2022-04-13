@@ -3,4 +3,4 @@ import { CreatePartnerDto } from 'src/modules/accounts-management/partners/appli
 export type RegisterPartnerDto = Omit<
   CreatePartnerDto,
   'refreshToken' | 'username'
->;
+> & { username?: string };

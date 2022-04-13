@@ -21,7 +21,7 @@ export class RegisterPartner implements IUseCase<RegisterPartnerDto, Response> {
     const partnerOrError = await this.createPartner.execute({
       ...request,
       refreshToken: JWTUtils.signRefresh(),
-      username: request.email.split('@')[0],
+      username: request.username || request.email.split('@')[0],
     });
     if (partnerOrError.isLeft()) return left(partnerOrError.value);
     else if (partnerOrError.isRight()) {

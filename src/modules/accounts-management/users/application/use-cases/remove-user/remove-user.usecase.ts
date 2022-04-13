@@ -16,7 +16,7 @@ export class RemoveUser implements IUseCase<RemoveUserDto, Response> {
   constructor(
     @Inject(UserProviders.IUserRepository) private repo: IUserRepository,
   ) {
-    this.logger = new Logger('CreateUserUseCase');
+    this.logger = new Logger('RemoveUserUseCase');
   }
 
   async execute(request: RemoveUserDto): Promise<Response> {

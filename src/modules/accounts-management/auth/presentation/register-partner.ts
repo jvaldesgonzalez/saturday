@@ -11,6 +11,7 @@ import {
   IsLongitude,
   IsUUID,
   IsPhoneNumber,
+  IsOptional,
 } from 'class-validator';
 
 class Place {
@@ -63,6 +64,11 @@ export class RegisterPartnerRequest {
   @IsString()
   @IsNotEmpty()
   businessName: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  username: string;
 
   @ApiProperty()
   @IsPhoneNumber()
