@@ -1,4 +1,4 @@
-FROM docker.uclv.cu/node:16 AS development
+FROM node:16 AS development
 
 WORKDIR /usr/src/app
 
@@ -12,7 +12,7 @@ COPY . .
 
 RUN yarn run build
 
-FROM docker.uclv.cu/node:16-alpine AS production
+FROM node:16-alpine AS production
 
 WORKDIR /usr/src/app
 
