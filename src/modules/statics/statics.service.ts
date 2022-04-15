@@ -26,7 +26,7 @@ export class StaticsService implements IStaticsService {
     );
     return {
       putUrl: url,
-      readUrl: `http://${minioConfig.endPoint}:${minioConfig.port}/${staticsBucketConfig.name}/${objectWithSlug}`,
+      readUrl: `https://${minioConfig.endPoint}/${staticsBucketConfig.name}/${objectWithSlug}`,
       expTime: staticsBucketConfig.ttl,
       fileName: objectWithSlug,
     };
