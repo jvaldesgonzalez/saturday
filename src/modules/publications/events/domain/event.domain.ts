@@ -7,6 +7,7 @@ import { EventCategory } from './value-objects/event-categories.value';
 import { EventCollaborators } from './value-objects/event-collaborators.value';
 import { EventDescription } from './value-objects/event-description.value';
 import { EventPlace } from './value-objects/event-place.value';
+import _ from 'lodash';
 
 type EventProps = {
   publisher: UniqueEntityID;
@@ -170,6 +171,30 @@ export class Event extends DomainEntity<EventProps> {
       .map((hstg) => hstg.slice(1)); // remove leading sharp(#)
   }
 
+  private static addTicketsInfoToDescription(
+    desc: EventDescription,
+    occurrences: EventOccurrence[],
+  ): EventDescription {
+    //select different tickets
+    const tickets = _.uniqBy(
+      occurrences.flatMap((o) => o.newTickets),
+      'name',
+    );
+
+    const newDescriptionFieldBody = tickets
+      .map((t) => `• ${t.name} (${t.price.toFixed(2)} CUP):\n${t.description}`)
+      .join('\n\n');
+
+    return [
+      ...desc,
+      {
+        header: 'Informacion de los tickets',
+        inline: true,
+        body: newDescriptionFieldBody,
+      },
+    ];
+  }
+
   public static new(
     props: Omit<
       EventProps,
@@ -192,6 +217,10 @@ export class Event extends DomainEntity<EventProps> {
     const defaultValues: EventProps = {
       ...props,
       collaborators: props.collaborators ? props.collaborators : [],
+      description: this.addTicketsInfoToDescription(
+        props.description,
+        props.newOccurrences,
+      ),
     };
     return Ok(new Event(defaultValues, id));
   }
