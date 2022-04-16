@@ -171,13 +171,10 @@ export class Event extends DomainEntity<EventProps> {
       .map((hstg) => hstg.slice(1)); // remove leading sharp(#)
   }
 
-  private static addTicketsInfoToDescription(
-    desc: EventDescription,
-    occurrences: EventOccurrence[],
-  ): EventDescription {
+  public addTicketsInfoToDescription(): void {
     //select different tickets
     const tickets = _.uniqBy(
-      occurrences.flatMap((o) => o.newTickets),
+      this.newOccurrences.flatMap((o) => o.newTickets),
       'name',
     );
 
@@ -185,14 +182,14 @@ export class Event extends DomainEntity<EventProps> {
       .map((t) => `• ${t.name} (${t.price.toFixed(2)} CUP):\n${t.description}`)
       .join('\n\n');
 
-    return [
-      ...desc,
+    this.changeDescription([
+      ...this.description,
       {
         header: 'Informacion de los tickets',
-        inline: true,
+        inline: false,
         body: newDescriptionFieldBody,
       },
-    ];
+    ]);
   }
 
   public static new(
@@ -217,10 +214,6 @@ export class Event extends DomainEntity<EventProps> {
     const defaultValues: EventProps = {
       ...props,
       collaborators: props.collaborators ? props.collaborators : [],
-      description: this.addTicketsInfoToDescription(
-        props.description,
-        props.newOccurrences,
-      ),
     };
     return Ok(new Event(defaultValues, id));
   }

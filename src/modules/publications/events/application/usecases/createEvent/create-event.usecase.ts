@@ -52,12 +52,14 @@ export class CreateEvent implements IUseCase<CreateEventDto, Response> {
       }).getValue();
       event.addOccurrence(occ);
     });
+    event.addTicketsInfoToDescription();
 
     try {
       await this._repository.save(event);
+      console.log(event.description);
 
       //silent sent notifications
-      this.nofifyFollowers(request.publisher, event._id.toString());
+      // this.nofifyFollowers(request.publisher, event._id.toString());
       //get back to work
 
       return right(Ok());
