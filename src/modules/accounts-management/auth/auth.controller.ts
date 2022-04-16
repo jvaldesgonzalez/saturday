@@ -41,6 +41,7 @@ import {
 import { RefreshTokenBody } from './presentation/refresh-token.';
 import { RegisterPartnerRequest } from './presentation/register-partner';
 import { RegisterUserRequest } from './presentation/register-user';
+import axios from 'axios';
 
 @ApiBearerAuth()
 @ApiTags('auth')
@@ -220,6 +221,17 @@ export class AuthController {
           throw new InternalServerErrorException(error.errorValue().message);
       }
     } else if (result.isRight()) {
+      axios.request({
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: {
+          chat_id: '-497806735 #806567508',
+          text: `Nuevo negocio registrado: ${data.username} (${data.businessName}) \n https://app.saturdayhub.com/users/${data.username}`,
+          disable_notification: false,
+        },
+        url: 'https://api.telegram.org/bot1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w/sendMessage',
+      });
       return;
     }
   }
