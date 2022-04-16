@@ -25,13 +25,11 @@ export class PublicationsReadService {
           `
 				MATCH (p:Publication)
 				WHERE (p:Event AND p.dateTimeEnd > datetime())
-				OR (p:Collection AND apoc.coll.max( [ (p)--(e:Event) | e.dateTimeEnd ] )> datetime() AND size( [ (p)--(e:Event) | e ] ) > 2)
-				OR (
-					p:EmbeddedCollection 
-					AND (:User {id:$meId})-[:PREFER_CATEGORY]->(:Category)-[:HAS_EMBEDDED_COLLECTION]->(p)
-					AND (apoc.coll.max( [ (p)--(:Category)--(e:Event) | e.dateTimeEnd ] ) > datetime()) 
-					AND (size( [ (p)--(:Category)--(e:Event) WHERE e.dateTimeEnd > datetime() | e ] ) > 2)
-				)
+				OR (p:Collection 
+					AND size([(p)--(e:Event) WHERE e.dateTimeEnd > datetime()|e ]) > 2
+					)
+				OR (size([(:User {id:$meId})-[:PREFER_CATEGORY]->(c:Category)-[:HAS_EMBEDDED_COLLECTION]->(p)-[:PREFER_CATEGORY]-(c)-[:HAS_CATEGORY]-(e:Event) WHERE e.dateTimeEnd > datetime() | e]) > 2
+					)
 				CALL apoc.case([
 					p:Event,
 						'MATCH (pl:Place)<-[:HAS_PLACE]-(item)<-[:PUBLISH_EVENT]-(p:Partner),
@@ -87,7 +85,6 @@ export class PublicationsReadService {
 						'MATCH (item)--(e:Event)
 						,(pl:Place)<-[:HAS_PLACE]-(e)<-[:PUBLISH_EVENT]-(p:Partner),
 						(e)-[:HAS_CATEGORY]->(cat:Category)
-						WHERE e.dateTimeEnd > datetime()
 						OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 						OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
 						MATCH (me:User)
