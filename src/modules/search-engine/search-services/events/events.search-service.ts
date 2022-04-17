@@ -45,7 +45,7 @@ export class EventSearchService implements ISearchService<EventItem> {
 				WHERE true
 				${
           dateInterval
-            ? 'AND size([(node)--(occ:EventOccurrence) WHERE occ.dateTimeInit >= $fromDate AND occ.dateTimeEnd <= $toDate| occ]) > 0 '
+            ? 'AND size([(node)--(occ:EventOccurrence) WHERE ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate ) OR ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate )| occ]) > 0 '
             : ''
         } ${categories.some((i) => i) ? 'AND c.id IN $categories' : ''}
         ${locationId ? 'AND l.id = $locationId' : ''}
@@ -121,7 +121,7 @@ export class EventSearchService implements ISearchService<EventItem> {
 				WHERE node.dateTimeEnd >= datetime()
 				${
           dateInterval
-            ? 'AND size([(node)--(occ:EventOccurrence) WHERE occ.dateTimeInit >= $fromDate AND occ.dateTimeEnd <= $toDate| occ]) > 0 '
+            ? 'AND size([(node)--(occ:EventOccurrence) WHERE ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate ) OR ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate )| occ]) > 0 '
             : ''
         } ${categories.some((i) => i) ? 'AND c.id IN $categories' : ''}
         ${locationId ? 'AND l.id = $locationId' : ''}
@@ -190,7 +190,7 @@ export class EventSearchService implements ISearchService<EventItem> {
 				WHERE node.dateTimeEnd >= datetime()
 				${
           dateInterval
-            ? 'AND size([(node)--(occ:EventOccurrence) WHERE occ.dateTimeInit >= $fromDate AND occ.dateTimeEnd <= $toDate| occ]) > 0 '
+            ? 'AND size([(node)--(occ:EventOccurrence) WHERE ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate ) OR ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate )| occ]) > 0 '
             : ''
         } ${categories.some((i) => i) ? 'AND c.id IN $categories' : ''}
         ${locationId ? 'AND l.id = $locationId' : ''}
@@ -262,7 +262,7 @@ export class EventSearchService implements ISearchService<EventItem> {
 				WHERE node.dateTimeEnd >= datetime()
 				${
           dateInterval
-            ? 'AND size([(node)--(occ:EventOccurrence) WHERE occ.dateTimeInit >= $fromDate AND occ.dateTimeEnd <= $toDate| occ]) > 0 '
+            ? 'AND size([(node)--(occ:EventOccurrence) WHERE ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate ) OR ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate )| occ]) > 0 '
             : ''
         } ${categories.some((i) => i) ? 'AND c.id IN $categories' : ''}
         ${locationId ? 'AND l.id = $locationId' : ''}
