@@ -73,7 +73,8 @@ export class PublicationsReadService {
 							dateTimeInit:e.dateTimeInit,
 							dateTimeEnd:e.dateTimeEnd,
 							createdAt:e.createdAt,
-							basePrice:e.basePrice
+							basePrice:e.basePrice,
+							slug:e.slug
 						} as eventInfo, me, e
 						call {
 							WITH e,me
@@ -122,7 +123,8 @@ export class PublicationsReadService {
 							totalUsersInterested: usersInterested,
 							dateTimeInit:e.dateTimeInit,
 							dateTimeEnd:e.dateTimeEnd,
-							basePrice:e.basePrice
+							basePrice:e.basePrice,
+							slug:e.slug
 						} as eventInfo, me, e,item
 						call {
 							WITH e,me
@@ -179,7 +181,8 @@ export class PublicationsReadService {
 							totalUsersInterested: usersInterested,
 							dateTimeInit:e.dateTimeInit,
 							dateTimeEnd:e.dateTimeEnd,
-							basePrice:e.basePrice
+							basePrice:e.basePrice,
+							slug:e.slug
 						} as eventInfo, me, e,item
 						call {
 							WITH e,me

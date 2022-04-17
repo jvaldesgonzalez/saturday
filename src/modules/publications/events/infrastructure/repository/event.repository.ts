@@ -63,6 +63,7 @@ export class EventRepository
 				WHERE c.id = $cId
         MERGE (p)-[:PUBLISH_EVENT]->(event:Event {id:$eId})-[:HAS_CATEGORY]->(c)
         SET event+= $data
+				SET event.slug = apoc.text.slug(event.name,'-')
 				SET event:Publication
         `,
       ).bind({
