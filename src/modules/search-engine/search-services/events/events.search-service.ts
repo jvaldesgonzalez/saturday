@@ -73,10 +73,28 @@ export class EventSearchService implements ISearchService<EventItem> {
         .bind({
           categories,
           fromDate: dateInterval
-            ? DateTime.fromStandardDate(dateInterval.from)
+            ? new DateTime(
+                dateInterval.from.getFullYear(),
+                dateInterval.from.getMonth() + 1,
+                dateInterval.from.getDate(),
+                dateInterval.from.getHours(),
+                dateInterval.from.getMinutes(),
+                dateInterval.from.getSeconds(),
+                dateInterval.from.getMilliseconds() * 1000000,
+                dateInterval.from.getTimezoneOffset(),
+              )
             : null,
           toDate: dateInterval
-            ? DateTime.fromStandardDate(dateInterval.to)
+            ? new DateTime(
+                dateInterval.to.getFullYear(),
+                dateInterval.to.getMonth() + 1,
+                dateInterval.to.getDate(),
+                dateInterval.to.getHours(),
+                dateInterval.to.getMinutes(),
+                dateInterval.to.getSeconds(),
+                dateInterval.to.getMilliseconds() * 1000000,
+                dateInterval.to.getTimezoneOffset(),
+              )
             : null,
           fromPrice: priceInterval ? priceInterval.from : null,
           toPrice: priceInterval ? priceInterval.to : null,
@@ -117,10 +135,28 @@ export class EventSearchService implements ISearchService<EventItem> {
       ).bind({
         categories,
         fromDate: dateInterval
-          ? DateTime.fromStandardDate(dateInterval.from)
+          ? new DateTime(
+              dateInterval.from.getFullYear(),
+              dateInterval.from.getMonth() + 1,
+              dateInterval.from.getDate(),
+              dateInterval.from.getHours(),
+              dateInterval.from.getMinutes(),
+              dateInterval.from.getSeconds(),
+              dateInterval.from.getMilliseconds() * 1000000,
+              dateInterval.from.getTimezoneOffset(),
+            )
           : null,
         toDate: dateInterval
-          ? DateTime.fromStandardDate(dateInterval.to)
+          ? new DateTime(
+              dateInterval.to.getFullYear(),
+              dateInterval.to.getMonth() + 1,
+              dateInterval.to.getDate(),
+              dateInterval.to.getHours(),
+              dateInterval.to.getMinutes(),
+              dateInterval.to.getSeconds(),
+              dateInterval.to.getMilliseconds() * 1000000,
+              dateInterval.to.getTimezoneOffset(),
+            )
           : null,
         fromPrice: priceInterval ? priceInterval.from : null,
         toPrice: priceInterval ? priceInterval.to : null,
@@ -182,10 +218,28 @@ export class EventSearchService implements ISearchService<EventItem> {
         .bind({
           categories,
           fromDate: dateInterval
-            ? DateTime.fromStandardDate(dateInterval.from)
+            ? new DateTime(
+                dateInterval.from.getFullYear(),
+                dateInterval.from.getMonth() + 1,
+                dateInterval.from.getDate(),
+                dateInterval.from.getHours(),
+                dateInterval.from.getMinutes(),
+                dateInterval.from.getSeconds(),
+                dateInterval.from.getMilliseconds() * 1000000,
+                dateInterval.from.getTimezoneOffset(),
+              )
             : null,
           toDate: dateInterval
-            ? DateTime.fromStandardDate(dateInterval.to)
+            ? new DateTime(
+                dateInterval.to.getFullYear(),
+                dateInterval.to.getMonth() + 1,
+                dateInterval.to.getDate(),
+                dateInterval.to.getHours(),
+                dateInterval.to.getMinutes(),
+                dateInterval.to.getSeconds(),
+                dateInterval.to.getMilliseconds() * 1000000,
+                dateInterval.to.getTimezoneOffset(),
+              )
             : null,
           fromPrice: priceInterval ? priceInterval.from : null,
           toPrice: priceInterval ? priceInterval.to : null,
@@ -222,10 +276,28 @@ export class EventSearchService implements ISearchService<EventItem> {
       ).bind({
         categories,
         fromDate: dateInterval
-          ? DateTime.fromStandardDate(dateInterval.from)
+          ? new DateTime(
+              dateInterval.from.getFullYear(),
+              dateInterval.from.getMonth() + 1,
+              dateInterval.from.getDate(),
+              dateInterval.from.getHours(),
+              dateInterval.from.getMinutes(),
+              dateInterval.from.getSeconds(),
+              dateInterval.from.getMilliseconds() * 1000000,
+              dateInterval.from.getTimezoneOffset(),
+            )
           : null,
         toDate: dateInterval
-          ? DateTime.fromStandardDate(dateInterval.to)
+          ? new DateTime(
+              dateInterval.to.getFullYear(),
+              dateInterval.to.getMonth() + 1,
+              dateInterval.to.getDate(),
+              dateInterval.to.getHours(),
+              dateInterval.to.getMinutes(),
+              dateInterval.to.getSeconds(),
+              dateInterval.to.getMilliseconds() * 1000000,
+              dateInterval.to.getTimezoneOffset(),
+            )
           : null,
         fromPrice: priceInterval ? priceInterval.from : null,
         toPrice: priceInterval ? priceInterval.to : null,
