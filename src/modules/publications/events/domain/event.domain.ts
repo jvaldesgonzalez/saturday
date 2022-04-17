@@ -190,7 +190,7 @@ export class Event extends DomainEntity<EventProps> {
     this.changeDescription([
       ...this.description,
       {
-        header: 'Informacion de los tickets',
+        header: 'Información de los tickets',
         inline: false,
         body: newDescriptionFieldBody,
       },
