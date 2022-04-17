@@ -179,7 +179,12 @@ export class Event extends DomainEntity<EventProps> {
     );
 
     const newDescriptionFieldBody = tickets
-      .map((t) => `• ${t.name} (${t.price.toFixed(2)} CUP):\n${t.description}`)
+      .map(
+        (t) =>
+          `• ${t.name} (${
+            t.price == 0 ? `${t.price.toFixed(2)} CUP` : 'GRATIS'
+          }):\n${t.description}`,
+      )
       .join('\n\n');
 
     this.changeDescription([
