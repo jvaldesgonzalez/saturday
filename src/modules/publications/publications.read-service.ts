@@ -41,13 +41,16 @@ export class PublicationsReadService {
 						OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
 						OPTIONAL MATCH (me)-[rlike:LIKE]-(item)
 						OPTIONAL MATCH (u:User)-[:LIKE]->(item)
-						WITH item as e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me
+						OPTIONAL MATCH (u:User)-[rPrediction:LIKE_PREDICTION]->(item)
+
+						WITH item as e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,rPrediction
 						with distinct {
 							type:"event",
 							id:e.id,
 							name:e.name,
 							occurrences:[],
 							info:e.description,
+							likePrediction: CASE WHEN rPrediction IS NULL THEN 0 ELSE rPrediction.score END,
 							publisher:{
 								id:p.id,
 								avatar:p.avatar,
@@ -93,12 +96,14 @@ export class PublicationsReadService {
 						OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
 						OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
 						OPTIONAL MATCH (u:User)-[:LIKE]->(e)
-						WITH e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,item
+						OPTIONAL MATCH (u:User)-[rPrediction:LIKE_PREDICTION]->(e)
+						WITH e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,item,rPrediction
 						with distinct {
 							id:e.id,
 							name:e.name,
 							occurrences:[],
 							info:e.description,
+							likePrediction: CASE WHEN rPrediction IS NULL THEN 0 ELSE rPrediction.score END,
 							publisher:{
 								id:p.id,
 								avatar:p.avatar,
@@ -138,7 +143,8 @@ export class PublicationsReadService {
 							name:item.name,
 							description:item.description,
 							events:collect(events),
-							createdAt:item.createdAt
+							createdAt:item.createdAt,
+							likePrediction:apoc.coll.avg(collect(events.likePrediction))
 						} as result',
 					p:EmbeddedCollection,
 						'MATCH (item)--(cat:Category)--(e:Event)
@@ -151,12 +157,14 @@ export class PublicationsReadService {
 						OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
 						OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
 						OPTIONAL MATCH (u:User)-[:LIKE]->(e)
-						WITH e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,item
+						OPTIONAL MATCH (u:User)-[rPrediction:LIKE_PREDICTION]->(e)
+						WITH e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,item,rPrediction
 						with distinct {
 							id:e.id,
 							name:e.name,
 							occurrences:[],
 							info:e.description,
+							likePrediction: CASE WHEN rPrediction IS NULL THEN 0 ELSE rPrediction.score END,
 							publisher:{
 								id:p.id,
 								avatar:p.avatar,
@@ -197,13 +205,14 @@ export class PublicationsReadService {
 							description:item.description,
 							events:collect(events),
 							isMini:true,
+							likePrediction:apoc.coll.avg(collect(events.likePrediction))
 							createdAt:item.createdAt
 						} as result'
 				],
 				'return null as result',
 				{item:p,meId:$meId}) YIELD value
 				return value.result as r
-				ORDER BY r.createdAt DESC
+				ORDER BY r.likePrediction DESC
 			`,
         )
           .bind({
