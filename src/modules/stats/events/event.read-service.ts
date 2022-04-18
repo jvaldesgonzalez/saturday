@@ -33,15 +33,16 @@ export class EventsReadService implements IEventStats {
 					MATCH (e:Event)
 					WHERE e.id = $eId
 					OPTIONAL MATCH (e)-[:LIKE]-(uLike:User)
-					OPTIONAL MATCH (e)--(:ForwardedEvent)-[:FORWARD]-(uForward:User)
+					OPTIONAL MATCH (e)-[:EVENT_FORWARDED]-(f:ForwardedEvent)-[:FORWARD]-(uForward:User)
 					RETURN {
 							likes: collect(distinct uLike {
 								.gender,
 								age: duration.between(uLike.birthday,datetime()).years,
 								.username
 							}),
-							shared: collect(uForward {
+							shared: collect(distinct uForward {
 								.gender,
+								fKey:id(f),
 								age: duration.between(uForward.birthday,datetime()).years,
 								.username
 							})
@@ -185,7 +186,7 @@ export class EventsReadService implements IEventStats {
 				(place:Place)--(e)--(c:Category)
 				WHERE p.id = $pId
 				OPTIONAL MATCH (e)-[:LIKE]-(liked:User)
-				OPTIONAL MATCH (e)--(:ForwardedEvent)-[:FORWARD]-(forwarded:User)
+				OPTIONAL MATCH (e)--(r:ForwardedEvent)-[:FORWARD]-(forwarded:User)
 				RETURN e{
 					.id,
 					.name,
@@ -197,7 +198,7 @@ export class EventsReadService implements IEventStats {
 					stats:{
 						reached:NULL,
 						interested:count(distinct liked),
-						sharedTimes:count(distinct forwarded)
+						sharedTimes:count(distinct forwarded{.username,fKey:id(r)})
 					}
 				}
 					ORDER BY e.createdAt DESC

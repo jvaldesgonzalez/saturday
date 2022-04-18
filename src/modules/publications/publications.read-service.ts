@@ -41,7 +41,7 @@ export class PublicationsReadService {
 						OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
 						OPTIONAL MATCH (me)-[rlike:LIKE]-(item)
 						OPTIONAL MATCH (u:User)-[:LIKE]->(item)
-						OPTIONAL MATCH (u:User)-[rPrediction:LIKE_PREDICTION]->(item)
+						OPTIONAL MATCH (me:User)-[rPrediction:LIKE_PREDICTION]->(item)
 
 						WITH item as e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,rPrediction
 						with distinct {
@@ -96,7 +96,7 @@ export class PublicationsReadService {
 						OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
 						OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
 						OPTIONAL MATCH (u:User)-[:LIKE]->(e)
-						OPTIONAL MATCH (u:User)-[rPrediction:LIKE_PREDICTION]->(e)
+						OPTIONAL MATCH (me:User)-[rPrediction:LIKE_PREDICTION]->(e)
 						WITH e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,item,rPrediction
 						with distinct {
 							id:e.id,
@@ -157,7 +157,7 @@ export class PublicationsReadService {
 						OPTIONAL MATCH (me)-[rfollow:FOLLOW]->(p)
 						OPTIONAL MATCH (me)-[rlike:LIKE]-(e)
 						OPTIONAL MATCH (u:User)-[:LIKE]->(e)
-						OPTIONAL MATCH (u:User)-[rPrediction:LIKE_PREDICTION]->(e)
+						OPTIONAL MATCH (me:User)-[rPrediction:LIKE_PREDICTION]->(e)
 						WITH e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested, rlike,rfollow,me,item,rPrediction
 						with distinct {
 							id:e.id,

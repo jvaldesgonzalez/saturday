@@ -34,6 +34,22 @@ export namespace EventDetailsMapper {
           inRange.filter((i) => i.gender === Gender.Female).length,
           inRange.filter((i) => i.gender === Gender.Male).length,
           inRange.filter((i) => i.gender === Gender.PreferNotSay).length,
+          inRange.filter((i) => i.gender === Gender.Unknown).length,
+        ],
+      };
+    };
+
+    const buildDefaultEntry = (
+      chartLike: [{ gender: Gender; age: number }],
+    ) => {
+      const inRange = chartLike.filter((i) => !i.age);
+      return {
+        range: [0, 0] as [number, number],
+        values: [
+          inRange.filter((i) => i.gender === Gender.Female).length,
+          inRange.filter((i) => i.gender === Gender.Male).length,
+          inRange.filter((i) => i.gender === Gender.PreferNotSay).length,
+          inRange.filter((i) => i.gender === Gender.Unknown).length,
         ],
       };
     };
@@ -44,8 +60,14 @@ export namespace EventDetailsMapper {
       usersInterested: new ChartsBuilder()
         .makePieBar()
         .withName('Sexo y edad')
-        .withCategories(['Mujeres', 'Hombres', 'Non-Binary'])
+        .withCategories([
+          'Mujeres',
+          'Hombres',
+          'Prefiero No Decir',
+          'Desconocido',
+        ])
         .addEntries([
+          buildDefaultEntry(charts.likes),
           buildEntry([18, 20], charts.likes),
           buildEntry([20, 25], charts.likes),
           buildEntry([25, 30], charts.likes),
@@ -56,8 +78,14 @@ export namespace EventDetailsMapper {
       timesShared: new ChartsBuilder()
         .makePieBar()
         .withName('Sexo y edad')
-        .withCategories(['Mujeres', 'Hombres', 'Non-Binary'])
+        .withCategories([
+          'Mujeres',
+          'Hombres',
+          'Prefiero No Decir',
+          'Desconocido',
+        ])
         .addEntries([
+          buildDefaultEntry(charts.shared),
           buildEntry([18, 20], charts.shared),
           buildEntry([20, 25], charts.shared),
           buildEntry([25, 30], charts.shared),

@@ -57,7 +57,10 @@ export class PieBarChart {
       type: this.brand as string,
       values: this.values.map((val) => {
         return {
-          range: `${val.range[0]}-${val.range[1]}`,
+          range:
+            val.range[1] === 0
+              ? 'Desconocido'
+              : `${val.range[0]}-${val.range[1]}`,
           values: val.values.map((num, i) => {
             return {
               name: this.categories[i],
