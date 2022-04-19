@@ -17,7 +17,7 @@ export namespace EventOccurrenceDetailsMapper {
   ): EventWithOccurrenceDetailsReadEntity {
     const buildEntry = (
       ageRange: [number, number],
-      chartLike: [{ gender: Gender; age: number }],
+      chartLike: [{ gender: Gender; age: number }?],
     ) => {
       const inRange = chartLike.filter(
         (i) => i.age >= ageRange[0] && i.age < ageRange[1],
@@ -28,6 +28,22 @@ export namespace EventOccurrenceDetailsMapper {
           inRange.filter((i) => i.gender === Gender.Female).length,
           inRange.filter((i) => i.gender === Gender.Male).length,
           inRange.filter((i) => i.gender === Gender.PreferNotSay).length,
+          inRange.filter((i) => i.gender === Gender.Unknown).length,
+        ],
+      };
+    };
+
+    const buildDefaultEntry = (
+      chartLike: [{ gender: Gender; age: number }?],
+    ) => {
+      const inRange = chartLike.filter((i) => !i.age);
+      return {
+        range: [0, 0] as [number, number],
+        values: [
+          inRange.filter((i) => i.gender === Gender.Female).length,
+          inRange.filter((i) => i.gender === Gender.Male).length,
+          inRange.filter((i) => i.gender === Gender.PreferNotSay).length,
+          inRange.filter((i) => i.gender === Gender.Unknown).length,
         ],
       };
     };
@@ -72,27 +88,35 @@ export namespace EventOccurrenceDetailsMapper {
               new ChartsBuilder()
                 .makePieBar()
                 .withName('Sexo y edad')
-                .withCategories(['Mujeres', 'Hombres', 'Non-Binary'])
+                .withCategories([
+                  'Mujeres',
+                  'Hombres',
+                  'Prefiero No Decir',
+                  'Desconocido',
+                ])
                 .addEntries([
+                  buildDefaultEntry(
+                    charts.find((i) => i.id === o.id)?.reservations || [],
+                  ),
                   buildEntry(
                     [18, 20],
-                    charts.find((i) => i.id === o.id).reservations,
+                    charts.find((i) => i.id === o.id)?.reservations || [],
                   ),
                   buildEntry(
                     [20, 25],
-                    charts.find((i) => i.id === o.id).reservations,
+                    charts.find((i) => i.id === o.id)?.reservations || [],
                   ),
                   buildEntry(
                     [25, 30],
-                    charts.find((i) => i.id === o.id).reservations,
+                    charts.find((i) => i.id === o.id)?.reservations || [],
                   ),
                   buildEntry(
                     [30, 40],
-                    charts.find((i) => i.id === o.id).reservations,
+                    charts.find((i) => i.id === o.id)?.reservations || [],
                   ),
                   buildEntry(
                     [40, 60],
-                    charts.find((i) => i.id === o.id).reservations,
+                    charts.find((i) => i.id === o.id)?.reservations || [],
                   ),
                 ])
                 .build(),

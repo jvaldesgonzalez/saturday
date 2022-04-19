@@ -21,14 +21,14 @@ export class CorrectTagsForEvents {
   }
 
   private async cleanTags() {
-    this.logger.log('Cleaning...');
+    // this.logger.log('Cleaning...');
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(`
 			MATCH (t:AttentionTag)-[r]-(e:Event)
 			DELETE r
 			`),
     );
-    this.logger.log('Cleaned...');
+    // this.logger.log('Cleaned...');
     await Promise.all([
       this.correctBestSeller(),
       this.correctSoldOut(),
@@ -37,7 +37,7 @@ export class CorrectTagsForEvents {
   }
 
   private async correctBestSeller() {
-    this.logger.log('Correcting best seller...');
+    // this.logger.log('Correcting best seller...');
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(`
 				MATCH (e:Event)-[:HAS_OCCURRENCE]-(:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(r:Reservation)
@@ -55,7 +55,7 @@ export class CorrectTagsForEvents {
   }
 
   private async correctSoldOut() {
-    this.logger.log('Correcting sold out...');
+    // this.logger.log('Correcting sold out...');
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(`
 				MATCH (e:Event)-[:HAS_OCCURRENCE]-(:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)
@@ -70,7 +70,7 @@ export class CorrectTagsForEvents {
   }
 
   private async correctRunningOut() {
-    this.logger.log('Correcting running out...');
+    // this.logger.log('Correcting running out...');
     await this.persistenceManager.execute(
       QuerySpecification.withStatement(`
 				MATCH (e:Event)-[:HAS_OCCURRENCE]-(:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(r:Reservation)

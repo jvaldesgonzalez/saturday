@@ -83,7 +83,6 @@ export class EventsReadService implements IEventStats {
       )
         .bind({ eId: theEventId })
         .map((r) => {
-          console.log(r);
           return r;
         }),
     );
@@ -143,7 +142,7 @@ export class EventsReadService implements IEventStats {
 					(c:Category)--(e)-[:HAS_PLACE]->(p:Place),
 					(t:Ticket)--(o:EventOccurrence)--(e)
 				WHERE publisher.id = $pId AND e.id = $eId
-				WITH distinct e,c,p,collect(o.dateTimeInit) as occurrences, collect(t) as tickets
+				WITH distinct e,c,p,collect(distinct o.dateTimeInit) as occurrences, collect(t) as tickets
 				UNWIND tickets as t
 				OPTIONAL MATCH (t)--(r:Reservation)
 				WITH e,c,p,occurrences,collect(distinct t) as tickets,apoc.coll.sum(collect(r.amountOfTickets)) as reservationAmounts
