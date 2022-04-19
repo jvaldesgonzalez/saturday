@@ -4,6 +4,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { CollectionsController } from './collections/collections.controller';
 import { CollectionsReadService } from './collections/collections.read-service';
 import eventsUseCases from './events/application/usecases';
+import { UpdateEventsDateTimesCron } from './events/cron-jobs/update-date-init.cron';
 import {
   EventsController,
   PartnerEventsController,
@@ -26,6 +27,7 @@ import { PublicationsReadService } from './publications.read-service';
       provide: EventProviders.IEventRepository,
       useClass: EventRepository,
     },
+    UpdateEventsDateTimesCron,
   ],
   controllers: [
     EventsController,
