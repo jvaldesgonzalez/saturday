@@ -4,8 +4,10 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
-import { DateTime } from 'neo4j-driver-core';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  makeDate,
+  parseDate,
+} from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import {
   ISearchResult,
@@ -72,30 +74,8 @@ export class EventSearchService implements ISearchService<EventItem> {
       )
         .bind({
           categories,
-          fromDate: dateInterval
-            ? new DateTime(
-                dateInterval.from.getFullYear(),
-                dateInterval.from.getMonth() + 1,
-                dateInterval.from.getDate(),
-                dateInterval.from.getHours(),
-                dateInterval.from.getMinutes(),
-                dateInterval.from.getSeconds(),
-                dateInterval.from.getMilliseconds() * 1000000,
-                dateInterval.from.getTimezoneOffset(),
-              )
-            : null,
-          toDate: dateInterval
-            ? new DateTime(
-                dateInterval.to.getFullYear(),
-                dateInterval.to.getMonth() + 1,
-                dateInterval.to.getDate(),
-                dateInterval.to.getHours(),
-                dateInterval.to.getMinutes(),
-                dateInterval.to.getSeconds(),
-                dateInterval.to.getMilliseconds() * 1000000,
-                dateInterval.to.getTimezoneOffset(),
-              )
-            : null,
+          fromDate: dateInterval ? makeDate(dateInterval.from) : null,
+          toDate: dateInterval ? makeDate(dateInterval.to) : null,
           fromPrice: priceInterval ? priceInterval.from : null,
           toPrice: priceInterval ? priceInterval.to : null,
           locationId: locationId,
@@ -118,7 +98,7 @@ export class EventSearchService implements ISearchService<EventItem> {
 				WHERE node:Event
 				MATCH (l:Location)--(place:Place)--(node)-[:PUBLISH_EVENT]-(publisher:Partner),
 				(c:Category)--(node)--(occ:EventOccurrence)
-				WHERE node.dateTimeEnd >= datetime()
+				WHERE node.dateTimeEnd >= $now
 				${
           dateInterval
             ? 'AND size([(node)--(occ:EventOccurrence) WHERE ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate ) OR ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate )| occ]) > 0 '
@@ -134,33 +114,12 @@ export class EventSearchService implements ISearchService<EventItem> {
 				`,
       ).bind({
         categories,
-        fromDate: dateInterval
-          ? new DateTime(
-              dateInterval.from.getFullYear(),
-              dateInterval.from.getMonth() + 1,
-              dateInterval.from.getDate(),
-              dateInterval.from.getHours(),
-              dateInterval.from.getMinutes(),
-              dateInterval.from.getSeconds(),
-              dateInterval.from.getMilliseconds() * 1000000,
-              dateInterval.from.getTimezoneOffset(),
-            )
-          : null,
-        toDate: dateInterval
-          ? new DateTime(
-              dateInterval.to.getFullYear(),
-              dateInterval.to.getMonth() + 1,
-              dateInterval.to.getDate(),
-              dateInterval.to.getHours(),
-              dateInterval.to.getMinutes(),
-              dateInterval.to.getSeconds(),
-              dateInterval.to.getMilliseconds() * 1000000,
-              dateInterval.to.getTimezoneOffset(),
-            )
-          : null,
+        fromDate: dateInterval ? makeDate(dateInterval.from) : null,
+        toDate: dateInterval ? makeDate(dateInterval.to) : null,
         fromPrice: priceInterval ? priceInterval.from : null,
         toPrice: priceInterval ? priceInterval.to : null,
         locationId: locationId,
+        now: makeDate(new Date()),
       }),
     );
     return {
@@ -187,7 +146,7 @@ export class EventSearchService implements ISearchService<EventItem> {
         `
 				MATCH (l:Location)--(place:Place)--(node:Event)-[:PUBLISH_EVENT]-(publisher:Partner),
 				(c:Category)--(node)
-				WHERE node.dateTimeEnd >= datetime()
+				WHERE node.dateTimeEnd >= $now
 				${
           dateInterval
             ? 'AND size([(node)--(occ:EventOccurrence) WHERE ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate ) OR ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate )| occ]) > 0 '
@@ -217,33 +176,12 @@ export class EventSearchService implements ISearchService<EventItem> {
       )
         .bind({
           categories,
-          fromDate: dateInterval
-            ? new DateTime(
-                dateInterval.from.getFullYear(),
-                dateInterval.from.getMonth() + 1,
-                dateInterval.from.getDate(),
-                dateInterval.from.getHours(),
-                dateInterval.from.getMinutes(),
-                dateInterval.from.getSeconds(),
-                dateInterval.from.getMilliseconds() * 1000000,
-                dateInterval.from.getTimezoneOffset(),
-              )
-            : null,
-          toDate: dateInterval
-            ? new DateTime(
-                dateInterval.to.getFullYear(),
-                dateInterval.to.getMonth() + 1,
-                dateInterval.to.getDate(),
-                dateInterval.to.getHours(),
-                dateInterval.to.getMinutes(),
-                dateInterval.to.getSeconds(),
-                dateInterval.to.getMilliseconds() * 1000000,
-                dateInterval.to.getTimezoneOffset(),
-              )
-            : null,
+          fromDate: dateInterval ? makeDate(dateInterval.from) : null,
+          toDate: dateInterval ? makeDate(dateInterval.to) : null,
           fromPrice: priceInterval ? priceInterval.from : null,
           toPrice: priceInterval ? priceInterval.to : null,
           locationId: locationId,
+          now: makeDate(new Date()),
         })
         .skip(skip)
         .limit(limit)
@@ -259,7 +197,7 @@ export class EventSearchService implements ISearchService<EventItem> {
         `
 				MATCH (l:Location)--(place:Place)--(node:Event)-[:PUBLISH_EVENT]-(publisher:Partner),
 				(c:Category)--(node)
-				WHERE node.dateTimeEnd >= datetime()
+				WHERE node.dateTimeEnd >= $now
 				${
           dateInterval
             ? 'AND size([(node)--(occ:EventOccurrence) WHERE ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate ) OR ( occ.dateTimeInit >= $fromDate AND occ.dateTimeInit <= $toDate )| occ]) > 0 '
@@ -275,33 +213,12 @@ export class EventSearchService implements ISearchService<EventItem> {
 				`,
       ).bind({
         categories,
-        fromDate: dateInterval
-          ? new DateTime(
-              dateInterval.from.getFullYear(),
-              dateInterval.from.getMonth() + 1,
-              dateInterval.from.getDate(),
-              dateInterval.from.getHours(),
-              dateInterval.from.getMinutes(),
-              dateInterval.from.getSeconds(),
-              dateInterval.from.getMilliseconds() * 1000000,
-              dateInterval.from.getTimezoneOffset(),
-            )
-          : null,
-        toDate: dateInterval
-          ? new DateTime(
-              dateInterval.to.getFullYear(),
-              dateInterval.to.getMonth() + 1,
-              dateInterval.to.getDate(),
-              dateInterval.to.getHours(),
-              dateInterval.to.getMinutes(),
-              dateInterval.to.getSeconds(),
-              dateInterval.to.getMilliseconds() * 1000000,
-              dateInterval.to.getTimezoneOffset(),
-            )
-          : null,
+        fromDate: dateInterval ? makeDate(dateInterval.from) : null,
+        toDate: dateInterval ? makeDate(dateInterval.to) : null,
         fromPrice: priceInterval ? priceInterval.from : null,
         toPrice: priceInterval ? priceInterval.to : null,
         locationId: locationId,
+        now: makeDate(new Date()),
       }),
     );
     return {

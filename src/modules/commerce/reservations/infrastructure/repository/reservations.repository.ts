@@ -6,6 +6,7 @@ import {
 } from '@liberation-data/drivine';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
+import { makeDate } from 'src/shared/modules/data-access/neo4j/utils';
 import {
   BuyerMetadata,
   IReservationsRepository,
@@ -93,10 +94,14 @@ export class ReservationsRepository
       QuerySpecification.withStatement(
         `
 				MATCH (u:User)--(r:Reservation)
-				WHERE u.id = $uId AND r.createdAt > datetime() - duration({hours:$hours})
+				WHERE u.id = $uId AND r.createdAt > $now - duration({hours:$hours})
 				RETURN count(r)
 					`,
-      ).bind({ uId: theUser.toString(), hours: timeInHours }),
+      ).bind({
+        now: makeDate(new Date()),
+        uId: theUser.toString(),
+        hours: timeInHours,
+      }),
     );
   }
 

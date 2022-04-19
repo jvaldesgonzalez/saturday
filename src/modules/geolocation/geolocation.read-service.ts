@@ -4,7 +4,7 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
-import { DateTime } from 'neo4j-driver-core';
+import { makeDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { MapLocation } from 'src/shared/typedefs/map-location';
 import { EventWithPlaceEntity } from './entities/place-with-event.entity';
 import { EventWithPlaceMapper } from './mappers/event-with-place.mapper';
@@ -29,7 +29,7 @@ export class GeolocationReadService {
 				WITH point({latitude:$latitude, longitude:$longitude}) as center
 				MATCH (publisher:Partner)-[:PUBLISH_EVENT]-(e:Event)--(place:Place),
 				(c:Category)--(e:Event)
-				WHERE e.dateTimeEnd >= datetime()
+				WHERE e.dateTimeEnd >= $now
 				${
           dateInterval
             ? 'AND e.dateTimeInit >= $fromDate AND e.dateTimeEnd <= $toDate'
@@ -65,15 +65,12 @@ export class GeolocationReadService {
           latitude: location.latitude,
           longitude: location.longitude,
           radius,
-          fromDate: dateInterval
-            ? DateTime.fromStandardDate(dateInterval.from)
-            : null,
-          toDate: dateInterval
-            ? DateTime.fromStandardDate(dateInterval.to)
-            : null,
+          fromDate: dateInterval ? makeDate(dateInterval.from) : null,
+          toDate: dateInterval ? makeDate(dateInterval.to) : null,
           fromPrice: priceInterval ? priceInterval.from : null,
           toPrice: priceInterval ? priceInterval.to : null,
           categories,
+          now: makeDate(new Date()),
         })
         .map(EventWithPlaceMapper.toDto),
     );

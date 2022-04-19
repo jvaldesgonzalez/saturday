@@ -5,6 +5,7 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import { makeDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { ISocialGraphService } from '../../common/social-graph.service.interface';
 import { ViewStoryInteraction } from './view-story.interaction';
 
@@ -25,8 +26,12 @@ export class ViewStoryService
         `MATCH (u:User),(s:Story)
 				WHERE u.id = $uId AND s.id = $sId
 				MERGE (u)-[r:VIEW]->(s)
-				SET r.createdAt = datetime()`,
-      ).bind({ uId: from.toString(), sId: interaction.to.toString() }),
+				SET r.createdAt = $now`,
+      ).bind({
+        uId: from.toString(),
+        sId: interaction.to.toString(),
+        now: makeDate(new Date()),
+      }),
     );
   }
 

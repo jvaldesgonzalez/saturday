@@ -7,7 +7,10 @@ import { Injectable } from '@nestjs/common';
 import { Integer } from 'neo4j-driver-core';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  makeDate,
+  parseDate,
+} from 'src/shared/modules/data-access/neo4j/utils';
 import { SocialGraphNode } from '../../common/social-graph-node.entity';
 import { ISocialGraphService } from '../../common/social-graph.service.interface';
 import {
@@ -87,8 +90,12 @@ export class FriendRequestService
         `MATCH (u:User),(f:User)
 				WHERE u.id = $uId AND f.id = $fId
 				MERGE (u)-[r:FRIEND_REQUEST]->(f)
-				SET r.createdAt = datetime()`,
-      ).bind({ uId: from.toString(), fId: interaction.to.toString() }),
+				SET r.createdAt = $now`,
+      ).bind({
+        uId: from.toString(),
+        fId: interaction.to.toString(),
+        now: makeDate(new Date()),
+      }),
     );
   }
 

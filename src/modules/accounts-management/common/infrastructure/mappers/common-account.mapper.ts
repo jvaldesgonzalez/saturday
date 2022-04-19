@@ -1,15 +1,13 @@
-import { types } from 'neo4j-driver';
+import { makeDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { CommonAccount } from '../../domain/common-account.domain';
 import { CommonAccountEntity } from '../entities/common-account.entity';
-
-const { DateTime } = types;
 
 export namespace CommonAccountMappers {
   export function toPersistence(domain: CommonAccount): CommonAccountEntity {
     return {
       id: domain._id.toString(),
-      createdAt: DateTime.fromStandardDate(domain.createdAt),
-      updatedAt: DateTime.fromStandardDate(domain.updatedAt),
+      createdAt: makeDate(domain.createdAt),
+      updatedAt: makeDate(domain.updatedAt),
       username: domain.username,
       email: domain.email,
       firebasePushId: domain.firebasePushId,

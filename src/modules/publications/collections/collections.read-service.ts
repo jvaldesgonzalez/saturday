@@ -4,7 +4,10 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  makeDate,
+  parseDate,
+} from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import { EventDetails } from '../events/presentation/event-details';
 import { CollectionDetails } from './presentation/collection-details';
@@ -24,7 +27,7 @@ export class CollectionsReadService {
 				(pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
 				(e)-[:HAS_CATEGORY]->(cat:Category),
 				(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-				WHERE col.id = $cId AND e.dateTimeEnd > datetime()
+				WHERE col.id = $cId AND e.dateTimeEnd > $now
 				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag),
 				(e)<-[:COLLABORATOR]-(c:Partner)
 				WITH {
@@ -66,7 +69,7 @@ export class CollectionsReadService {
 				}
 				`,
         )
-          .bind({ cId: collectionId })
+          .bind({ cId: collectionId, now: makeDate(new Date()) })
           .map((r) => {
             return {
               ...r,

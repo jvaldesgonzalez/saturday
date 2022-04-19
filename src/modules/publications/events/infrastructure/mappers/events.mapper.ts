@@ -1,6 +1,8 @@
-import { DateTime } from 'neo4j-driver-core';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  makeDate,
+  parseDate,
+} from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import { Event } from '../../domain/event.domain';
 import { EventDescription } from '../../domain/value-objects/event-description.value';
@@ -10,10 +12,10 @@ import { EventOccurrenceMapper } from './event-occurrence.mapper';
 export namespace EventMapper {
   export function toPersistence(d: Event): EventEntity {
     return {
-      dateTimeInit: DateTime.fromStandardDate(d.dateTimeInit),
-      dateTimeEnd: DateTime.fromStandardDate(d.dateTimeEnd),
-      createdAt: DateTime.fromStandardDate(d.createdAt),
-      updatedAt: DateTime.fromStandardDate(d.updatedAt),
+      dateTimeInit: makeDate(d.dateTimeInit),
+      dateTimeEnd: makeDate(d.dateTimeEnd),
+      createdAt: makeDate(d.createdAt),
+      updatedAt: makeDate(d.updatedAt),
       publisher: d.publisher.toString(),
       description: JSON.stringify(d.description),
       multimedia: JSON.stringify(d.multimedia),

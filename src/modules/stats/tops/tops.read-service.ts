@@ -5,6 +5,7 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
+import { makeDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { EventReadEntity } from './entities/event.entity';
 import { ITopsService } from './interfaces/tops.read-service.interface';
 import { TopsEventMapper } from './mappers/event.mapper';
@@ -25,7 +26,7 @@ export class TopsReadService implements ITopsService {
 					MATCH (publisher:Partner)-[:PUBLISH_EVENT]-(e:Event)-[:HAS_PLACE]-(place:Place),
 					(e)-[:HAS_OCCURRENCE]-(o:EventOccurrence)-[:HAS_TICKET]-(t:Ticket),
 					(e)-[:HAS_CATEGORY]->(cat:Category)
-					WHERE e.dateTimeEnd > datetime()
+					WHERE e.dateTimeEnd > $now
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 					WITH o{.id, .dateTimeInit, .dateTimeEnd, tickets:collect(distinct t{.id, .price, .name, .amount, .description})} as occ,
 						e,
@@ -50,6 +51,7 @@ export class TopsReadService implements ITopsService {
 					ORDER BY event.basePrice
 				`,
         )
+          .bind({ now: makeDate(new Date()) })
           .skip(skip)
           .limit(limit)
           .map(TopsEventMapper.toDto)
@@ -83,7 +85,7 @@ export class TopsReadService implements ITopsService {
 					MATCH (publisher:Partner)-[:PUBLISH_EVENT]-(e:Event)-[:HAS_PLACE]-(place:Place),
 					(e)-[:HAS_OCCURRENCE]-(o:EventOccurrence)-[:HAS_TICKET]-(t:Ticket)--(p:Reservation),
 					(e)-[:HAS_CATEGORY]->(cat:Category)
-					WHERE e.dateTimeEnd > datetime()
+					WHERE e.dateTimeEnd > $now
 					OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 					WITH place{.name, .latitude, .longitude, .address} as place,
 						publisher{.id, .avatar, .username} as publisher,
@@ -109,6 +111,7 @@ export class TopsReadService implements ITopsService {
 					ORDER BY events.purchases DESC
 				`,
         )
+          .bind({ now: makeDate(new Date()) })
           .skip(skip)
           .limit(limit)
           .map(TopsEventMapper.toDto)

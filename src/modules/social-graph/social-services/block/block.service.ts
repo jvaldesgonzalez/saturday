@@ -5,6 +5,7 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
+import { makeDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { ISocialGraphService } from '../../common/social-graph.service.interface';
 import { BlockInteraction } from './block.interaction';
 
@@ -24,8 +25,12 @@ export class BlockService
       QuerySpecification.withStatement(
         `MATCH (u:User),(o:User)
 				WHERE u.id = $uId AND o.id = $oId
-				MERGE (u)-[:BLOCK {createdAt: datetime()}]->(o)`,
-      ).bind({ uId: from.toString(), oId: interaction.to.toString() }),
+				MERGE (u)-[:BLOCK {createdAt: $now}]->(o)`,
+      ).bind({
+        uId: from.toString(),
+        oId: interaction.to.toString(),
+        now: makeDate(new Date()),
+      }),
     );
   }
 

@@ -1,6 +1,8 @@
-import { DateTime } from 'neo4j-driver-core';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  makeDate,
+  parseDate,
+} from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import {
   BaseNotification,
@@ -16,8 +18,8 @@ export namespace NotificationsMapper {
   export function toPersistence(d: BaseNotification): NotificationEntity {
     const entityWithNuls: NotificationEntity = {
       recipientId: d.recipientId.map((r) => r.toString()),
-      createdAt: DateTime.fromStandardDate(d.createdAt),
-      updatedAt: DateTime.fromStandardDate(d.updatedAt),
+      createdAt: makeDate(d.createdAt),
+      updatedAt: makeDate(d.updatedAt),
       id: d._id.toString(),
       type: d.type,
       viewed: d.viewed,

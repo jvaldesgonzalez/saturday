@@ -1,7 +1,9 @@
-import { DateTime } from 'neo4j-driver-core';
 import { Multimedia } from 'src/shared/domain/multimedia.value';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  makeDate,
+  parseDate,
+} from 'src/shared/modules/data-access/neo4j/utils';
 import { Story } from '../../domain/story.domain';
 import { StoryEntity } from '../entities/story.entity';
 
@@ -27,8 +29,8 @@ export class StoryMapper {
       type: s.multimedia.type,
       url: s.multimedia.url,
       attachedText: s.attachedText,
-      createdAt: DateTime.fromStandardDate(s.createdAt),
-      updatedAt: DateTime.fromStandardDate(s.updatedAt),
+      createdAt: makeDate(s.createdAt),
+      updatedAt: makeDate(s.updatedAt),
     };
   }
 }

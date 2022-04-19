@@ -1,13 +1,13 @@
-import { types } from 'neo4j-driver';
 import { CommonAccountMappers } from 'src/modules/accounts-management/common/infrastructure/mappers/common-account.mapper';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  makeDate,
+  parseDate,
+} from 'src/shared/modules/data-access/neo4j/utils';
 import { User } from '../../domain/user.domain';
 import { AuthProvider } from '../../domain/value-objects/auth-provider.value';
 import { Gender } from '../../domain/value-objects/gender.value';
 import { UserEntity } from '../entities/user.entity';
-
-const { DateTime } = types;
 
 export namespace UserMappers {
   export function toPersistence(domain: User): UserEntity {
@@ -17,9 +17,7 @@ export namespace UserMappers {
       ...common,
       fullname: domain.fullname,
       description: domain.description,
-      birthday: domain.birthday
-        ? DateTime.fromStandardDate(domain.birthday)
-        : null,
+      birthday: domain.birthday ? makeDate(domain.birthday) : null,
       gender: domain.gender ? domain.gender : null,
       categoryPreferences: domain.categoryPreferences.map((p) => p.toString()),
       locationId: domain.locationId.toString(),

@@ -6,6 +6,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Gender } from 'src/modules/accounts-management/users/domain/value-objects/gender.value';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
+import { makeDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { EventDetailsReadEntity } from './entities/event-details.entity';
 import { EventListItemReadEntity } from './entities/event-list-item.entity';
 import { EventWithOccurrenceDetailsReadEntity } from './entities/event-occurrence-details.entity';
@@ -37,19 +38,19 @@ export class EventsReadService implements IEventStats {
 					RETURN {
 							likes: collect(distinct uLike {
 								.gender,
-								age: duration.between(uLike.birthday,datetime()).years,
+								age: duration.between(uLike.birthday,$now).years,
 								.username
 							}),
 							shared: collect(distinct uForward {
 								.gender,
 								fKey:id(f),
-								age: duration.between(uForward.birthday,datetime()).years,
+								age: duration.between(uForward.birthday,$now).years,
 								.username
 							})
 					}
 			`,
       )
-        .bind({ eId: theEventId })
+        .bind({ eId: theEventId, now: makeDate(new Date()) })
         .map((r) => {
           return r;
         }),
@@ -75,13 +76,13 @@ export class EventsReadService implements IEventStats {
 						reservations: collect( u
 							{
 								.username,
-								age: duration.between(u.birthday,datetime()).years,
+								age: duration.between(u.birthday,$now).years,
 								.gender
 							})
 					}
 			`,
       )
-        .bind({ eId: theEventId })
+        .bind({ eId: theEventId, now: makeDate(new Date()) })
         .map((r) => {
           return r;
         }),

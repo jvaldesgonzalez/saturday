@@ -1,4 +1,4 @@
-import { DateTime } from 'neo4j-driver';
+import { DateTime } from 'neo4j-driver-core';
 
 export const parseDate = (neo4jDateTime: DateTime<number>): Date => {
   const { year, month, day, hour, minute, second, nanosecond } = neo4jDateTime;
@@ -13,4 +13,17 @@ export const parseDate = (neo4jDateTime: DateTime<number>): Date => {
   );
 
   return date;
+};
+
+export const makeDate = (jsDate: Date): DateTime<number> => {
+  return new DateTime(
+    jsDate.getFullYear(),
+    jsDate.getMonth() + 1,
+    jsDate.getDate(),
+    jsDate.getHours(),
+    jsDate.getMinutes(),
+    jsDate.getSeconds(),
+    jsDate.getMilliseconds() * 1000000,
+    jsDate.getTimezoneOffset(),
+  );
 };

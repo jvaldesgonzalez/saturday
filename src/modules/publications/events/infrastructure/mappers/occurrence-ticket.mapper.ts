@@ -1,6 +1,8 @@
-import { DateTime } from 'neo4j-driver-core';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  makeDate,
+  parseDate,
+} from 'src/shared/modules/data-access/neo4j/utils';
 import { OccurrenceTicket } from '../../domain/occurrence-ticket.domain';
 import { OccurrenceTicketEntity } from '../entities/event-occurrence.entity';
 
@@ -9,8 +11,8 @@ export namespace OccurrenceTicketMapper {
     return {
       name: d.name,
       id: d._id.toString(),
-      createdAt: DateTime.fromStandardDate(d.createdAt),
-      updatedAt: DateTime.fromStandardDate(d.updatedAt),
+      createdAt: makeDate(d.createdAt),
+      updatedAt: makeDate(d.updatedAt),
       amount: d.amount,
       description: d.description,
       price: d.price,

@@ -6,7 +6,10 @@ import {
 import { Injectable } from '@nestjs/common';
 import { DateTime, Integer } from 'neo4j-driver-core';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  makeDate,
+  parseDate,
+} from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import { EventDetails } from './presentation/event-details';
 import { EventDetailsReadMapper } from './read-model/mappers/event-details.read-mapper';
@@ -29,7 +32,7 @@ export class EventsReadService {
 				(e)-[:HAS_CATEGORY]->(cat:Category)
 				WHERE e.id = $eId
 				OPTIONAL MATCH (e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
-				WHERE o.dateTimeEnd > datetime()
+				WHERE o.dateTimeEnd > $now
 				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 				OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
 				MATCH (me:User)
@@ -83,7 +86,7 @@ export class EventsReadService {
 				return apoc.map.merge(eventInfo, {friends:collect( distinct f{.username, .avatar})})
 				`,
         )
-          .bind({ eId: eventId, meId: userId })
+          .bind({ eId: eventId, meId: userId, now: makeDate(new Date()) })
           .map(EventDetailsReadMapper.toResponse)
           .transform(EventDetails),
       )) ?? null

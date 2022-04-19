@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { EventDetails } from './events/presentation/event-details';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { EventDetailsReadMapper } from './events/read-model/mappers/event-details.read-mapper';
+import { makeDate } from 'src/shared/modules/data-access/neo4j/utils';
 
 @Injectable()
 export class PublicationsReadService {
@@ -24,11 +25,11 @@ export class PublicationsReadService {
         QuerySpecification.withStatement(
           `
 				MATCH (p:Publication)
-				WHERE (p:Event AND p.dateTimeEnd > datetime())
+				WHERE (p:Event AND p.dateTimeEnd > $now)
 				OR (p:Collection 
-					AND size([(p)--(e:Event) WHERE e.dateTimeEnd > datetime()|e ]) > 2
+					AND size([(p)--(e:Event) WHERE e.dateTimeEnd > $now|e ]) > 2
 					)
-				OR (size([(:User {id:$meId})-[:PREFER_CATEGORY]->(c:Category)-[:HAS_EMBEDDED_COLLECTION]->(p)-[:PREFER_CATEGORY]-(c)-[:HAS_CATEGORY]-(e:Event) WHERE e.dateTimeEnd > datetime() | e]) > 2
+				OR (size([(:User {id:$meId})-[:PREFER_CATEGORY]->(c:Category)-[:HAS_EMBEDDED_COLLECTION]->(p)-[:PREFER_CATEGORY]-(c)-[:HAS_CATEGORY]-(e:Event) WHERE e.dateTimeEnd > $now | e]) > 2
 					)
 				CALL apoc.case([
 					p:Event,
@@ -149,7 +150,7 @@ export class PublicationsReadService {
 					p:EmbeddedCollection,
 						'MATCH (item)--(cat:Category)--(e:Event)
 						,(pl:Place)<-[:HAS_PLACE]-(e)<-[:PUBLISH_EVENT]-(p:Partner)
-						WHERE e.dateTimeEnd > datetime()
+						WHERE e.dateTimeEnd > $now
 						OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
 						OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
 						MATCH (me:User)
@@ -217,6 +218,7 @@ export class PublicationsReadService {
         )
           .bind({
             meId: userId,
+            now: makeDate(new Date()),
           })
           .skip(skip)
           .limit(limit)
@@ -235,17 +237,17 @@ export class PublicationsReadService {
         QuerySpecification.withStatement(
           `
 					MATCH (p:Publication)
-					WHERE (p:Event AND p.dateTimeEnd > datetime())
-					OR (p:Collection AND apoc.coll.max( [ (p)--(e:Event) | e.dateTimeEnd ] )> datetime() AND size( [ (p)--(e:Event) | e ] ) > 2)
+					WHERE (p:Event AND p.dateTimeEnd > $now)
+					OR (p:Collection AND apoc.coll.max( [ (p)--(e:Event) | e.dateTimeEnd ] )> $now AND size( [ (p)--(e:Event) | e ] ) > 2)
 					OR (
 						p:EmbeddedCollection 
 						AND (:User {id:$meId})-[:PREFER_CATEGORY]->(:Category)-[:HAS_EMBEDDED_COLLECTION]->(p)
-						AND (apoc.coll.max( [ (p)--(:Category)--(e:Event) | e.dateTimeEnd ] ) > datetime()) 
-						AND (size( [ (p)--(:Category)--(e:Event) WHERE e.dateTimeEnd > datetime() | e ] ) > 2)
+						AND (apoc.coll.max( [ (p)--(:Category)--(e:Event) | e.dateTimeEnd ] ) > $now) 
+						AND (size( [ (p)--(:Category)--(e:Event) WHERE e.dateTimeEnd > $now | e ] ) > 2)
 					)
 					RETURN count(p)
 					`,
-        ).bind({ meId: userId }),
+        ).bind({ meId: userId, now: makeDate(new Date()) }),
       ),
     ]);
     return {

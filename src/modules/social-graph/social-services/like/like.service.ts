@@ -8,7 +8,10 @@ import { Integer } from 'neo4j-driver-core';
 import { EventDetails } from 'src/modules/publications/events/presentation/event-details';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  makeDate,
+  parseDate,
+} from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import { ISocialGraphService } from '../../common/social-graph.service.interface';
 import { UserInteractor } from '../../common/user.interactor';
@@ -314,8 +317,12 @@ export class LikeService
         `MATCH (u:User),(e:Event)
 				WHERE u.id = $uId AND e.id = $eId
 				MERGE (u)-[r:LIKE]->(e)
-				SET r.createdAt = datetime()`,
-      ).bind({ uId: from.toString(), eId: interaction.to.toString() }),
+				SET r.createdAt = $now`,
+      ).bind({
+        uId: from.toString(),
+        eId: interaction.to.toString(),
+        now: makeDate(new Date()),
+      }),
     );
   }
 

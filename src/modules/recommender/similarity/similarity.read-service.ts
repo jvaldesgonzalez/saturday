@@ -6,7 +6,10 @@ import {
 import { Injectable } from '@nestjs/common';
 import { EventDetails } from 'src/modules/publications/events/presentation/event-details';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
-import { parseDate } from 'src/shared/modules/data-access/neo4j/utils';
+import {
+  makeDate,
+  parseDate,
+} from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import { SimilarAccount } from './entities/account.entity';
 
@@ -115,7 +118,7 @@ export class SimilarityReadService {
         QuerySpecification.withStatement(
           `
 					MATCH (e:Event)-[HAS_CATEGORY]->(c:Category)<-[:HAS_CATEGORY]-(similar:Event),(similar)-[:LIKE]-(whoLike:User)-[:LIKE]-(e)
-					WHERE e.id = $eventId AND e.dateTimeEnd > datetime()
+					WHERE e.id = $eventId AND e.dateTimeEnd > $now
 					WITH similar as e,count(whoLike) as commonLikes
 					ORDER BY commonLikes
 
@@ -170,6 +173,7 @@ export class SimilarityReadService {
           .bind({
             eventId,
             meId,
+            now: makeDate(new Date()),
           })
           .skip(skip)
           .limit(limit)
