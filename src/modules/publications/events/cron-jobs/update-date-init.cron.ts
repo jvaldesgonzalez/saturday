@@ -24,8 +24,8 @@ export class UpdateEventsDateTimesCron {
         `
 			MATCH (e:Event)
 			WHERE e.dateTimeEnd > $now
-			WITH head(apoc.coll.sort([(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence) WHERE o.dateTimeInit > $now|o.dateTimeInit])) as newDateTimeInit,e
-			SET e.dateTimeInit = newDateTimeInit
+			WITH head(apoc.coll.sort([(e)-[:HAS_OCCURRENCE]->(o:EventOccurrence) WHERE o.dateTimeInit > $now |o.dateTimeInit])) as newDateTimeInit,e
+			SET e.dateTimeInit = CASE WHEN newDateTimeInit IS NULL THEN e.dateTimeInit ELSE newDateTimeInit END
 			`,
       ).bind({ now: makeDate(new Date()) }),
     );
