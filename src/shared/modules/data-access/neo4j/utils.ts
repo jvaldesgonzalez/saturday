@@ -1,10 +1,26 @@
-import { DateTime } from 'neo4j-driver-core';
+import { LocalDateTime, DateTime } from 'neo4j-driver-core';
+import { DateTime as lxDate } from 'luxon';
 
-export const parseDate = (neo4jDateTime: DateTime<number>): Date => {
+// export const parseDate = (neo4jDateTime: DateTime<number>): Date => {
+//   const { year, month, day, hour, minute, second, nanosecond } = neo4jDateTime;
+//   const date = new Date(
+//     year,
+//     month - 1, // neo4j dates start at 1, js dates start at 0
+//     day,
+//     hour,
+//     minute,
+//     second,
+//     nanosecond / 1000000, // js dates use milliseconds
+//   );
+
+//   return date;
+// };
+
+export const parseDate = (neo4jDateTime: LocalDateTime<number>): Date => {
   const { year, month, day, hour, minute, second, nanosecond } = neo4jDateTime;
-  const date = new Date(
+  const date = lxDate.utc(
     year,
-    month - 1, // neo4j dates start at 1, js dates start at 0
+    month, // neo4j dates start at 1, js dates start at 0
     day,
     hour,
     minute,
@@ -12,7 +28,7 @@ export const parseDate = (neo4jDateTime: DateTime<number>): Date => {
     nanosecond / 1000000, // js dates use milliseconds
   );
 
-  return date;
+  return date.toJSDate();
 };
 
 export const makeDate = (jsDate: Date): DateTime<number> => {

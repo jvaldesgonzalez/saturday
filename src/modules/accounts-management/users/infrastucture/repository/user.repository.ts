@@ -4,7 +4,6 @@ import {
   QuerySpecification,
   Transactional,
 } from '@liberation-data/drivine';
-import { Query } from '@nestjs/common';
 import {
   JWTClaim,
   RefreshToken,

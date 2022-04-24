@@ -5,6 +5,7 @@ import {
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
+import { makeDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { ReservationReadResponse } from './presentation/reservation-read';
 import { ReservationReadMapper } from './read-model/mappers/reservations.read-mapper';
 
@@ -62,11 +63,12 @@ export class ReservationsReadService {
 						name:e.name
 					}
 				} AS reservation
-				ORDER BY reservation.isValidated, reservation.createdAt DESC
+				ORDER BY (reservation.isValidated OR reservation.event.dateTimeInit > $now), reservation.createdAt DESC
 			`,
         )
           .bind({
             uId: userId,
+            now: makeDate(new Date()),
           })
           .skip(skip)
           .limit(limit)
