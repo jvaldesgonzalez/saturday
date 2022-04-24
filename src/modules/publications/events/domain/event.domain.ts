@@ -182,7 +182,7 @@ export class Event extends DomainEntity<EventProps> {
       .map(
         (t) =>
           `• ${t.name} (${
-            t.price == 0 ? `${t.price.toFixed(2)} CUP` : 'GRATIS'
+            t.price == 0 ? 'GRATIS' : `${t.price.toFixed(2)} CUP`
           }):\n${t.description}`,
       )
       .join('\n\n');
