@@ -145,7 +145,6 @@ export class PartnerRepository
       QuerySpecification.withStatement(
         `MATCH (p:Partner),(l:Location)
 				WHERE p.id = $uId
-				AND l.id = $lId
 				MERGE (p)-[:HAS_PLACE]->(place:Place)-[:IN_LOCATION]->(l)
 				SET place += $placeData`,
       ).bind({ uId: thePartnerId.toString(), placeData, lId: locationId }),
