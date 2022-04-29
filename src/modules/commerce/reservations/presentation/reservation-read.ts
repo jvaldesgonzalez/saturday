@@ -83,4 +83,6 @@ export class ReservationReadResponse {
   toPay: number;
   @ApiResponseProperty()
   isValidated: boolean;
+  @ApiResponseProperty()
+  isCancelled: boolean;
 }

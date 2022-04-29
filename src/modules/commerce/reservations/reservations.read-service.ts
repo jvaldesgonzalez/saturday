@@ -37,6 +37,7 @@ export class ReservationsReadService {
 					},
 					userId:u.id,
 					id:p.id,
+					isCancelled:p.cancelled,
 					amountOfTickets:p.amountOfTickets,
 					couponApplied:coupon{.code},
 					toPay:p.amountOfTickets * p.ticketPrice,
@@ -63,7 +64,7 @@ export class ReservationsReadService {
 						name:e.name
 					}
 				} AS reservation
-				ORDER BY (reservation.isValidated OR reservation.event.dateTimeInit > $now), reservation.createdAt DESC
+				ORDER BY (reservation.isValidated OR reservation.event.dateTimeInit < $now), reservation.createdAt DESC
 			`,
         )
           .bind({
@@ -113,6 +114,7 @@ export class ReservationsReadService {
 					},
 					userId:u.id,
 					id:p.id,
+					isCancelled:p.cancelled,
 					amountOfTickets:p.amountOfTickets,
 					couponApplied:coupon{.code},
 					toPay:p.amountOfTickets * p.ticketPrice,

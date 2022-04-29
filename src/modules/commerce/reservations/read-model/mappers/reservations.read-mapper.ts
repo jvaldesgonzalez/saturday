@@ -10,6 +10,7 @@ export namespace ReservationReadMapper {
     delete db.createdAt;
     const preReturn: ReservationReadResponse = {
       ...db,
+      isCancelled: db.isCancelled || false,
       event: {
         ...db.event,
         dateTimeEnd: parseDate(db.event.dateTimeEnd),

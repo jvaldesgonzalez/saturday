@@ -42,4 +42,5 @@ export class ReservationReadFromDBEntity {
   toPay: number;
   isValidated: boolean;
   createdAt: DateTime<number>;
+  isCancelled: boolean;
 }

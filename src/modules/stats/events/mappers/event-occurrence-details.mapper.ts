@@ -78,9 +78,7 @@ export namespace EventOccurrenceDetailsMapper {
                       expectation: tk.total,
                       value: tk.sold,
                       name: tk.name,
-                      trailing: `${tk.sold}/${tk.total} = ${
-                        Number(tk.price) * tk.sold
-                      }`,
+                      trailing: `${Number(tk.price) * tk.sold}CUP`,
                     };
                   }),
                 ])

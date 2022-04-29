@@ -46,9 +46,18 @@ export class ConfirmReservation
         new UniqueEntityID(reservationOrNone._id.toString()),
       );
 
+      const meta = await this.repo.getTicketMetadata(
+        new UniqueEntityID(reservationOrNone.ticketId),
+      );
+
       if (reservationOrNone.isValidated)
         return left(
           new ConfirmReservationErrors.ReservationIsVerified({
+            ...meta,
+            name: reservationOrNone.ticketName,
+            price: reservationOrNone.ticketPrice,
+            description: reservationOrNone.ticketDescription,
+            amountOfTickets: reservationOrNone.amountOfTickets,
             user: userData,
             verifiedAt: reservationOrNone.updatedAt,
           }),
@@ -56,9 +65,6 @@ export class ConfirmReservation
 
       reservationOrNone.validate();
       await this.repo.save(reservationOrNone);
-      const meta = await this.repo.getTicketMetadata(
-        new UniqueEntityID(reservationOrNone.ticketId),
-      );
       return right(
         Ok({
           ...meta,
