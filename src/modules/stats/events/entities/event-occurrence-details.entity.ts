@@ -1,4 +1,4 @@
-import { ApiResponseProperty, OmitType } from '@nestjs/swagger';
+import { ApiResponseProperty } from '@nestjs/swagger';
 import { DateTime } from 'neo4j-driver-core';
 import { ListChartJSON } from '../../charts/list.chart';
 import { PieBarChartJSON } from '../../charts/pie-bar.chart';

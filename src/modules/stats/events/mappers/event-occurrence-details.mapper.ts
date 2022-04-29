@@ -74,11 +74,12 @@ export namespace EventOccurrenceDetailsMapper {
                     trailing: '',
                   },
                   ...o.tickets.map((tk) => {
+                    console.log(tk.price);
                     return {
                       expectation: tk.total,
                       value: tk.sold,
                       name: tk.name,
-                      trailing: `${Number(tk.price) * tk.sold}CUP`,
+                      trailing: `${Number(tk.price) * tk.sold} CUP`,
                     };
                   }),
                 ])
