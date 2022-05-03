@@ -30,7 +30,7 @@ export class PublicationsReadService {
 					AND size([(p)--(e:Event) WHERE e.dateTimeEnd > $now|e ]) > 2
 					)
 				OR (p:EmbeddedCollection 
-					AND size([(:User {id:$meId})-[:PREFER_CATEGORY]->(c:Category)-[r:HAS_EMBEDDED_COLLECTION]->(p)<-[r]-(c)-[:HAS_CATEGORY]-(e:Event) WHERE e.dateTimeEnd > $now | e]) > 2
+					AND size([(:User {id:$meId})-[:PREFER_CATEGORY]->(c:Category)-[rel:HAS_EMBEDDED_COLLECTION]->(p)<-[rel]-(c)-[:HAS_CATEGORY]-(e:Event) WHERE e.dateTimeEnd > $now | e]) > 2
 					)
 				CALL apoc.case([
 					p:Event,
@@ -207,12 +207,12 @@ export class PublicationsReadService {
 							description:item.description,
 							events:collect(events),
 							isMini:true,
-							likePrediction:apoc.coll.avg(collect(events.likePrediction))
+							likePrediction:apoc.coll.avg(collect(events.likePrediction)),
 							createdAt:item.createdAt
 						} as result'
 				],
 				'return null as result',
-				{item:p,meId:$meId}) YIELD value
+				{item:p,meId:$meId,now:$now}) YIELD value
 				return value.result as r
 				ORDER BY r.likePrediction DESC
 			`,
@@ -224,6 +224,7 @@ export class PublicationsReadService {
           .skip(skip)
           .limit(limit)
           .map((r) => {
+            console.log(r);
             delete r.createdAt;
             if (r.type === 'collection') console.log(r.name);
             return r.type === 'event'

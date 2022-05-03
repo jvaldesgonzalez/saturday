@@ -15,7 +15,7 @@ export class AdamicAdarRoutineCron {
     this.logger = new Logger('RemoveStoriesDailyCron');
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_2AM)
+  @Cron(CronExpression.EVERY_2_HOURS)
   handleCron() {
     this.logger.log(
       'Running Adamic-Adar link-prediction routine for users and events',
