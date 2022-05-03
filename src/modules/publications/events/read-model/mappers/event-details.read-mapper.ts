@@ -17,7 +17,7 @@ export namespace EventDetailsReadMapper {
               {
                 color: '#1FCF85',
                 description: 'Descuento del 10% para todos los eventos',
-                title: 'Descuento 10%',
+                title: '10% OFF',
               },
               ...r.attentionTags,
             ]

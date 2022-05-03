@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@bitnine-oss/ag-driver": "^0.1.0",
+    "@casl/ability": "^5.4.3",
     "@liberation-data/agensgraph": "^0.1.0-rc",
     "@liberation-data/drivine": "^2.1.3",
     "@nestjs/axios": "^0.0.3",
