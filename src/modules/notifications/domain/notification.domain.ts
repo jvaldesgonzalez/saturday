@@ -20,6 +20,7 @@ type NotificationProps = {
   recipientId: RecipientId[];
   userData?: NotificationUserData;
   eventData?: NotificationEventData;
+  reservationId?: string;
   createdAt: Date;
   updatedAt: Date;
   viewed: boolean;
@@ -52,6 +53,10 @@ export abstract class BaseNotification extends AggregateDomainEntity<Notificatio
   }
 
   get eventData(): NotificationEventData {
+    return null;
+  }
+
+  get reservationId(): string {
     return null;
   }
 
@@ -195,6 +200,48 @@ export class EventPublishedNotification extends BaseNotification {
   ): Result<EventPublishedNotification> {
     return Ok(
       new EventPublishedNotification(
+        {
+          ...props,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          viewed: false,
+        },
+        id,
+      ),
+    );
+  }
+}
+
+export class EventCancelledNotification extends BaseNotification {
+  get title(): string {
+    return 'Evento Cancelado';
+  }
+
+  get body(): string {
+    return `${this.props.userData.username} ha cancelado el evento ${this.props.eventData.name}.`;
+  }
+  get type(): NotificationType {
+    return NotificationType.EventCancelled;
+  }
+
+  get userData() {
+    return this.props.userData!;
+  }
+
+  get eventData() {
+    return this.props.eventData!;
+  }
+
+  get reservationId(): string {
+    return this.props.reservationId!;
+  }
+
+  public static create(
+    props: NewNotificationProps,
+    id: UniqueEntityID,
+  ): Result<EventSharedNotification> {
+    return Ok(
+      new EventCancelledNotification(
         {
           ...props,
           createdAt: new Date(),

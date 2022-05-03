@@ -3,7 +3,7 @@ import { AuthProvider } from '../../domain/value-objects/auth-provider.value';
 import { Gender } from '../../domain/value-objects/gender.value';
 
 export type CreateUserDto = {
-  fullname: string;
+  fullname?: string;
   birthday?: Date;
   description: string;
   gender?: Gender;

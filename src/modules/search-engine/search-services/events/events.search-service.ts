@@ -53,7 +53,7 @@ export class EventSearchService implements ISearchService<EventItem> {
         ${locationId ? 'AND l.id = $locationId' : ''}
 				${
           priceInterval
-            ? 'AND node.basePrice >= $fromPrice AND node.topPrice <= $toPrice'
+            ? 'AND size([(node)--(occ:EventOccurrence)--(t:Ticket) WHERE ( t.price >= $fromPrice AND t.price <= $toPrice ) | occ]) > 0 '
             : ''
         } 
 				RETURN {

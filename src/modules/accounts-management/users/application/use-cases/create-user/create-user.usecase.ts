@@ -39,6 +39,7 @@ export class CreateUser implements IUseCase<CreateUserDto, Response> {
 
       const userOrError = User.new({
         ...request,
+        fullname: request.fullname || request.username,
         categoryPreferences,
         isActive: true,
         locationId,

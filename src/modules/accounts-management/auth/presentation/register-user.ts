@@ -25,9 +25,8 @@ export class RegisterUserRequest {
   @IsNotEmpty()
   loginParams: LoginParams;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  fullname: string;
+  @ApiPropertyOptional()
+  fullname?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

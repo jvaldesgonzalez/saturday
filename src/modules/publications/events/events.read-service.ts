@@ -4,12 +4,11 @@ import {
   QuerySpecification,
 } from '@liberation-data/drivine';
 import { Injectable } from '@nestjs/common';
-import { DateTime, Integer } from 'neo4j-driver-core';
+import { Integer } from 'neo4j-driver-core';
+import { CreateNotification } from 'src/modules/notifications/application/use-cases/createNotification/create-notification.usecase';
+import { NotificationType } from 'src/modules/notifications/enums/notification-type';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
-import {
-  makeDate,
-  parseDate,
-} from 'src/shared/modules/data-access/neo4j/utils';
+import { makeDate } from 'src/shared/modules/data-access/neo4j/utils';
 import { TextUtils } from 'src/shared/utils/text.utils';
 import { EventDetails } from './presentation/event-details';
 import { EventDetailsReadMapper } from './read-model/mappers/event-details.read-mapper';
@@ -18,6 +17,7 @@ import { EventDetailsReadMapper } from './read-model/mappers/event-details.read-
 export class EventsReadService {
   constructor(
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
+    private notify: CreateNotification,
   ) {}
 
   async getEventDetails(
@@ -290,7 +290,7 @@ export class EventsReadService {
     eventId: string;
     closedTickets: { userId: string; ticketId: string }[];
   }> {
-    return await this.persistenceManager.getOne<{
+    const ret = await this.persistenceManager.getOne<{
       eventId: string;
       closedTickets: { userId: string; ticketId: string }[];
     }>(
@@ -307,5 +307,39 @@ export class EventsReadService {
 				`,
       ).bind({ oId: theOccurrenceId }),
     );
+    this.notifyBuyers(
+      [...new Set(ret.closedTickets.map((t) => t.ticketId))],
+      ret.eventId,
+    );
+    return ret;
+  }
+
+  async notifyBuyers(theTicketsId: string[], eventId: string): Promise<void> {
+    const notificationData = await this.persistenceManager.query<{
+      recipient: string;
+      reservationId: string;
+      publisher: string;
+    }>(
+      QuerySpecification.withStatement(
+        `
+					MATCH (p:Partner)--(e:Event)--(o:EventOccurrence)--(t:Ticket)--(r:Reservation)--(buyer:User)
+					WHERE t.id IN $ticketsId
+					RETURN {
+						recipient:buyer.id,
+						publisher:p.id,
+						reservationId: r.id
+					}
+			`,
+      ).bind({ ticketsId: theTicketsId }),
+    );
+    for (const data of notificationData) {
+      this.notify.execute({
+        recipientId: [data.recipient],
+        eventId: eventId,
+        userId: data.publisher,
+        reservationId: data.reservationId,
+        type: NotificationType.EventCancelled,
+      });
+    }
   }
 }

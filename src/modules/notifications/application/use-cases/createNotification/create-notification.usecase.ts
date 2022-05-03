@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import {
   BaseNotification,
+  EventCancelledNotification,
   EventPublishedNotification,
   EventSharedNotification,
   FriendRequestNotification,
@@ -36,7 +37,6 @@ export class CreateNotification
       request.eventId,
       request.userId,
     );
-    console.log(notificationData);
 
     let notification: BaseNotification;
 
@@ -72,6 +72,16 @@ export class CreateNotification
         notification = EventPublishedNotification.create(
           {
             ...notificationData,
+            recipientId: request.recipientId.map((i) => new UniqueEntityID(i)),
+          },
+          new UniqueEntityID(),
+        ).getValue();
+        break;
+      case NotificationType.EventCancelled:
+        notification = EventCancelledNotification.create(
+          {
+            ...notificationData,
+            reservationId: request.reservationId,
             recipientId: request.recipientId.map((i) => new UniqueEntityID(i)),
           },
           new UniqueEntityID(),
