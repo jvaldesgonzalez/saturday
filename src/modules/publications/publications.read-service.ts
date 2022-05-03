@@ -29,7 +29,8 @@ export class PublicationsReadService {
 				OR (p:Collection 
 					AND size([(p)--(e:Event) WHERE e.dateTimeEnd > $now|e ]) > 2
 					)
-				OR (size([(:User {id:$meId})-[:PREFER_CATEGORY]->(c:Category)-[:HAS_EMBEDDED_COLLECTION]->(p)-[:PREFER_CATEGORY]-(c)-[:HAS_CATEGORY]-(e:Event) WHERE e.dateTimeEnd > $now | e]) > 2
+				OR (p:EmbeddedCollection 
+					AND size([(:User {id:$meId})-[:PREFER_CATEGORY]->(c:Category)-[r:HAS_EMBEDDED_COLLECTION]->(p)<-[r]-(c)-[:HAS_CATEGORY]-(e:Event) WHERE e.dateTimeEnd > $now | e]) > 2
 					)
 				CALL apoc.case([
 					p:Event,
