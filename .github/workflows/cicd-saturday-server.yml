@@ -10,7 +10,7 @@ jobs:
       - name: notify process initialization
         uses: appleboy/telegram-action@master
         with:
-          to: -583932975 #806567508
+          to: -1001641820276
           token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w
           args: |
             "💻 New commit pushed!!"
@@ -29,7 +29,7 @@ jobs:
       - name: notify image pushed
         uses: appleboy/telegram-action@master
         with:
-          to: -583932975 #806567508
+          to: -1001641820276
           token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w
           args: |
             "New image pushed to docker registry [registry.saturdayhub.com]"
@@ -45,7 +45,7 @@ jobs:
       - name: notify deploy finished
         uses: appleboy/telegram-action@master
         with:
-          to: -583932975 #806567508
+          to: -1001641820276
           token: 1745032824:AAHlK2UlsX1JIcy2I48vFExw-nJfwQwg84w
           args: |
             "New version deployed to https://api.saturdayhub.com"
