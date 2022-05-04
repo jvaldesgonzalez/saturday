@@ -4,6 +4,7 @@ import {
   QuerySpecification,
   Transactional,
 } from '@liberation-data/drivine';
+import { setInitialScore } from 'src/modules/recommender/scripts/update-score.script';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import { BaseRepository } from 'src/shared/modules/data-access/neo4j/base.repository';
 import { makeDate } from 'src/shared/modules/data-access/neo4j/utils';
@@ -67,7 +68,7 @@ export class EventRepository
 				SET event:Publication
         `,
       ).bind({
-        data,
+        data: { ...data, score: setInitialScore() },
         publisher: publisher,
         eId: id,
         cId: category,

@@ -6,6 +6,8 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Integer } from 'neo4j-driver-core';
 import { EventDetails } from 'src/modules/publications/events/presentation/event-details';
+import { ScoringService } from 'src/modules/recommender/scoring.service';
+import { updateScoreWithLike } from 'src/modules/recommender/scripts/update-score.script';
 import { PaginatedFindResult } from 'src/shared/core/PaginatedFindResult';
 import { UniqueEntityID } from 'src/shared/domain/UniqueEntityID';
 import {
@@ -23,6 +25,7 @@ export class LikeService
 {
   constructor(
     @InjectPersistenceManager() private persistenceManager: PersistenceManager,
+    private scoring: ScoringService,
   ) {}
 
   async getOutgoings(
@@ -324,6 +327,7 @@ export class LikeService
         now: makeDate(new Date()),
       }),
     );
+    this.scoring.updateScore(interaction.to.toString(), updateScoreWithLike);
   }
 
   async drop(

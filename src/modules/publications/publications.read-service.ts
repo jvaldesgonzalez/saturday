@@ -52,7 +52,7 @@ export class PublicationsReadService {
 							name:e.name,
 							occurrences:[],
 							info:e.description,
-							likePrediction: CASE WHEN rPrediction IS NULL THEN 0 ELSE rPrediction.score END,
+							likePrediction: e.score * (CASE WHEN rPrediction IS NULL THEN 1.1 ELSE rPrediction.score END),
 							publisher:{
 								id:p.id,
 								avatar:p.avatar,
@@ -105,7 +105,7 @@ export class PublicationsReadService {
 							name:e.name,
 							occurrences:[],
 							info:e.description,
-							likePrediction: CASE WHEN rPrediction IS NULL THEN 0 ELSE rPrediction.score END,
+							likePrediction: e.score * (CASE WHEN rPrediction IS NULL THEN 1.1 ELSE rPrediction.score END),
 							publisher:{
 								id:p.id,
 								avatar:p.avatar,
@@ -166,7 +166,7 @@ export class PublicationsReadService {
 							name:e.name,
 							occurrences:[],
 							info:e.description,
-							likePrediction: CASE WHEN rPrediction IS NULL THEN 0 ELSE rPrediction.score END,
+							likePrediction: e.score * (CASE WHEN rPrediction IS NULL THEN 1.1 ELSE rPrediction.score END),
 							publisher:{
 								id:p.id,
 								avatar:p.avatar,

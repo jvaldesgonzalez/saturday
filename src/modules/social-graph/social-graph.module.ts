@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CreateNotification } from '../notifications/application/use-cases/createNotification/create-notification.usecase';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { RecommenderModule } from '../recommender/recommender.module';
 import {
   EventsGraphController,
   PartnersGraphController,
@@ -16,7 +17,7 @@ import { ShareService } from './social-services/share/share.service';
 import { ViewStoryService } from './social-services/view-story/view-story.service';
 
 @Module({
-  imports: [NotificationsModule],
+  imports: [NotificationsModule, RecommenderModule],
   providers: [
     LikeService,
     FollowService,
