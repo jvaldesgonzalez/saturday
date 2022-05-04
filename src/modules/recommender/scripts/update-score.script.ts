@@ -1,6 +1,6 @@
 import { compose } from 'lodash/fp';
 
-const daysRate = 2; //decaying by 2 days
+const daysRate = 1; //decaying by 2 days
 const millisecondsInDaysRate = daysRate * 24 * 3.6e6;
 const rate = 1 / millisecondsInDaysRate;
 
