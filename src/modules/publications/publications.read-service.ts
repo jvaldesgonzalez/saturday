@@ -214,7 +214,7 @@ export class PublicationsReadService {
 				'return null as result',
 				{item:p,meId:$meId,now:$now}) YIELD value
 				return value.result as r
-				ORDER BY r.likePrediction DESC
+				ORDER BY r.likePrediction DESC ,r.createdAt DESC
 			`,
         )
           .bind({
