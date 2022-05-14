@@ -34,7 +34,7 @@ export class AppleProvider implements IAppleProvider {
       authProviderId: jwtPayload.sub,
       gender: Gender.PreferNotSay,
       avatar:
-        'https://s3.saturdayhub.com/avatars/avatars-' +
+        'https://s3.saturdayhub.com/media/avatars/avatars-' +
         randomInt(1, 100).toString().padStart(2, '0') +
         '.jpg',
     };

@@ -26,7 +26,7 @@ export class FacebookProvider implements IFacebookProvider {
     return {
       fullname: data.name,
       avatar:
-        'https://s3.saturdayhub.com/avatars/avatars-' +
+        'https://s3.saturdayhub.com/media/avatars/avatars-' +
         randomInt(1, 100).toString().padStart(2, '0') +
         '.png',
       authProviderId: data.id,

@@ -32,7 +32,7 @@ export class GoogleProvider implements IGoogleProvider {
     return {
       fullname: data.names ? data.names[0].displayName : null,
       avatar:
-        'https://s3.saturdayhub.com/avatars/avatars-' +
+        'https://s3.saturdayhub.com/media/avatars/avatars-' +
         randomInt(1, 100).toString().padStart(2, '0') +
         '.jpg',
       authProviderId: data.resourceName.split('/')[1],
