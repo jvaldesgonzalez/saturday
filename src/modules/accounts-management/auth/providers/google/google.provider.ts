@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { randomInt } from 'crypto';
 import { AuthProvider } from 'src/modules/accounts-management/users/domain/value-objects/auth-provider.value';
 import { Gender } from 'src/modules/accounts-management/users/domain/value-objects/gender.value';
 import { RegisterUserDto } from '../../application/dtos/register-user.dto';
@@ -30,7 +31,10 @@ export class GoogleProvider implements IGoogleProvider {
     console.log(data);
     return {
       fullname: data.names ? data.names[0].displayName : null,
-      avatar: data.photos ? data.photos[0].url.split('=s')[0] + '=s500' : null,
+      avatar:
+        'https://s3.saturdayhub.com/avatars/avatars-' +
+        randomInt(1, 100).toString().padStart(2, '0') +
+        '.jpg',
       authProviderId: data.resourceName.split('/')[1],
       authProvider: AuthProvider.Google,
       email: data.emailAddresses[0].value,

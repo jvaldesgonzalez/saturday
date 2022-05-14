@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { randomInt } from 'crypto';
 import { AuthProvider } from 'src/modules/accounts-management/users/domain/value-objects/auth-provider.value';
 import { Gender } from 'src/modules/accounts-management/users/domain/value-objects/gender.value';
 import { RegisterUserDto } from '../../application/dtos/register-user.dto';
@@ -24,7 +25,10 @@ export class FacebookProvider implements IFacebookProvider {
 
     return {
       fullname: data.name,
-      avatar: data.picture.data.url,
+      avatar:
+        'https://s3.saturdayhub.com/avatars/avatars-' +
+        randomInt(1, 100).toString().padStart(2, '0') +
+        '.png',
       authProviderId: data.id,
       authProvider: AuthProvider.Facebook,
       email: data.email,
