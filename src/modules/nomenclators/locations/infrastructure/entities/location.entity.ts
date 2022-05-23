@@ -7,4 +7,6 @@ export class LocationEntity extends PersistentEntity {
   active: boolean;
   enclosingPolygon: Point[];
   imageUrl: string;
+  latitude: number;
+  longitude: number;
 }
