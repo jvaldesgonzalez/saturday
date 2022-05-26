@@ -29,7 +29,9 @@ export class PaymentMethodsReadService {
 				OPTIONAL MATCH (t)-[:ALLOW]-(pm:PaymentMethod)-[:IS_GATEWAY_FOR]-(pw:PaymentGateway)
 				RETURN {
 					code:pm.code,
-					gateways:collect(distinct pw{.code, .name, .constraints})
+					name:pm.name,
+					description:pm.description,
+					gateways:collect(distinct pw{.code, .name, .constraints, .logo})
 				}
 				`,
       )

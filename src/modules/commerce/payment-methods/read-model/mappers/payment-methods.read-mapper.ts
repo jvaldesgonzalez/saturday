@@ -16,6 +16,7 @@ export namespace PaymentMethodReadMapper {
             return {
               code: gw.code,
               name: gw.name,
+              logo: gw.logo,
               allowed: true,
               reasons: [],
             };
