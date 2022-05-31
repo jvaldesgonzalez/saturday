@@ -23,14 +23,10 @@ class PaymentGateway {
   logo: string;
   allowed: boolean;
   reasons: string[];
-}
-
-class PaymentMethod {
-  code: string;
-  gateways: PaymentGateway[];
+  methodCode: string;
 }
 
 export class PaymentMethodsReadEntity {
   ticketId: string;
-  methods: PaymentMethod[];
+  gateways: PaymentGateway[];
 }

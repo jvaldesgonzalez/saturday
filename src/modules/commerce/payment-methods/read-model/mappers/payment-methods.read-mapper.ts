@@ -8,21 +8,21 @@ export namespace PaymentMethodReadMapper {
     db: PaymentMethodsFromDbEntity,
   ): PaymentMethodsReadEntity {
     return {
-      ...db,
-      methods: db.methods.map((m) => {
-        return {
-          ...m,
-          gateways: m.gateways.map((gw) => {
+      ticketId: db.ticketId,
+      gateways: db.methods
+        .flatMap((m) => {
+          return m.gateways.map((gw) => {
             return {
               code: gw.code,
               name: gw.name,
               logo: gw.logo,
               allowed: true,
               reasons: [],
+              methodCode: m.code,
             };
-          }),
-        };
-      }),
+          });
+        })
+        .sort((a, _) => Number(a.methodCode == 'online_payment')),
     };
   }
 
