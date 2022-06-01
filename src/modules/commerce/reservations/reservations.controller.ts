@@ -106,6 +106,14 @@ export class ReservationsController {
     }
   }
 
+  @Post('/payments/enzona')
+  async createPayment(
+    @Body() data: CreateReservationBody,
+    @CurrentUser() payload: JWTClaim,
+  ) {
+    return { redirectTo: 'https://app.saturdayhub.com/sandboxpayment' };
+  }
+
   @Post('/:id/cancel')
   @ApiParam({ name: 'id', type: String })
   async cancelReservation(
