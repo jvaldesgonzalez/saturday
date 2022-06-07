@@ -87,5 +87,5 @@ export class RegisterPartnerRequest {
   aditionalBusinessData: BusinessDescription[];
 
   @ApiPropertyOptional({ type: [BusinessDescription] })
-  additionalBusinessData: BusinessDescription[];
+  additionalBussinessData: BusinessDescription[];
 }

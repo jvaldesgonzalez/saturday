@@ -211,7 +211,7 @@ export class AuthController {
     const result = await this.registerPartnerUC.execute({
       ...rest,
       aditionalBusinessData:
-        data.aditionalBusinessData || data.aditionalBusinessData,
+        data.aditionalBusinessData || data.additionalBussinessData,
       firebasePushId: fcmToken,
     });
     if (result.isLeft()) {
