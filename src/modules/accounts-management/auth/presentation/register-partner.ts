@@ -83,7 +83,9 @@ export class RegisterPartnerRequest {
   @ApiPropertyOptional({ type: Place })
   place: Place;
 
-  @ApiProperty({ type: [BusinessDescription] })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ type: [BusinessDescription] })
   aditionalBusinessData: BusinessDescription[];
+
+  @ApiPropertyOptional({ type: [BusinessDescription] })
+  additionalBusinessData: BusinessDescription[];
 }
