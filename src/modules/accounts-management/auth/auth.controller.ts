@@ -210,6 +210,7 @@ export class AuthController {
     const { ...rest } = data;
     const result = await this.registerPartnerUC.execute({
       ...rest,
+      email: data.email.trim(),
       aditionalBusinessData:
         data.aditionalBusinessData || data.additionalBussinessData,
       firebasePushId: fcmToken,
