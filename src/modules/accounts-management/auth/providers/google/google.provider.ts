@@ -28,7 +28,6 @@ export class GoogleProvider implements IGoogleProvider {
     const { year, month, day } = data.birthdays
       ? data.birthdays[0].date
       : { year: null, month: null, day: null };
-    console.log(data);
     return {
       fullname: data.names ? data.names[0].displayName : null,
       avatar:
