@@ -30,7 +30,7 @@ export class EventsReadService {
           `
 				MATCH (pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
 				(e)-[:HAS_CATEGORY]->(cat:Category)
-				WHERE e.id = $eId
+				WHERE e.id = $eId OR e.slug = $eId
 				OPTIONAL MATCH (e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
 				WHERE o.dateTimeEnd > $now
 				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
