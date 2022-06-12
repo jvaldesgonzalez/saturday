@@ -20,6 +20,65 @@ export class EventsReadService {
     private notify: CreateNotification,
   ) {}
 
+  async getEventDetailsFromWeb(eventId: string): Promise<EventDetails> {
+    return (
+      (await this.persistenceManager.maybeGetOne<EventDetails>(
+        QuerySpecification.withStatement(
+          `
+				MATCH (pl:Place)<-[:HAS_PLACE]-(e:Event)<-[:PUBLISH_EVENT]-(p:Partner),
+				(e)-[:HAS_CATEGORY]->(cat:Category)
+				WHERE e.id = $eId OR e.slug = $eId
+				OPTIONAL MATCH (e)-[:HAS_OCCURRENCE]->(o:EventOccurrence)-[:HAS_TICKET]->(t:Ticket)
+				WHERE o.dateTimeEnd > $now
+				OPTIONAL MATCH (e)-[:HAS_TAG]-(tag:AttentionTag)
+				OPTIONAL MATCH (e)<-[:COLLABORATOR]-(c:Partner)
+				OPTIONAL MATCH (u:User)-[:LIKE]->(e)
+				WITH {
+					id:o.id,
+					dateTimeInit:o.dateTimeInit,
+					dateTimeEnd:o.dateTimeEnd,
+					tickets:collect(distinct t { .id, .price, .name, .amount, .description})
+				} as occ , e, collect(distinct tag { .title, .color, .description}) as tags, p, pl, cat, collect(distinct c {.id,.avatar,.username}) as coll,count(distinct u) as usersInterested ORDER BY occ.dateTimeInit
+				with distinct {
+					id:e.id,
+					name:e.name,
+					occurrences:collect(occ),
+					info:e.description,
+					publisher:{
+						id:p.id,
+						avatar:p.avatar,
+						username:p.username,
+						businessName:p.businessName
+					},
+					category:{
+						name:cat.name,
+						id:cat.id
+					},
+					place:{
+						name:pl.name,
+						address:pl.address,
+						longitude:(pl.longitude),
+						latitude:(pl.latitude)
+					},
+					collaborators: coll,
+					multimedia:e.multimedia,
+					attentionTags: tags,
+					totalUsersInterested: usersInterested,
+					dateTimeInit:e.dateTimeInit,
+					dateTimeEnd:e.dateTimeEnd,
+					basePrice:e.basePrice,
+					slug:e.slug
+				} as eventInfo
+				return eventInfo
+				`,
+        )
+          .bind({ eId: eventId, now: makeDate(new Date()) })
+          .map(EventDetailsReadMapper.toResponse)
+          .transform(EventDetails),
+      )) ?? null
+    );
+  }
+
   async getEventDetails(
     eventId: string,
     userId: string,

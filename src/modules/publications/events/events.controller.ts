@@ -18,6 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser } from 'src/modules/accounts-management/auth/decorators/current-user.decorator';
+import { SkipAuth } from 'src/modules/accounts-management/auth/decorators/skip-auth.decorator';
 import { JWTClaim } from 'src/modules/accounts-management/auth/login-payload.type';
 import { CreateEvent } from './application/usecases/createEvent/create-event.usecase';
 import { EventsReadService } from './events.read-service';
@@ -40,6 +41,15 @@ export class EventsController {
     @CurrentUser() payload: JWTClaim,
   ) {
     const event = await this.readService.getEventDetails(id, payload.id);
+    if (!event) throw new NotFoundException(`Event ${id} not found`);
+    return event;
+  }
+
+  @SkipAuth()
+  @Get('/web/:id')
+  @ApiOkResponse({ type: EventDetails })
+  async getEventDetailsFromWeb(@Param('id') id: string) {
+    const event = await this.readService.getEventDetailsFromWeb(id);
     if (!event) throw new NotFoundException(`Event ${id} not found`);
     return event;
   }

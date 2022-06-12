@@ -16,8 +16,6 @@ import { MetricsModule } from './shared/modules/metrics/metrics.module';
 import { FirebaseAdminModule } from './shared/firebase/firebase.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AttentionTagsModule } from './modules/attention-tags/attention-tags.module';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { LoggingInterceptor } from './modules/logging.interceptor';
 import { RateLimiterModule } from './shared/modules/rate-limiter/rate-limiter.module';
 
 @Module({
@@ -41,12 +39,6 @@ import { RateLimiterModule } from './shared/modules/rate-limiter/rate-limiter.mo
     StatsModule,
     MetricsModule,
     AttentionTagsModule,
-  ],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: LoggingInterceptor,
-    },
   ],
 })
 export class AppModule {}
