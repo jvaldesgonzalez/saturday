@@ -64,7 +64,7 @@ export class ReservationsReadService {
 						name:e.name
 					}
 				} AS reservation
-				ORDER BY (reservation.isValidated OR reservation.event.dateTimeInit < $now), reservation.createdAt DESC
+				ORDER BY (reservation.isValidated OR reservation.event.dateTimeEnd < $now), reservation.createdAt DESC
 			`,
         )
           .bind({
