@@ -13,6 +13,8 @@ COPY . .
 RUN yarn run build
 
 FROM node:16-alpine AS production
+RUN apk update && apk add tzdata
+ENV TZ=America/Havana
 
 WORKDIR /usr/src/app
 
